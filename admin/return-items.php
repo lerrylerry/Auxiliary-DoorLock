@@ -10,9 +10,15 @@ use PHPMailer\PHPMailer\Exception;
 require '../vendor/autoload.php';
 
 // Function to send email notification
-function sendEmailNotification($email, $name, $status, $itemDetails) {
+function sendEmailNotification($email, $name, $status, $itemDetails, $optionalMessage = '') {
     $subject = "Your Return Request Status";
-    $body = "Dear $name,\n\nYour return request has been $status.\n\nDetails:\n$itemDetails\n\nBest regards,\nTUP Auxiliary System";
+    $body = "Dear $name,\n\nYour return request has been $status.\n\nDetails:\n$itemDetails\n\n";
+
+    if (!empty($optionalMessage)) {
+      $body .= "Message from Admin: $optionalMessage\n\n"; // Add the optional message if present
+    }
+
+    $body .= "Best regards,\nTUP Auxiliary System";
 
     try {
         $mail = new PHPMailer(true);
@@ -45,63 +51,72 @@ function sendEmailNotification($email, $name, $status, $itemDetails) {
 }
 
 if (isset($_POST['approvereturn'])) {
-    // Update the return request status to Approved
-    $sqlupdateb = "UPDATE `tbreturn` SET `status`='Approved' WHERE id='" . $_POST['approvereturn'] . "'";
-    mysqli_query($db, $sqlupdateb);
+  // Update the return request status to Approved
+  $sqlupdateb = "UPDATE `tbreturn` SET `status` = 'Approved' WHERE id = '" . $_POST['approvereturn'] . "'";
+  mysqli_query($db, $sqlupdateb);
 
-    $sqlupdatedooraccess = "UPDATE `tbup` SET `dooraccess`='Approved' WHERE id='" . $_POST['userid'] . "'";
-    mysqli_query($db, $sqlupdatedooraccess);
+  // Update the door access status to Approved for the user
+  $sqlupdatedooraccess = "UPDATE `tbup` SET `dooraccess` = 'Approved' WHERE id = '" . $_POST['userid'] . "'";
+  mysqli_query($db, $sqlupdatedooraccess);
 
-    // Update stock and fetch item details
-    $sqlgetitems = "
-        SELECT 
-            tbreturn.id AS return_id, 
-            tbpendingreturn.itemid, 
-            tbpendingreturn.borrowqty, 
-            tbpendingreturn.transid 
-        FROM 
-            tbreturn 
-        INNER JOIN 
-            tbpendingreturn ON tbpendingreturn.transid = tbreturn.id 
-        WHERE 
-            tbpendingreturn.userid = '" . $_POST['userid'] . "' 
-            AND tbreturn.id = '" . $_POST['approvereturn'] . "'
-    ";
-    $listitems = mysqli_query($db, $sqlgetitems);
+  // Fetch the items related to this return request and user
+  $sqlgetitems = "
+      SELECT 
+          tbreturn.id AS return_id, 
+          tbpendingreturn.itemid, 
+          tbpendingreturn.borrowqty, 
+          tbpendingreturn.transid 
+      FROM 
+          tbreturn 
+      INNER JOIN 
+          tbpendingreturn ON tbpendingreturn.transid = tbreturn.id 
+      WHERE 
+          tbpendingreturn.userid = '" . $_POST['userid'] . "' 
+          AND tbreturn.id = '" . $_POST['approvereturn'] . "'
+  ";
+  $listitems = mysqli_query($db, $sqlgetitems);
 
-    $itemDetails = ''; // To hold the item details for the email
+  $itemDetails = ''; // To hold the item details for the email
 
-    while ($itelis = mysqli_fetch_assoc($listitems)) {
-        // Fetch the item name and category
-        $sqlCategory = "SELECT name, category FROM tbproductlist WHERE id='" . $itelis['itemid'] . "'";
-        $resultCategory = mysqli_query($db, $sqlCategory);
+  while ($itelis = mysqli_fetch_assoc($listitems)) {
+      // Fetch the item name and category from tbproductlist
+      $sqlCategory = "SELECT name, category FROM tbproductlist WHERE id = '" . $itelis['itemid'] . "'";
+      $resultCategory = mysqli_query($db, $sqlCategory);
 
-        if ($resultCategory && mysqli_num_rows($resultCategory) > 0) {
-            $rowCategory = mysqli_fetch_assoc($resultCategory);
+      if ($resultCategory && mysqli_num_rows($resultCategory) > 0) {
+          $rowCategory = mysqli_fetch_assoc($resultCategory);
 
-            // Append item details to the email content
-            $itemDetails .= "Item: " . $rowCategory['name'] . "\n";
-            $itemDetails .= "Quantity: " . $itelis['borrowqty'] . "\n";
-            $itemDetails .= "Category: " . $rowCategory['category'] . "\n\n";
+          // Append item details to the email content (you can use this if you plan to send an email later)
+          $itemDetails .= "Item: " . $rowCategory['name'] . "\n";
+          $itemDetails .= "Quantity: " . $itelis['borrowqty'] . "\n";
+          $itemDetails .= "Category: " . $rowCategory['category'] . "\n\n";
 
-            // Update stock based on the return quantity
-            $sqlupdatestock = "UPDATE `tbproductlist` SET `quantity`=`quantity` + " . $itelis['borrowqty'] . " WHERE id='" . $itelis['itemid'] . "'";
-            mysqli_query($db, $sqlupdatestock);
-        }
-    }
+          // Update the stock based on the return quantity (add the borrowed quantity back to stock)
+          $sqlupdatestock = "UPDATE `tbproductlist` 
+                             SET `quantity` = `quantity` + " . $itelis['borrowqty'] . " 
+                             WHERE id = '" . $itelis['itemid'] . "'";
+          mysqli_query($db, $sqlupdatestock);
 
+          // Now that the stock is updated, delete the record from tbpendingreturn
+          $sqldeletependingreturn = "DELETE FROM `tbpendingreturn` WHERE transid = '" . $itelis['transid'] . "' AND itemid = '" . $itelis['itemid'] . "'";
+          mysqli_query($db, $sqldeletependingreturn);
+      }
+  }
     // Get user's email and name for email notification
     $sqlgetuser = "SELECT email, name FROM tbup WHERE id = '" . $_POST['userid'] . "';";
     $user = mysqli_fetch_assoc(mysqli_query($db, $sqlgetuser));
 
+    // Get the optional approval message from the form
+    $optionalMessage = isset($_POST['approvalMessage']) ? $_POST['approvalMessage'] : '';
+
     // Send email notification with item details
-    $emailStatus = sendEmailNotification($user['email'], $user['name'], 'Approved', $itemDetails);
+    $emailStatus = sendEmailNotification($user['email'], $user['name'], 'Approved', $itemDetails, $optionalMessage);
     if ($emailStatus) {
-        // Success: Show success message and redirect to the same page
-        echo "<script>alert('Email sent successfully! The return request has been approved.'); window.location = '" . $_SERVER['PHP_SELF'] . "';</script>";
+        $statusMessage = 'The return request has been approved and the email sent successfully.';
+        $redirectUrl = $_SERVER['PHP_SELF'];
     } else {
-        // Failure: Show error message and redirect to the same page
-        echo "<script>alert('Failed to send email!'); window.location = '" . $_SERVER['PHP_SELF'] . "';</script>";
+        $statusMessage = 'Failed to send email! Please try again.';
+        $redirectUrl = $_SERVER['PHP_SELF'];
     }
 }
 
@@ -114,18 +129,25 @@ if (isset($_POST['rejectreturn'])) {
     $sqlgetuser = "SELECT email, name FROM tbup WHERE id = '" . $_POST['userid'] . "';";
     $user = mysqli_fetch_assoc(mysqli_query($db, $sqlgetuser));
 
-    // Send email notification
-    $emailStatus = sendEmailNotification($user['email'], $user['name'], 'Rejected', '');
+    // Since there's no item detail for rejection, just send the status in the email body
+    $itemDetails = ''; // No items in rejection, leave this empty
+
+    // Get the optional rejection message from the form
+    $optionalMessage = isset($_POST['rejectionMessage']) ? $_POST['rejectionMessage'] : '';
+
+    // Send email notification for rejection
+    $emailStatus = sendEmailNotification($user['email'], $user['name'], 'Rejected', $itemDetails, $optionalMessage);
     if ($emailStatus) {
-        // Success: Show success message and redirect to the same page
-        echo "<script>alert('Email sent successfully! The return request has been rejected.'); window.location = '" . $_SERVER['PHP_SELF'] . "';</script>";
+        $statusMessage = 'The return request has been rejected and the email sent successfully.';
+        $redirectUrl = $_SERVER['PHP_SELF'];  // You may need to set this after rejection
     } else {
-        // Failure: Show error message and redirect to the same page
-        echo "<script>alert('Failed to send email!'); window.location = '" . $_SERVER['PHP_SELF'] . "';</script>";
+        $statusMessage = 'Failed to send email! Please try again.';
+        $redirectUrl = $_SERVER['PHP_SELF'];
     }
+    
 }
 
-$sqlgetsimplifiedlist = "SELECT tbreturn.id as mainid,tbup.name,tbreturn.userid,tbup.id,tbreturn.status FROM `tbreturn` LEFT JOIN tbup ON tbreturn.userid = tbup.id Where tbreturn.status = 'Pending' ORDER BY mainid DESC;";
+$sqlgetsimplifiedlist = "SELECT tbreturn.id as mainid,tbup.name,tbreturn.userid,tbup.id,tbreturn.status,tbreturn.datetime FROM `tbreturn` LEFT JOIN tbup ON tbreturn.userid = tbup.id Where tbreturn.status = 'Pending' ORDER BY mainid DESC;";
 $listsimply = mysqli_query($db, $sqlgetsimplifiedlist);
 ?>
 
@@ -157,7 +179,7 @@ $listsimply = mysqli_query($db, $sqlgetsimplifiedlist);
     <thead class="table-dark">
       <tr>
         <th>Person</th>
-        <th>Status</th>
+        <th>Date</th>
         <th>Action</th>
       </tr>
       <br>
@@ -208,7 +230,7 @@ $listsimply = mysqli_query($db, $sqlgetsimplifiedlist);
 
 
           </td>
-          <td><?php echo $data['status'] ?></td>
+          <td><?php echo $data['datetime'] ?></td>
           <td>
               <?php if ($data['status'] == "Pending") { ?>
                   <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal"
@@ -225,7 +247,10 @@ $listsimply = mysqli_query($db, $sqlgetsimplifiedlist);
                                           aria-label="Close"></button>
                               </div>
                               <div class="modal-body">
-                                  Are you sure you want to approve this request?
+                              <p id="approveMessage<?php echo $data['mainid'] ?>">Are you sure you want to approve this request for <span class="text-danger"><?php echo $data['name']; ?>?</span></p>
+                                <!-- Optional message input field -->
+                                <form method="post" action="">
+                                <textarea name="approvalMessage" class="form-control" placeholder="Optional message" rows="3"></textarea>
                               </div>
                               <div class="modal-footer">
                                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel
@@ -260,7 +285,10 @@ $listsimply = mysqli_query($db, $sqlgetsimplifiedlist);
                                       aria-label="Close"></button>
                           </div>
                           <div class="modal-body">
-                              Are you sure you want to reject this request?
+                          <p id="approveMessage<?php echo $data['mainid'] ?>">Are you sure you want to approve this request for <span class="text-danger"><?php echo $data['name']; ?>?</span></p>
+                            <!-- Optional message input field -->
+                            <form method="post" action="">
+                            <textarea name="rejectionMessage" class="form-control" placeholder="Optional message" rows="3"></textarea>
                           </div>
                           <div class="modal-footer">
                               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel
@@ -268,6 +296,7 @@ $listsimply = mysqli_query($db, $sqlgetsimplifiedlist);
                               <form method="post" action="">
                                   <input type="hidden" class="form-control" name="rejectreturn"
                                          value="<?php echo $data['mainid'] ?>">
+                                  <input type="hidden" class="form-control" name="userid" value="<?php echo $data['userid']; ?>">
                                   <button type="submit" class="btn btn-danger">Reject</button>
                               </form>
                           </div>
@@ -283,7 +312,6 @@ $listsimply = mysqli_query($db, $sqlgetsimplifiedlist);
   </table>
 </div>
 </section>
-<script src="static/script.js"></script>
 
 <!-- Bootstrap JS (jQuery is required) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -293,25 +321,6 @@ $listsimply = mysqli_query($db, $sqlgetsimplifiedlist);
 <!-- Bootstrap Bundle (Popper.js is required) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-  $(document).ready(function() {
-    $('#itemRequestTable').DataTable();
-
-    // Handle click event on person link to populate modal with product details
-    $('.personLink').on('click', function() {
-      $('#productName').val('Product A').prop('disabled', true);
-      $('#unit').val('PCS').prop('disabled', true);
-      $('#quantity').val('10').prop('disabled', true);
-    });
-  });
-  $(document).ready(function() {
-    $('#personModal').DataTable({
-      "paging": false, // Disable pagination
-      "searching": false, // Disable search
-      "info": false // Disable show entries info
-    });
-  });
-</script>
 
 <!-- Person Details Modal -->
 <div class="modal fade" id="personDetailsModal" tabindex="-1" aria-labelledby="personDetailsModalLabel" aria-hidden="true">
@@ -387,5 +396,103 @@ $listsimply = mysqli_query($db, $sqlgetsimplifiedlist);
     </div>
   </div>
 </div>
+
+<!-- Success Modal -->
+<div id="successModal" class="modal fade" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="successModalLabel">Success</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="successMessage">Success message will go here</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Error Modal -->
+<div id="errorModal" class="modal fade" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="errorModalLabel">Error</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="errorMessage">Error message will go here</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function () {
+    // Initialize the main DataTable for itemRequestTable
+    var itemRequestTable = $('#itemRequestTable').DataTable();
+
+    // Handle modal visibility and email status (Success or Failure) based on approval or rejection
+    <?php if (isset($statusMessage)) { ?>
+        var statusMessage = "<?php echo $statusMessage; ?>";
+        if (statusMessage.includes('rejected')) {
+            // If the status message is about rejection
+            $('#successMessage').text(statusMessage); // Set the success message for rejection
+        } else {
+            // Handle other cases (approvals or others)
+            $('#successMessage').text(statusMessage);
+        }
+
+        $('#successModal').modal('show');
+        setTimeout(function () {
+            window.location = '<?php echo $redirectUrl; ?>';  // Ensure proper redirect after message
+        }, 2000);
+    <?php } ?>
+
+
+    // Handle actions when approving a borrow request
+    $('.approvereturn').on('click', function () {
+        // Show the success modal if approved
+        $('#approveModal').modal('show');
+    });
+
+    // Handle actions when rejecting a borrow request
+    $('.rejectreturn').on('click', function () {
+        // Show the reject modal if rejected
+        $('#rejectModal').modal('show');
+    });
+
+    // Handle click event on person link to populate modal with product details
+    $('.personLink').on('click', function () {
+        // Populating product details in the modal
+        $('#productName').val('Product A').prop('disabled', true);
+        $('#unit').val('PCS').prop('disabled', true);
+        $('#quantity').val('10').prop('disabled', true);
+    });
+
+    // Handle modal visibility and initialize DataTable for the person details modal only when it's shown
+    $('#personDetailsModal').on('shown.bs.modal', function () {
+        // Initialize DataTable for the modal if it's not already initialized
+        if (!$.fn.dataTable.isDataTable('#personModal')) {
+            $('#personModal').DataTable({
+                "paging": false, // Disable pagination
+                "searching": false, // Disable search
+                "info": false // Disable show entries info
+            });
+        }
+    });
+
+    // Optional: Handle DataTable re-initialization for other modals (if required)
+    // If you need to dynamically populate modals and then initialize DataTable
+    $('#personModal').DataTable({
+        "paging": false,
+        "searching": false,
+        "info": false
+    });
+});
+</script>
+
+<script src="static/script.js"></script>
+
 </body>
 </html>

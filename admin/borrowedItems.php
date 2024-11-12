@@ -10,9 +10,15 @@ use PHPMailer\PHPMailer\Exception;
 require '../vendor/autoload.php';
 
 // Function to send email notification
-function sendEmailNotification($email, $name, $status, $itemDetails) {
+function sendEmailNotification($email, $name, $status, $itemDetails, $optionalMessage = '') {
     $subject = "Your Borrow Request Status";
-    $body = "Dear $name,\n\nYour borrow request has been $status.\n\nDetails:\n$itemDetails\n\nBest regards,\nTUP Auxiliary System";
+    $body = "Dear $name,\n\nYour borrow request has been $status.\n\nDetails:\n$itemDetails\n\n";
+
+    if (!empty($optionalMessage)) {
+        $body .= "Message from Admin: $optionalMessage\n\n"; // Add the optional message if present
+    }
+
+    $body .= "Best regards,\nTUP Auxiliary System";
 
     try {
         $mail = new PHPMailer(true);
@@ -122,25 +128,19 @@ if (isset($_POST['approveborrow'])) {
     $sqlgetuser = "SELECT email, name FROM tbup WHERE id = '" . $_POST['userid'] . "';";
     $user = mysqli_fetch_assoc(mysqli_query($db, $sqlgetuser));
 
+    // Get the optional approval message from the form
+    $optionalMessage = isset($_POST['approvalMessage']) ? $_POST['approvalMessage'] : '';
+
     // Send email notification with item details
-    $emailStatus = sendEmailNotification($user['email'], $user['name'], 'Approved', $itemDetails);
+    $emailStatus = sendEmailNotification($user['email'], $user['name'], 'Approved', $itemDetails, $optionalMessage);
     if ($emailStatus) {
-        // Success: Show success message and redirect to the same page
-        echo "<script>
-            document.getElementById('successMessage').textContent = 'The borrow request has been approved and the email sent successfully.';
-            $('#successModal').modal('show');
-            setTimeout(function() { window.location = '" . $_SERVER['PHP_SELF'] . "'; }, 2000);
-        </script>";
+        $statusMessage = 'The borrow request has been approved and the email sent successfully.';
+        $redirectUrl = $_SERVER['PHP_SELF'];
     } else {
-        // Failure: Show error message and redirect to the same page
-        echo "<script>
-            document.getElementById('errorMessage').textContent = 'Failed to send approval email! Please try again.';
-            $('#errorModal').modal('show');
-            setTimeout(function() { window.location = '" . $_SERVER['PHP_SELF'] . "'; }, 2000);
-        </script>";
+        $statusMessage = 'Failed to send email! Please try again.';
+        $redirectUrl = $_SERVER['PHP_SELF'];
     }
 }
-
 
 if (isset($_POST['rejectborrow'])) {
     // Update the borrow request status to Rejected
@@ -164,29 +164,24 @@ if (isset($_POST['rejectborrow'])) {
     // Since there's no item detail for rejection, just send the status in the email body
     $itemDetails = ''; // No items in rejection, leave this empty
 
+    // Get the optional rejection message from the form
+    $optionalMessage = isset($_POST['rejectionMessage']) ? $_POST['rejectionMessage'] : '';
+
     // Send email notification for rejection
-    $emailStatus = sendEmailNotification($user['email'], $user['name'], 'Rejected', $itemDetails);
+    $emailStatus = sendEmailNotification($user['email'], $user['name'], 'Rejected', $itemDetails, $optionalMessage);
     if ($emailStatus) {
-        // Success: Show success message and redirect to the same page
-        echo "<script>
-            document.getElementById('successMessage').textContent = 'The borrow request has been rejected and the email sent successfully.';
-            $('#successModal').modal('show');
-            setTimeout(function() { window.location = '" . $_SERVER['PHP_SELF'] . "'; }, 2000);
-        </script>";
+        $statusMessage = 'The borrow request has been rejected and the email sent successfully.';
+        $redirectUrl = $_SERVER['PHP_SELF'];  // You may need to set this after rejection
     } else {
-        // Failure: Show error message and redirect to the same page
-        echo "<script>
-            document.getElementById('errorMessage').textContent = 'Failed to send rejection email! Please try again.';
-            $('#errorModal').modal('show');
-            setTimeout(function() { window.location = '" . $_SERVER['PHP_SELF'] . "'; }, 2000);
-        </script>";
+        $statusMessage = 'Failed to send email! Please try again.';
+        $redirectUrl = $_SERVER['PHP_SELF'];
     }
 }
 
-
-$sqlgetsimplifiedlist = "SELECT tbborrow.id as mainid,tbup.name,tbborrow.userid,tbup.id,tbborrow.status FROM `tbborrow` LEFT JOIN tbup ON tbborrow.userid = tbup.id Where tbborrow.status = 'Pending' ORDER BY mainid DESC;";
+$sqlgetsimplifiedlist = "SELECT tbborrow.id as mainid,tbup.name,tbborrow.userid,tbup.id,tbborrow.status,tbborrow.datetime FROM `tbborrow` LEFT JOIN tbup ON tbborrow.userid = tbup.id Where tbborrow.status = 'Pending' ORDER BY mainid DESC;";
 $listsimply = mysqli_query($db, $sqlgetsimplifiedlist);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -212,7 +207,7 @@ $listsimply = mysqli_query($db, $sqlgetsimplifiedlist);
             <thead class="table-dark">
             <tr>
                 <th>Person</th>
-                <th>Status</th>
+                <th>Date</th>
                 <th>Action</th>
             </tr>
             </thead>
@@ -265,33 +260,31 @@ $listsimply = mysqli_query($db, $sqlgetsimplifiedlist);
 
 
                     </td>
-                    <td><?php echo $data['status'] ?></td>
+                    <td><?php echo $data['datetime'] ?></td>
                     <td>
                         <?php if ($data['status'] == "Pending") { ?>
                             <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal"
                                     data-bs-target="#approveModal<?php echo $data['mainid'] ?>">
                                 <i class="bi bi-check-circle-fill"></i> Approve
                             </button>
-                            <div class="modal fade" id="approveModal<?php echo $data['mainid'] ?>" tabindex="-1"
-                                 aria-labelledby="approveModalLabel" aria-hidden="true">
+                            <!-- Approve Modal -->
+                            <div class="modal fade" id="approveModal<?php echo $data['mainid'] ?>" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             <h5 class="modal-title" id="approveModalLabel">Approve Request</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Close"></button>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
-                                            Are you sure you want to approve this request?
+                                            <p id="approveMessage<?php echo $data['mainid'] ?>">Are you sure you want to approve this request for <span class="text-danger"><?php echo $data['name']; ?>?</span></p>
+                                            <!-- Optional message input field -->
+                                            <form method="post" action="">
+                                                <textarea name="approvalMessage" class="form-control" placeholder="Optional message" rows="3"></textarea>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel
-                                            </button>
-                                            <form method="post" action="">
-                                                <input type="hidden" class="form-control" name="approveborrow"
-                                                       value="<?php echo $data['mainid'] ?>">
-                                                <input type="hidden" class="form-control" name="userid"
-                                                       value="<?php echo $data['userid'] ?>">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <input type="hidden" name="approveborrow" value="<?php echo $data['mainid'] ?>">
+                                                <input type="hidden" name="userid" value="<?php echo $data['userid'] ?>">
                                                 <button type="submit" class="btn btn-success">Approve</button>
                                             </form>
                                         </div>
@@ -307,31 +300,30 @@ $listsimply = mysqli_query($db, $sqlgetsimplifiedlist);
                             <?php } ?>
 
                             <!-- Reject Modal -->
-                            <div class="modal fade" id="rejectModal<?php echo $data['mainid'] ?>" tabindex="-1" aria-labelledby="rejectModalLabel"
-                                aria-hidden="true">
+                            <div class="modal fade" id="rejectModal<?php echo $data['mainid'] ?>" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="rejectModalLabel">Reject Request</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Close"></button>
+                                            <h5 class="modal-title" id="rejectModalLabel">Reject Request: </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
-                                            Are you sure you want to reject this request?
+                                            <p id="rejectMessage<?php echo $data['mainid'] ?>">Are you sure you want to reject this request for <span class="text-danger"><?php echo $data['name']; ?>?</span></p>
+                                            <!-- Optional message input field -->
+                                            <form method="post" action="">
+                                            <textarea name="rejectionMessage" class="form-control" placeholder="Optional message" rows="3"></textarea>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel
-                                            </button>
-                                            <form method="post" action="">
-                                                <input type="hidden" class="form-control" name="rejectborrow" value="<?php echo $data['mainid'] ?>">
-                                                <input type="hidden" class="form-control" name="userid" value="<?php echo $data['userid'] ?>"> <!-- Add this hidden field -->
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            
+                                                <input type="hidden" name="rejectborrow" value="<?php echo $data['mainid'] ?>">
+                                                <input type="hidden" name="userid" value="<?php echo $data['userid'] ?>">
                                                 <button type="submit" class="btn btn-danger">Reject</button>
                                             </form>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
                     </td>
                 </tr>
             <?php } ?>
@@ -369,7 +361,6 @@ $listsimply = mysqli_query($db, $sqlgetsimplifiedlist);
 
     </div>
 </section>
-<script src="static/script.js"></script>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
@@ -383,39 +374,46 @@ $(document).ready(function () {
     var itemRequestTable = $('#itemRequestTable').DataTable();
 
     // Handle modal visibility and email status (Success or Failure) based on approval or rejection
-    <?php if (isset($emailStatus)) { ?>
-        <?php if ($emailStatus) { ?>
-            // Email sent successfully for either Approval or Rejection
-            var statusMessage = "<?php echo isset($statusMessage) ? $statusMessage : ''; ?>";
-            if (statusMessage.includes('Rejected')) {
-                $('#successMessage').text('The borrow request has been rejected and the email sent successfully.');
-            } else {
-                $('#successMessage').text('Email sent successfully! The borrow request has been approved.');
-            }
-            $('#successModal').modal('show');
-            setTimeout(function () {
-                window.location = '<?php echo $_SERVER['PHP_SELF']; ?>';
-            }, 2000);
-        <?php } else { ?>
-            // Failed to send email (Approval or Rejection)
-            $('#errorMessage').text('Failed to send email! Please try again.');
-            $('#errorModal').modal('show');
-            setTimeout(function () {
-                window.location = '<?php echo $_SERVER['PHP_SELF']; ?>';
-            }, 2000);
-        <?php } ?>
+    <?php if (isset($statusMessage)) { ?>
+        var statusMessage = "<?php echo $statusMessage; ?>";
+        if (statusMessage.includes('rejected')) {
+            // If the status message is about rejection
+            $('#successMessage').text(statusMessage); // Set the success message for rejection
+        } else {
+            // Handle other cases (approvals or others)
+            $('#successMessage').text(statusMessage);
+        }
+
+        $('#successModal').modal('show');
+        setTimeout(function () {
+            window.location = '<?php echo $redirectUrl; ?>';  // Ensure proper redirect after message
+        }, 2000);
     <?php } ?>
 
     // Handle actions when approving a borrow request
     $('.approveborrow').on('click', function () {
-        // Show the success modal if approved
+        var submitButton = $(this); // Get the clicked button
+        submitButton.prop('disabled', true);  // Disable the button
+        submitButton.html('<i class="bi bi-arrow-clockwise"></i> Processing...'); // Change button text to indicate it's processing
+        
+        // Open the approve modal
         $('#approveModal').modal('show');
+
+        // Prevent any further clicks until the modal is processed
+        return false;
     });
 
     // Handle actions when rejecting a borrow request
     $('.rejectborrow').on('click', function () {
-        // Show the reject modal if rejected
+        var submitButton = $(this); // Get the clicked button
+        submitButton.prop('disabled', true);  // Disable the button
+        submitButton.html('<i class="bi bi-arrow-clockwise"></i> Processing...'); // Change button text to indicate it's processing
+        
+        // Open the reject modal
         $('#rejectModal').modal('show');
+
+        // Prevent any further clicks until the modal is processed
+        return false;
     });
 
     // Handle click event on person link to populate modal with product details
@@ -447,6 +445,9 @@ $(document).ready(function () {
     });
 });
 </script>
+
+
+<script src="static/script.js"></script>
 
 </body>
 </html>

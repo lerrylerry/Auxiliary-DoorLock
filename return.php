@@ -9,31 +9,58 @@ if (isset($_SESSION['loginid'])) {
     header("location: admin/homepage.php");
 }
 
+// if (isset($_POST['additem'])) {
+//     $sqlinsertp = "INSERT INTO `tbpendingreturn`(`itemid`, `userid`,`borrowqty`) VALUES ('" . $_POST['additem'] . "','" . $_GET['userid'] . "','" . $_POST['qty'] . "')";
+//     mysqli_query($db, $sqlinsertp);
+// }
+
 if (isset($_POST['additem'])) {
-    $sqlinsertp = "INSERT INTO `tbpendingreturn`(`itemid`, `userid`,`borrowqty`) VALUES ('" . $_POST['additem'] . "','" . $_GET['userid'] . "','" . $_POST['qty'] . "')";
-    mysqli_query($db, $sqlinsertp);
+    // Assuming 'returningqty' is the column to update
+    $itemid = $_POST['additem'];
+    $userid = $_GET['userid'];
+    $qty = $_POST['qty'];
+
+    // Update the returningqty field based on the itemid and userid
+    $sqlupdatep = "UPDATE tbpendingreturn SET returningqty = returningqty + $qty WHERE itemid = '$itemid' AND userid = '$userid'";
+
+    if (mysqli_query($db, $sqlupdatep)) {
+        // Update successful, you can add a success message here
+    } else {
+        // Handle any errors, such as if the query failed
+        echo "Error: " . mysqli_error($db);
+    }
 }
 
 if (isset($_POST['finalizerequest'])) {
+    // Insert a new request into tbreturn with status 'Pending'
     $sqlsubmitrequest = "INSERT INTO `tbreturn`(`userid`, `status`) VALUES ('" . $_POST['finalizerequest'] . "','Pending')";
     mysqli_query($db, $sqlsubmitrequest);
-    // if deduction of stocks upon submit, get all list with trans id 0 and apply stock minus quantity
-    $sqlupdatetransid = "UPDATE `tbpendingreturn` SET `transid`='".mysqli_insert_id($db)."' WHERE userid='" . $_POST['finalizerequest'] . "' AND transid='0' ";
+
+    // Get the transaction ID from the previous insert (this is used to link with tbpendingreturn)
+    $transaction_id = mysqli_insert_id($db);
+
+    // Update tbpendingreturn to link the transaction ID for items where returningqty != 0
+    // Instead of setting transid = 0, we set transid to the new transaction ID
+    $sqlupdatetransid = "UPDATE `tbpendingreturn` 
+                         SET `transid` = '$transaction_id', `returningqty` = 0 
+                         WHERE `userid` = '" . $_POST['finalizerequest'] . "' 
+                         AND `returningqty` != 0";
     mysqli_query($db, $sqlupdatetransid);
-    $resetaccess = "UPDATE `tbup` SET `dooraccess`='Rejected' WHERE id='" . $_POST['finalizerequest'] . "'";
+
+    // Reset the door access to 'Rejected' for the user in tbup
+    $resetaccess = "UPDATE `tbup` SET `dooraccess` = 'Rejected' WHERE id = '" . $_POST['finalizerequest'] . "'";
     mysqli_query($db, $resetaccess);
 
     // Step 1: Get the user details (name, email) for sending the email
     $sqlgetuser = "SELECT id, name, email FROM `tbup` WHERE id = '" . $_POST['finalizerequest'] . "';";
     $user = mysqli_fetch_assoc(mysqli_query($db, $sqlgetuser));
 
-    // Step 2: Get the list of items the user is returning
+    // Step 2: Get the list of items the user is returning with their borrow quantity
     $sqlgetitems = "SELECT tbproductlist.name, tbpendingreturn.borrowqty 
-    FROM tbpendingreturn 
-    LEFT JOIN tbproductlist ON tbpendingreturn.itemid = tbproductlist.id 
-    WHERE tbpendingreturn.userid = '" . $_POST['finalizerequest'] . "' 
-    AND tbpendingreturn.transid = '" . mysqli_insert_id($db) . "';";
-
+                    FROM tbpendingreturn 
+                    LEFT JOIN tbproductlist ON tbpendingreturn.itemid = tbproductlist.id 
+                    WHERE tbpendingreturn.userid = '" . $_POST['finalizerequest'] . "' 
+                    AND tbpendingreturn.transid = '$transaction_id';";
     $itemsresult = mysqli_query($db, $sqlgetitems);
 
     // Step 3: Prepare the email content
@@ -88,11 +115,12 @@ if (isset($_POST['finalizerequest'])) {
 }
 
 if (isset($_POST['delete'])) {  
-    $sqldeleteitem = "DELETE FROM `tbpendingreturn` WHERE id='" . $_POST['delete'] . "'";
-    mysqli_query($db, $sqldeleteitem);
+    $sqlupdateqty = "UPDATE `tbpendingreturn` SET returningqty = 0 WHERE id = '" . $_POST['delete'] . "'";
+    mysqli_query($db, $sqlupdateqty);
 }
 
-$sqlgetitems = "SELECT tbproductlist.*,tbpendingreturn.* FROM tbpendingreturn LEFT JOIN tbproductlist ON tbpendingreturn.itemid = tbproductlist.id WHERE userid = '" . $_GET['userid'] . "' AND transid ='0';";
+
+$sqlgetitems = "SELECT tbproductlist.*,tbpendingreturn.* FROM tbpendingreturn LEFT JOIN tbproductlist ON tbpendingreturn.itemid = tbproductlist.id WHERE userid = '" . $_GET['userid'] . "' AND returningqty != 0;";
 $listresult = mysqli_query($db, $sqlgetitems);
 
 $sqlgetcu = "SELECT id,name,pincode,status FROM `tbup` WHERE id ='" . $_GET['userid'] . "';";

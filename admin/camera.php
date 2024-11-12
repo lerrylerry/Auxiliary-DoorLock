@@ -138,5 +138,7 @@
   stopRecordingButton.addEventListener('click', stopRecording);
 </script>
 
+<script src="static/script.js"></script>
+
 </body>
 </html>

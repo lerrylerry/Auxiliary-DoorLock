@@ -80,6 +80,9 @@ $listmp = mysqli_query($db, $sqlgetmp);
 <?php include('static/sidebar.php')?>
 
 <section class="home-section" style="overflow-y: auto;">
+<div class="home-content">
+<i class='bx bx-menu'></i>
+</div>
 <div class="container mt-5">
   <h2>Maintenance Personnel List</h2>
   <table id="personnelTable" class="table">
@@ -182,7 +185,6 @@ $listmp = mysqli_query($db, $sqlgetmp);
   </table>
   <button type="button" class="btn btn-danger mb-3 mt-3" data-bs-toggle="modal" data-bs-target="#addPersonnelModal">Add Personnel</button>
 </div>
-</section>
 
 <!-- Bootstrap JS (jQuery is required) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -256,7 +258,8 @@ $listmp = mysqli_query($db, $sqlgetmp);
     </div>
   </div>
 </div>
-
+</section>
+<script src="static/script.js"></script>
 <!-- <script>
   $(document).ready(function() {
     $('#addpersonnelName').on('input', function() {

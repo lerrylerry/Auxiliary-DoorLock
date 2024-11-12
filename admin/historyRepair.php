@@ -219,7 +219,7 @@ $listmr = mysqli_query($db, $sqlgetmr);
     </table>
 </div>
 </section>
-<script src="static/script.js"></script>
+
 <!-- Bootstrap JS (jQuery is required) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
@@ -274,6 +274,8 @@ $listmr = mysqli_query($db, $sqlgetmr);
         </div>
     </div>
 </div>
+
+<script src="static/script.js"></script>
 
 </body>
 </html>

@@ -5,10 +5,46 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 require 'vendor/autoload.php';
 
+// if (isset($_POST['additem'])) {
+//     $sqlinsertp = "INSERT INTO `tbpendingborrow`(`itemid`, `userid`,`borrowqty`) VALUES ('" . $_POST['additem'] . "','" . $_GET['userid'] . "','" . $_POST['qty'] . "')";
+//     mysqli_query($db, $sqlinsertp);
+// }
+
+// Initialize message and modal type variables
+$message = ""; 
+$modalType = ""; 
+
 if (isset($_POST['additem'])) {
-    $sqlinsertp = "INSERT INTO `tbpendingborrow`(`itemid`, `userid`,`borrowqty`) VALUES ('" . $_POST['additem'] . "','" . $_GET['userid'] . "','" . $_POST['qty'] . "')";
-    mysqli_query($db, $sqlinsertp);
+    $itemid = $_POST['additem'];
+    $userid = $_GET['userid'];
+    $borrowqty = $_POST['qty'];
+
+    // Check if the item has already been borrowed
+    $sqlcheck = "SELECT * FROM `tbpendingborrow` 
+                 WHERE `itemid` = '$itemid' 
+                 AND `userid` = '$userid' 
+                 AND `transid` = '0'";  // Check only unprocessed (transid = 0) requests
+
+    $result = mysqli_query($db, $sqlcheck);
+
+    if (mysqli_num_rows($result) > 0) {
+        // Item already borrowed, don't insert
+        $message = "This item has already been added to your borrow request. Please delete the first entry and try again. Thank You!";
+        $modalType = "error"; // Set modal type to error
+    } else {
+        // Item not borrowed, proceed with insert
+        $sqlinsertp = "INSERT INTO `tbpendingborrow`(`itemid`, `userid`, `borrowqty`) 
+                       VALUES ('$itemid', '$userid', '$borrowqty')";
+        if (mysqli_query($db, $sqlinsertp)) {
+            // $message = "Item added to borrow request.";
+            // $modalType = "success"; // Set modal type to success
+        } else {
+            $message = "Error adding item to borrow request.";
+            $modalType = "error"; // Set modal type to error
+        }
+    }
 }
+
 
 if (isset($_POST['finalizerequest'])) {
     // Insert the borrow request into tbborrow table
@@ -246,6 +282,24 @@ $listp = mysqli_query($db, $sqlgetp);
     </div>
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger" id="messageModalLabel">Error Message:</h5>
+                <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+            </div>
+            <div class="modal-body" id="modalMessage">
+                <!-- The message will be inserted here dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="js/borrow-items.js" type="module"></script>
 <script>
     $(document).ready(function() {
@@ -268,5 +322,19 @@ $listp = mysqli_query($db, $sqlgetp);
 });
 
 </script>
+
+<script>
+$(document).ready(function() {
+    // Check if there's a message to show
+    <?php if (!empty($message)) { ?>
+        // Set the modal message content
+        $('#modalMessage').text("<?php echo $message; ?>");
+        
+        // Show the modal
+        $('#messageModal').modal('show');
+    <?php } ?>
+});
+</script>
+
 </body>
 </html>
