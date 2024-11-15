@@ -9,49 +9,18 @@
                     </svg>
                 </div>
                 <h5 class="mt-3">Success</h5>
-                <p>Your transaction was successful.<br>Redirecting you to the page.</p>
-                <button type="button" class="btn btn-primary mb-3" id="modalRedirectButton" onclick="redirectToPage()">OK</button>
+                <p id="successMessage"><?php echo $successMessage; ?></p>
+                <button type="button" class="btn btn-primary mb-3" id="modalRedirectButton" data-bs-dismiss="modal" onclick="redirectToPage()">OK</button>
             </div>
         </div>
     </div>
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- Success Modal
-<div class="modal fade" id="responseModal" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title" id="responseModalLabel">
-          <i class="bi bi-info-circle-fill"></i> Response
-        </h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="modalBody">
-        <p class="text-center"><strong>Your action was successful!</strong></p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" id="confirmBtn">OK</button>
-      </div>
-    </div>
-  </div>
-</div> -->
+<script>
+    // Function to redirect after modal close
+    function redirectToPage() {
+        $('#successModal').modal('hide');  // Close the modal
+        // Optionally, add redirection or refresh page logic here
+        // window.location.href = "somepage.php";
+    }
+</script>

@@ -37,6 +37,99 @@ if (isset($_SESSION['loginid'])) {
     }
 }
 
+// Initialize message variables
+$successMessage = "";
+$errorMessage = "";
+
+if (isset($_POST['assignedTo']) && isset($_POST['repairid'])) {
+    $repair_id = $_POST['repairid'];
+    $assignedToId = $_POST['assignedTo'];
+
+    // Fetch the maintenance person's name and email based on the assigned ID
+    $mainteQuery = "SELECT name, email FROM `tbmp` WHERE `id` = '$assignedToId'";
+    $mainteResult = mysqli_query($db, $mainteQuery);
+
+    if ($mainteResult) {
+        $mainteData = mysqli_fetch_assoc($mainteResult);
+        $assignedToName = $mainteData['name'];
+        $assignedToEmail = $mainteData['email'];
+
+        // Generate a new unique token for the assignment
+        $token = bin2hex(random_bytes(16)); // 32-character token
+
+        // Get the current token from the database (in case you need to invalidate it)
+        $query = "SELECT `token` FROM `tbminorrepair` WHERE `id` = '$repair_id'";
+        $result = mysqli_query($db, $query);
+        if ($result) {
+            // Fetch the old token (if needed for any invalidation logic)
+            $row = mysqli_fetch_assoc($result);
+            $old_token = $row['token'];  // You could log this if you need
+
+            // Update the repair request with the new maintenance person's name and new token
+            $query = "UPDATE `tbminorrepair` 
+                      SET `personnelAssigned` = '$assignedToName', `token` = '$token' 
+                      WHERE `id` = '$repair_id'";
+
+            if (mysqli_query($db, $query)) {
+                // Set success message
+                $successMessage = "Repair request has been successfully assigned to $assignedToName. The maintenance person has been notified.";
+                // Send email notification to the newly assigned maintenance person
+                try {
+                    $mail = new PHPMailer(true); // Create a new PHPMailer instance
+                    $mail->isSMTP();
+                    $mail->Host = 'smtp.gmail.com';
+                    $mail->SMTPAuth = true;
+                    $mail->Username = 'projxacts12@gmail.com';
+                    $mail->Password = 'vdbwgupzfybcixsk';
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                    $mail->Port = 587;
+
+                    // Recipient
+                    $mail->setFrom('projxacts12@gmail.com', 'TUP Auxiliary System');
+                    $mail->addAddress($assignedToEmail, $assignedToName);
+
+                    // Content
+                    $mail->isHTML(true);
+                    $mail->Subject = 'Repair Request Assigned - Action Required';
+                    $mail->Body = "
+                        <h3>A repair request has been assigned to you:</h3>
+                        <p><strong>Assigned by:</strong> $assignedByName</p>
+                        <p><strong>Assigned To:</strong> $assignedToName</p>
+                        <p>Click the link below to complete the action:</p>
+                        <a href='http://127.0.0.1/var/www/html/admin/maintenance_form.php?token=$token'>Complete the form</a>";
+
+                    // Send the email
+                    $mail->send();
+                } catch (Exception $e) {
+                    // Set error message if email fails
+                    $errorMessage = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}. Please try again.";
+                }
+            } else {
+                // Set error message if DB update fails
+                $errorMessage = "Error updating repair request: " . mysqli_error($db);
+            }
+        }
+    } else {
+        // Set error message if maintenance person data fetching fails
+        $errorMessage = "Error fetching maintenance data. Please try again later.";
+    }
+}
+
+// If the form is submitted
+if (isset($_POST['reselectYes'])) {
+    $repairId = $_POST['repairId'];
+
+    // Directly update personnel without checking assigned time
+    $updateQuery = "UPDATE tbminorrepair SET personnelAssigned = NULL WHERE id = $repairId";
+
+    if (mysqli_query($db, $updateQuery)) {
+        // Successfully updated
+        $successMessage = "The personnel has been successfully removed from the repair request. You can now reassign them.";
+    } else {
+        // Error updating the database
+        $errorMessage = "There was an error processing your request. Please try again later.";
+    }
+}
 // Handle form submissions (Insert, Update, Approve, Reject)
 
 if (isset($_POST['name'])) {
@@ -108,65 +201,6 @@ if (isset($_POST['rejectmr'])) {
         $mail->send();
     } catch (Exception $e) {
         echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
-    }
-}
-
-// Handle repair assignment
-if (isset($_POST['assignedTo']) && isset($_POST['repairid'])) {
-    $repair_id = $_POST['repairid'];
-    $assignedToId = $_POST['assignedTo'];
-
-    // Fetch the employee's name and email based on the assigned ID
-    $employeeQuery = "SELECT name, email FROM `tbmp` WHERE `id` = '$assignedToId'";
-    $employeeResult = mysqli_query($db, $employeeQuery);
-
-    if ($employeeResult) {
-        $employeeData = mysqli_fetch_assoc($employeeResult);
-        $assignedToName = $employeeData['name'];
-        $assignedToEmail = $employeeData['email'];
-
-        // Generate a unique token
-        $token = bin2hex(random_bytes(16)); // 32-character token
-
-        // Update the repair request with the employee's name and the token
-        $query = "UPDATE `tbminorrepair` SET `personnelAssigned` = '$assignedToName', `token` = '$token' WHERE `id` = '$repair_id'";
-
-        if (mysqli_query($db, $query)) {
-            // Send email notification to the assigned employee
-            try {
-                $mail->isSMTP();
-                $mail->Host = 'smtp.gmail.com';
-                $mail->SMTPAuth = true;
-                $mail->Username = 'projxacts12@gmail.com';
-                $mail->Password = 'vdbwgupzfybcixsk';
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                $mail->Port = 587;
-
-                // Recipient
-                $mail->setFrom('projxacts12@gmail.com', 'TUP Auxillary System');
-                $mail->addAddress($assignedToEmail, $assignedToName);
-
-                // Content
-                $mail->isHTML(true);
-                $mail->Subject = 'Repair Request Assigned - Action Required';
-                $mail->Body = "
-                    <h3>A repair request has been assigned to you:</h3>
-                    <p><strong>Assigned by:</strong> $assignedByName</p>
-                    <p><strong>Assigned To:</strong> $assignedToName</p>
-                    <p>Click the link below to complete the action:</p>
-                    <a href='http://127.0.0.1/var/www/html/admin/maintenance_form.php?token=$token'>Complete the form</a>";
-
-                // Send the email
-                $mail->send();
-                echo "<script>alert('Repair request assigned successfully. The employee has been notified.');</script>";
-            } catch (Exception $e) {
-                echo "<script>alert('Message could not be sent. Mailer Error: {$mail->ErrorInfo}');</script>";
-            }
-        } else {
-            echo "<script>alert('Error updating repair request: " . mysqli_error($db) . "');</script>";
-        }
-    } else {
-        echo "<script>alert('Error fetching employee data.');</script>";
     }
 }
 
@@ -311,40 +345,112 @@ $listmr = mysqli_query($db, $sqlgetmr);
                     <td><?php echo $data['status']?></td>
                     <td><?php echo $data['datetime']?></td>
                     <td>
-                        <!-- In the table, trigger the modal with this button -->
-                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#assignedModal<?php echo $data['id']; ?>">
-                            <i class="bi bi-check-circle-fill"></i> Assigned
-                        </button>
+                    <?php
+                    $repairId = $data['id'];
+                    $query = "SELECT personnelAssigned FROM tbminorrepair WHERE id = $repairId";
+                    $result = mysqli_query($db, $query);
 
-                        <!-- Assigned Modal -->
+                    // Check if the query returns a result
+                    if ($result) {
+                        $row = mysqli_fetch_assoc($result);
+                        $personnelAssigned = $row['personnelAssigned']; // Get the personnelAssigned value
+                    }
+
+                    // Render the button based on whether personnel is assigned
+                    if (empty($personnelAssigned)) {
+                        // If no personnel is assigned
+                        echo '<button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#assignedModal' . $repairId . '">
+                                <i class="bi bi-check-circle-fill"></i> Assigned
+                            </button>';
+                    } else {
+                        // If personnel is already assigned, show "reselect" button
+                        echo '<button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#reselectModal' . $repairId . '">
+                                <i class="bi bi-pencil-fill"></i> Reselect
+                            </button>';
+                    }
+                    ?>
+                        
+                        <!-- Reselect Modal -->
+                        <div class="modal fade" id="reselectModal<?php echo $repairId; ?>" tabindex="-1" aria-labelledby="reselectModalLabel<?php echo $repairId; ?>" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <!-- Modal Header -->
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="reselectModalLabel<?php echo $repairId; ?>">Confirmation</h5>
+                                        <!-- The close button will not appear, we use custom functionality -->
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="display:none;"></button>
+                                    </div>
+                                    <!-- Modal Body -->
+                                    <div class="modal-body">
+                                        Do you want to reselect maintenance personnel? This can be changed only after 1 day.
+                                    </div>
+                                    <!-- Modal Footer -->
+                                    <div class="modal-footer">
+                                        <form method="post" action="">
+                                            <input type="hidden" name="repairId" value="<?php echo $repairId; ?>">
+                                            
+                                            <!-- Yes Button with Icon -->
+                                            <button type="submit" name="reselectYes" class="btn btn-outline-danger">
+                                                <i class="bi bi-check-circle-fill"></i> Yes
+                                            </button>
+                                            
+                                            <!-- No Button with Icon -->
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                <i class="bi bi-x-circle-fill"></i> No
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        
+                        <!-- Modal for assigning personnel -->
                         <div class="modal fade" id="assignedModal<?php echo $data['id']; ?>" tabindex="-1" aria-labelledby="assignedModalLabel<?php echo $data['id']; ?>" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="assignedModalLabel<?php echo $data['id']; ?>">Assign Repair Request</h5>
+                                        <h5 class="modal-title" id="assignedModalLabel<?php echo $data['id']; ?>">Assign Maintenance Personnel</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
+                                        <?php
+                                        // Query to get the current assigned personnel
+                                        $repairId = $data['id'];
+                                        $query = "SELECT personnelAssigned FROM tbminorrepair WHERE id = $repairId";
+                                        $result = mysqli_query($db, $query);
+                                        if ($result) {
+                                            $row = mysqli_fetch_assoc($result);
+                                            $assignedName = $row['personnelAssigned'];
+                                        } else {
+                                            echo "<p>Error fetching the assigned personnel data.</p>";
+                                        }
+                                        ?>
+
+                                        <!-- Form for assigning personnel -->
                                         <form method="post" action="">
                                             <div class="mb-3">
                                                 <label for="assignedTo" class="form-label">Assign to:</label>
                                                 <select class="form-select" name="assignedTo" required>
-                                                    <option value="">Select Employee</option>
+                                                    <option value="">Select here</option>
                                                     <?php while ($up = mysqli_fetch_assoc($listup)) { ?>
                                                         <option value="<?php echo $up['id']; ?>"><?php echo $up['name']; ?></option>
                                                     <?php } ?>
                                                 </select>
                                             </div>
                                             <input type="hidden" name="repairid" value="<?php echo $data['id']; ?>">
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                        <button type="submit" class="btn btn-primary">Assign</button>
-                                    </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-primary">Assign</button>
+                                        </div>
                                         </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
 
                         <?php if ($data['status'] == "Pending") { ?>
                             <a href="adminForm.php?id=<?php echo $data['id']; ?>" class="btn btn-primary btn-sm">
@@ -483,3 +589,8 @@ $listmr = mysqli_query($db, $sqlgetmr);
         </section>
     </body>
 </html>
+
+<?php
+require 'success.php';
+require 'error.php';
+?>

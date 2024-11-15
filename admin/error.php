@@ -9,9 +9,18 @@
                     </svg>
                 </div>
                 <h5 class="mt-3">Error</h5>
-                <p>There was an error processing your transaction.<br>Please try again later.</p>
-                <button type="button" class="btn btn-primary mb-3" id="modalRedirectButton" onclick="redirectToPage()">OK</button>
+                <p id="errorMessage"><?php echo $errorMessage; ?></p>
+                <button type="button" class="btn btn-primary mb-3" id="modalRedirectButton" data-bs-dismiss="modal" onclick="redirectToPage()">OK</button>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    // Function to redirect after modal close
+    function redirectToPage() {
+        $('#errorModal').modal('hide');  // Close the modal
+        // Optionally, add redirection or refresh page logic here
+        // window.location.href = "somepage.php";
+    }
+</script>
