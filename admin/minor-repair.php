@@ -90,13 +90,13 @@ if (isset($_POST['assignedTo']) && isset($_POST['repairid'])) {
 
                     // Content
                     $mail->isHTML(true);
-                    $mail->Subject = 'Repair Request Assigned - Action Required';
+                    $mail->Subject = 'Minor Repair Request Assigned - Action Required';
                     $mail->Body = "
                         <h3>A repair request has been assigned to you:</h3>
                         <p><strong>Assigned by:</strong> $assignedByName</p>
                         <p><strong>Assigned To:</strong> $assignedToName</p>
                         <p>Click the link below to complete the action:</p>
-                        <a href='http://127.0.0.1/var/www/html/admin/maintenance_form.php?token=$token'>Complete the form</a>";
+                        <a href='http://127.0.0.1/Auxiliary-DoorLock/admin/assessment-form.php?token=$token'>Complete the form</a>";
 
                     // Send the email
                     $mail->send();
@@ -176,7 +176,7 @@ if (isset($_POST['approverepair'])) {
 
 // Handle repair rejection
 if (isset($_POST['rejectmr'])) {
-    $sqlupdater = "UPDATE `tbminorrepair` SET `status`='Rejected', `approval`='" . $_POST['reason'] . "' WHERE id='" . $_POST['rejectmr'] . "'";
+    $sqlupdater = "UPDATE `tbminorrepair` SET `status`='Rejected' WHERE id='" . $_POST['rejectmr'] . "'";
     mysqli_query($db, $sqlupdater);
 
     // Email sending for rejection
@@ -212,6 +212,14 @@ $listup = mysqli_query($db, $sqlgetup);
 $sqlgetmr = "SELECT * FROM `tbminorrepair` WHERE `status` = 'Pending';";
 $listmr = mysqli_query($db, $sqlgetmr);
 
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Query to fetch repair requests where dateHead is NULL
+$sqlgetPendingRepairs = "SELECT * FROM `tbminorrepair` WHERE `status` = 'Assessed by Maintenance' AND (`dateHead` IS NULL OR `dateHead` = '')";
+$listPendingRepairs = mysqli_query($db, $sqlgetPendingRepairs);
+
+
 ?>
 
 
@@ -223,6 +231,7 @@ $listmr = mysqli_query($db, $sqlgetmr);
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Auxiliary | Minor Repair</title>
   <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/forms.css">
   <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css" rel="stylesheet">
@@ -241,29 +250,48 @@ $listmr = mysqli_query($db, $sqlgetmr);
             <div class="container mt-5">
             <h2>Minor Repair</h2>
             <br>
-            <table class="table table-striped" id="minorRepairTable">
-                <thead class="table-dark">
-                <tr>
-                    <th>Name</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
-                <tbody>
-                <?php while ($data = mysqli_fetch_assoc($listmr)) { ?>
-                <tr>
-                    <td><a href="#" class="requestLink" data-bs-toggle="modal" data-bs-target="#requestDetailsModal<?php echo $data['id']?>"><?php echo $data['name']?></a></td>
-                    <!-- Form Modal -->
-                    <div class="modal fade" id="requestDetailsModal<?php echo $data['id']?>" tabindex="-1" role="dialog" aria-labelledby="requestModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-xl" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="requestModalLabel">Request by <?php echo $data['name']?></h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <form>
+            <!-- Tabs Navigation -->
+            <ul class="nav nav-tabs" id="myTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" id="request-tab" data-bs-toggle="tab" href="#request" role="tab" aria-controls="request" aria-selected="true">Request</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="assessment-tab" data-bs-toggle="tab" href="#assessment" role="tab" aria-controls="assessment" aria-selected="false">Assessment</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="results-tab" data-bs-toggle="tab" href="#results" role="tab" aria-controls="results" aria-selected="false">Results</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="feedback-tab" data-bs-toggle="tab" href="#feedback-tab" role="tab" aria-controls="feedback-tab" aria-selected="false">Feedback</a>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="myTabsContent">
+                <!-- Request Tab -->
+                <div class="tab-pane fade show active" id="request" role="tabpanel" aria-labelledby="request-tab">
+                    <table class="table table-striped" id="requestTable">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php while ($data = mysqli_fetch_assoc($listmr)) { ?>
+                    <tr>
+                        <td><a href="#" class="requestLink" data-bs-toggle="modal" data-bs-target="#requestDetailsModal<?php echo $data['id']?>"><?php echo $data['name']?></a></td>
+                        <!-- Form Modal -->
+                        <div class="modal fade" id="requestDetailsModal<?php echo $data['id']?>" tabindex="-1" role="dialog" aria-labelledby="requestModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-xl" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="requestModalLabel">Request by <?php echo $data['name']?></h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
                                         <div class="row">
                                             <!-- <h6>Request By:<span class="text-danger"><?php echo $data['name']?> - <?php echo $data['datetime']?></span></h6>
                                             <h6>Status:<span class="text-danger"><?php echo $data['status']?> | Reason:  <?php echo $data['approval']?></span></h6> -->
@@ -332,44 +360,51 @@ $listmr = mysqli_query($db, $sqlgetmr);
                                                 </div>
                                             </div>
                                         </div>
-                                    </form>
+                                        <div class="text-end">
+                                            <form method="post" action="">
+                                                <input type="hidden" class="form-control" name="rejectmr"
+                                                        value="<?php echo $data['id'] ?>">
+                                                        <button type="submit" class="btn btn-danger btn-sm"
+                                                            <i class="bi bi-x-circle-fill"></i> Reject
+                                                        </button>
+                                            </form>                                            
+                                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+                                                <i class="bi bi-arrow-left-circle-fill"></i> Back
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
+
                             </div>
-
-                            <!-- <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            </div> -->
-
                         </div>
-                    </div>
-                    <td><?php echo $data['status']?></td>
-                    <td><?php echo $data['datetime']?></td>
-                    <td>
-                    <?php
-                    $repairId = $data['id'];
-                    $query = "SELECT personnelAssigned FROM tbminorrepair WHERE id = $repairId";
-                    $result = mysqli_query($db, $query);
+                        <td><?php echo $data['status']?></td>
+                        <td><?php echo $data['datetime']?></td>
+                        <td>
+                        <?php
+                        $repairId = $data['id'];
+                        $query = "SELECT personnelAssigned FROM tbminorrepair WHERE id = $repairId";
+                        $result = mysqli_query($db, $query);
 
-                    // Check if the query returns a result
-                    if ($result) {
-                        $row = mysqli_fetch_assoc($result);
-                        $personnelAssigned = $row['personnelAssigned']; // Get the personnelAssigned value
-                    }
+                        // Check if the query returns a result
+                        if ($result) {
+                            $row = mysqli_fetch_assoc($result);
+                            $personnelAssigned = $row['personnelAssigned']; // Get the personnelAssigned value
+                        }
 
-                    // Render the button based on whether personnel is assigned
-                    if (empty($personnelAssigned)) {
-                        // If no personnel is assigned
-                        echo '<button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#assignedModal' . $repairId . '">
-                                <i class="bi bi-check-circle-fill"></i> Assigned
-                            </button>';
-                    } else {
-                        // If personnel is already assigned, show "reselect" button
-                        echo '<button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#reselectModal' . $repairId . '">
-                                <i class="bi bi-pencil-fill"></i> Reselect
-                            </button>';
-                    }
-                    ?>
-                        
+                        // Render the button based on whether personnel is assigned
+                        if (empty($personnelAssigned)) {
+                            // If no personnel is assigned
+                            echo '<button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#assignedModal' . $repairId . '">
+                                    <i class="bi bi-check-circle-fill"></i> Assigned
+                                </button>';
+                        } else {
+                            // If personnel is already assigned, show "reselect" button
+                            echo '<button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#reselectModal' . $repairId . '">
+                                    <i class="bi bi-pencil-fill"></i> Reselect
+                                </button>';
+                        }
+                        ?>
+
                         <!-- Reselect Modal -->
                         <div class="modal fade" id="reselectModal<?php echo $repairId; ?>" tabindex="-1" aria-labelledby="reselectModalLabel<?php echo $repairId; ?>" aria-hidden="true">
                             <div class="modal-dialog">
@@ -377,24 +412,19 @@ $listmr = mysqli_query($db, $sqlgetmr);
                                     <!-- Modal Header -->
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="reselectModalLabel<?php echo $repairId; ?>">Confirmation</h5>
-                                        <!-- The close button will not appear, we use custom functionality -->
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="display:none;"></button>
                                     </div>
                                     <!-- Modal Body -->
                                     <div class="modal-body">
-                                        Do you want to reselect maintenance personnel? This can be changed only after 1 day.
+                                        Do you want to reselect maintenance personnel?
                                     </div>
                                     <!-- Modal Footer -->
                                     <div class="modal-footer">
                                         <form method="post" action="">
                                             <input type="hidden" name="repairId" value="<?php echo $repairId; ?>">
-                                            
-                                            <!-- Yes Button with Icon -->
                                             <button type="submit" name="reselectYes" class="btn btn-outline-danger">
                                                 <i class="bi bi-check-circle-fill"></i> Yes
                                             </button>
-                                            
-                                            <!-- No Button with Icon -->
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                                 <i class="bi bi-x-circle-fill"></i> No
                                             </button>
@@ -404,20 +434,17 @@ $listmr = mysqli_query($db, $sqlgetmr);
                             </div>
                         </div>
 
-
-                        
                         <!-- Modal for assigning personnel -->
-                        <div class="modal fade" id="assignedModal<?php echo $data['id']; ?>" tabindex="-1" aria-labelledby="assignedModalLabel<?php echo $data['id']; ?>" aria-hidden="true">
+                        <div class="modal fade" id="assignedModal<?php echo $repairId; ?>" tabindex="-1" aria-labelledby="assignedModalLabel<?php echo $repairId; ?>" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="assignedModalLabel<?php echo $data['id']; ?>">Assign Maintenance Personnel</h5>
+                                        <h5 class="modal-title" id="assignedModalLabel<?php echo $repairId; ?>">Assign Maintenance Personnel</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
                                         <?php
                                         // Query to get the current assigned personnel
-                                        $repairId = $data['id'];
                                         $query = "SELECT personnelAssigned FROM tbminorrepair WHERE id = $repairId";
                                         $result = mysqli_query($db, $query);
                                         if ($result) {
@@ -426,8 +453,12 @@ $listmr = mysqli_query($db, $sqlgetmr);
                                         } else {
                                             echo "<p>Error fetching the assigned personnel data.</p>";
                                         }
-                                        ?>
 
+                                        // Query to get the list of active personnel
+                                        $sqlgetup = "SELECT id, name FROM tbmp WHERE `status` = 'active';";
+                                        $listup = mysqli_query($db, $sqlgetup);
+                                        ?>
+                                        
                                         <!-- Form for assigning personnel -->
                                         <form method="post" action="">
                                             <div class="mb-3">
@@ -439,101 +470,96 @@ $listmr = mysqli_query($db, $sqlgetmr);
                                                     <?php } ?>
                                                 </select>
                                             </div>
-                                            <input type="hidden" name="repairid" value="<?php echo $data['id']; ?>">
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                            <button type="submit" class="btn btn-primary">Assign</button>
-                                        </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <?php if ($data['status'] == "Pending") { ?>
-                            <a href="adminForm.php?id=<?php echo $data['id']; ?>" class="btn btn-primary btn-sm">
-                                <i class="bi bi-check-circle-fill"></i> Edit
-                            </a>
-                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal"
-                                    data-bs-target="#approveModal">
-                                <i class="bi bi-check-circle-fill"></i> Approve
-                            </button>
-
-                            <div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel<?php echo $data['id'] ?>"aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="approveModalLabel<?php echo $data['id'] ?>">Approve Repair Request</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            Are you sure you want to accept this request?
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel
-                                            </button>
-                                            <form method="post" action="">
-                                                <input type="hidden" class="form-control" name="approverepair"
-                                                    value="<?php echo $data['id'] ?>">
-                                                <button type="submit" class="btn btn-success">Approve</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                    data-bs-target="#rejectModal">
-                                <i class="bi bi-x-circle-fill"></i> Reject
-                            </button>
-
-                            <a href="generatepdf.php?id=<?php echo $data['id']; ?>&name=<?php echo urlencode($data['name']); ?>&position=<?php echo urlencode($data['position']); ?>&department=<?php echo urlencode($data['department']); ?>&email=<?php echo urlencode($data['email']); ?>&type=<?php echo urlencode($data['type']); ?>&serial=<?php echo urlencode($data['serial']); ?>&brandmodel=<?php echo urlencode($data['brandmodel']); ?>&propertyno=<?php echo urlencode($data['propertyno']); ?>&acqcost=<?php echo urlencode($data['acqcost']); ?>&acqdate=<?php echo urlencode($data['acqdate']); ?>&scope=<?php echo urlencode($data['scope']); ?>&datetime=<?php echo urlencode($data['datetime']); ?>" class="btn btn-secondary btn-sm">
-                                <i class="bi bi-printer"></i> Print
-                            </a>
-
-
-                        <?php } ?>
-
-                        <!-- Reject Modal -->
-                        <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel<?php echo $data['id'] ?>"
-                            aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="rejectModalLabel<?php echo $data['id'] ?>">Reject Request</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-
-                                        <form method="post" action="">
-                                            <label for="productName" class="form-label">Rejection Reason</label>
-                                            <input type="text" class="form-control" name="reason" required placeholder="Reason for Rejection">
-                                            Are you sure you want to reject this request?
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel
-                                        </button>
-                                        <form method="post" action="">
-                                            <input type="hidden" class="form-control" name="rejectmr"
-                                                    value="<?php echo $data['id'] ?>">
-                                            <button type="submit" class="btn btn-danger">Reject</button>
+                                            <input type="hidden" name="repairid" value="<?php echo $repairId; ?>">
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-primary">Assign</button>
+                                            </div>
                                         </form>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </td>
-                </tr>
-                <?php } ?>
-                <!-- Add more rows as needed -->
-                </tbody>
-            </table>
+
+                    </tr>
+                    <?php } ?>
+                    <!-- Add more rows as needed -->
+                    </tbody>
+                </table>
+                </div>
+
+
+
+
+
+
+                <!-- Assessment Tab -->
+                <div class="tab-pane fade" id="assessment" role="tabpanel" aria-labelledby="assessment-tab">
+                    <table class="table table-striped" id="evaluateTable">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            // Loop through the result set and populate the table rows
+                            if (mysqli_num_rows($listPendingRepairs) > 0) {
+                                while ($row = mysqli_fetch_assoc($listPendingRepairs)) {
+                                    // Assuming `name`, `status`, and `dateHead` are columns in your `tbminorrepair` table
+                                    $repairName = $row['name'];
+                                    $repairStatus = $row['status'];
+                                    $repairDate = $row['dateHead'] ? $row['dateHead'] : 'Not Assigned';  // If no dateHead, show "Not Assigned"
+                                    $repairId = $row['id'];  // The ID of the repair request
+                                    ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($repairName); ?></td>
+                                        <td><?php echo htmlspecialchars($repairStatus); ?></td>
+                                        <td><?php echo htmlspecialchars($repairDate); ?></td>
+                                        <td>
+                                            <a href="admin-form.php?id=<?php echo $repairId; ?>" class="btn btn-primary btn-sm">Evaluate</a>
+                                            <!-- Add more buttons as needed -->
+                                        </td>
+                                    </tr>
+                                    <?php
+                                }
+                            } else {
+                                // If no records are found
+                                echo "<tr><td colspan='4'>No pending repairs found.</td></tr>";
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+</div>
+
+
+
+
+
+
+
+
+                <!-- Results Tab -->
+                <div class="tab-pane fade" id="results" role="tabpanel" aria-labelledby="results-tab">
+                    <h3>Contact Tab</h3>
+                    <p>This is the content for the Contact tab. Add your contact details or a contact form here.</p>
+                </div>
+
             </div>
+            </div>
+
+
+
+
+
+
+
+
+
 
         <!-- Bootstrap JS (jQuery is required) -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -546,7 +572,8 @@ $listmr = mysqli_query($db, $sqlgetmr);
 
         <script>
         $(document).ready(function() {
-            $('#minorRepairTable').DataTable();
+            $('#requestTable').DataTable();
+            $('#evaluateTable').DataTable();
         });
         </script>
 
@@ -566,26 +593,6 @@ $listmr = mysqli_query($db, $sqlgetmr);
         <!-- Latest compiled JavaScript -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
         <script src="static/script.js"></script>
-            <div class="modal fade" id="declineModal" tabindex="-1" aria-labelledby="declineModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="declineModalLabel">Decline Request</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                    <div class="mb-3">
-                        <label for="remarks" class="form-label">Remarks</label>
-                        <textarea class="form-control" id="remarks" rows="3" placeholder="Enter your remarks"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-danger">Decline</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    </form>
-                </div>
-                </div>
-            </div>
-            </div>
         </section>
     </body>
 </html>

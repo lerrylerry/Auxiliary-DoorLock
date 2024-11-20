@@ -82,7 +82,7 @@ $listp = mysqli_query($db, $sqlgetp);
               <i class="fas fa-tools fa-3x mb-3"></i>
               <h5 class="card-title">Minor Repair Request <span class="text-danger">(<?php echo $getrepairrequest;?>)</span></h5>
               <p class="card-text">There are requesting for minor repairs</p>
-              <a href="minorRepair.php" type="button" class="btn btn-danger"><i class="fas fa-info-circle"></i> More Info</a>
+              <a href="minor-repair.php" type="button" class="btn btn-danger"><i class="fas fa-info-circle"></i> More Info</a>
             </div>
           </div>
         </div>
