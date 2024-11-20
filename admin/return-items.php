@@ -230,7 +230,7 @@ $listsimply = mysqli_query($db, $sqlgetsimplifiedlist);
 
 
           </td>
-          <td><?php echo $data['datetime'] ?></td>
+          <td><?php echo date("F j, Y g:i A", strtotime($data['datetime'])); ?></td>
           <td>
               <?php if ($data['status'] == "Pending") { ?>
                   <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal"

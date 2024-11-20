@@ -53,7 +53,7 @@ $listhistemd = mysqli_query($db, $sqlhistems);
             <td><?php echo $data['unit'] ?></td>
             <td><?php echo $data['quantity'] ?></td>
             <td><?php echo $data['category'] ?></td>
-            <td><?php echo $data['created_at'] ?></td>
+            <td><?php echo date("F j, Y", strtotime($data['created_at'])) ?></td>
         </tr>
         <?php } ?>
     </tbody>

@@ -149,7 +149,7 @@ $listreturn= mysqli_query($db, $sqlgetreturn);
                 </td>
                 <td>Return</td>
                 <td><?php echo $datar['status'] ?></td>
-                <td> <?php echo $datar['datetime'] ?></td>
+                <td><?php echo date("F j, Y", strtotime($datar['datetime'])) ?></td>
             </tr>
         <?php } ?>
 

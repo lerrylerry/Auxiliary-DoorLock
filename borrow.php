@@ -223,7 +223,7 @@ $listp = mysqli_query($db, $sqlgetp);
             <?php while ($data = mysqli_fetch_assoc($listresult)) { ?>
                 <tr>
                     <td><?php echo $data['name'] ?></td>
-                    <td><span class="text-danger"><?php echo $data['borrowqty'] ?></span></td>
+                    <td><?php echo $data['quantity'] ?><span class="text-danger"> (-<?php echo $data['borrowqty'] ?>) </span></td>
                     <td><?php echo $data['unit'] ?></td>
                     <td>
                         <form action="" method="POST">
@@ -259,6 +259,7 @@ $listp = mysqli_query($db, $sqlgetp);
                         </select>
                 </div>
             </div>
+           
             <div class="col-4">
                 <label>Quantity:</label><br>
                 <input type="number" style="z-index:1;" id="quantity" name="qty" placeholder="" required>

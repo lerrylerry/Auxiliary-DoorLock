@@ -378,7 +378,7 @@ $listPendingRepairs = mysqli_query($db, $sqlgetPendingRepairs);
                             </div>
                         </div>
                         <td><?php echo $data['status']?></td>
-                        <td><?php echo $data['datetime']?></td>
+                        <td><?php echo date("F j, Y g:i A", strtotime($data['datetime'])); ?></td>
                         <td>
                         <?php
                         $repairId = $data['id'];
