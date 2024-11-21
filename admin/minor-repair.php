@@ -433,6 +433,8 @@ $listPendingRepairs = mysqli_query($db, $sqlgetPendingRepairs);
                                 </div>
                             </div>
                         </div>
+                        <a href="generatepdf.php?id=<?php echo $data['id']; ?>&name=<?php echo urlencode($data['name']); ?>&position=<?php echo urlencode($data['position']); ?>&department=<?php echo urlencode($data['department']); ?>&email=<?php echo urlencode($data['email']); ?>&type=<?php echo urlencode($data['type']); ?>&serial=<?php echo urlencode($data['serial']); ?>&brandmodel=<?php echo urlencode($data['brandmodel']); ?>&propertyno=<?php echo urlencode($data['propertyno']); ?>&acqcost=<?php echo urlencode($data['acqcost']); ?>&acqdate=<?php echo urlencode($data['acqdate']); ?>&scope=<?php echo urlencode($data['scope']); ?>&datetime=<?php echo urlencode($data['datetime']); ?>" class="btn btn-secondary btn-sm"><i class="bi bi-printer"></i> Print</a>
+
 
                         <!-- Modal for assigning personnel -->
                         <div class="modal fade" id="assignedModal<?php echo $repairId; ?>" tabindex="-1" aria-labelledby="assignedModalLabel<?php echo $repairId; ?>" aria-hidden="true">
