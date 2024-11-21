@@ -317,3 +317,8 @@ hr {
         font-size: 14px; /* Adjust font size for header */
     }
 }
+
+
+.modal-content {
+    background-color: #ed8383 !important;
+}

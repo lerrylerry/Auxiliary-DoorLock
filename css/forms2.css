@@ -1,0 +1,83 @@
+/* General styles */
+body {
+    font-family: Arial, sans-serif;
+}
+
+/* Modal Styles */
+.modal-content {
+    border-radius: 10px !important; /* Enforcing border-radius */
+    background-color: #fff !important;
+    border: 1px solid #ed8383 !important;
+}
+
+.modal-header {
+    background-color: #ed8383 !important;
+    color: white !important;
+    border-bottom: 1px solid #ed8383 !important;
+    border-radius: 10px 10px 0 0 !important; /* Enforcing border-radius */
+}
+
+.modal-body {
+    padding: 30px !important;
+}
+
+/* Card Styles */
+.card {
+    border-radius: 10px !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+.card-header {
+    background-color: #ed8383 !important;
+    color: white !important;
+    font-size: 24px !important;
+    font-weight: bold !important;
+    border-radius: 10px 10px 0 0 !important; /* Enforcing border-radius */
+}
+
+.card-footer {
+    background-color: #ed8383 !important;
+    color: white !important;
+    text-align: center !important;
+    border-radius: 0 0 10px 10px !important;
+}
+
+.card-body {
+    padding: 20px !important;
+}
+
+/* Form Fields */
+.row {
+    margin-bottom: 15px !important;
+}
+
+.row .col-sm-4 {
+    font-weight: bold !important;
+}
+
+.row .col-sm-8 {
+    color: #555 !important;
+}
+
+/* Customizing Button/Link */
+.requestLink {
+    color: #ed8383 !important;
+    text-decoration: none !important;
+    font-weight: bold !important;
+}
+
+.requestLink:hover {
+    color: #d47474 !important;
+}
+
+/* Modal Close Button */
+.modal-header .btn-close {
+    background-color: transparent !important;
+    border: none !important;
+    color: white !important;
+}
+
+/* Small text in the footer */
+.card-footer small {
+    font-size: 12px !important;
+}
