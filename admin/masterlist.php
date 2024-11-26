@@ -66,9 +66,6 @@ $listp = mysqli_query($db, $sqlgetp);
 
 ?>
 
-<?php include 'success.php'?>
-<?php include 'error.php'?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -85,6 +82,33 @@ $listp = mysqli_query($db, $sqlgetp);
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
   <!-- DataTables CSS -->
   <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+  <style>
+    .table {
+            margin-top: 15px;
+        }
+
+        .table th, .table td {
+            text-align: center;
+            padding: 12px;
+        }
+
+        .table th {
+            background-color: #9e1b32;
+            color: white;
+        }
+
+        .table td {
+            background-color: #f9f9f9;
+        }
+        .active>.page-link, .page-link.active{
+            background-color: #9e1b32;
+            border-color: #9e1b32; 
+        }
+        .page-link {
+            color: #9e1b32;
+        }
+        
+  </style>
 </head>
 <body>
 <?php include('static/sidebar.php')?>

@@ -14,20 +14,36 @@ if (isset($_SESSION['loginid'])) {
 //     mysqli_query($db, $sqlinsertp);
 // }
 
+$message = ""; 
+$modalType = ""; 
+
 if (isset($_POST['additem'])) {
     // Assuming 'returningqty' is the column to update
     $itemid = $_POST['additem'];
     $userid = $_GET['userid'];
     $qty = $_POST['qty'];
 
-    // Update the returningqty field based on the itemid and userid
-    $sqlupdatep = "UPDATE tbpendingreturn SET returningqty = returningqty + $qty WHERE itemid = '$itemid' AND userid = '$userid'";
+    // Check if the item has already been returned
+    $sqlcheck = "SELECT * FROM `tbpendingborrow` 
+                 WHERE `itemid` = '$itemid' 
+                 AND `userid` = '$userid'";
 
-    if (mysqli_query($db, $sqlupdatep)) {
-        // Update successful, you can add a success message here
+    $result = mysqli_query($db, $sqlcheck);
+
+    if (mysqli_num_rows($result) > 0) {
+        // Item already borrowed, don't insert
+        $message = "This item has already been added to your return request. Please delete the first entry and try again. Thank You!";
+        $modalType = "error"; // Set modal type to error
     } else {
-        // Handle any errors, such as if the query failed
-        echo "Error: " . mysqli_error($db);
+        // Item not returned, proceed with insert
+        $sqlupdatep = "UPDATE tbpendingreturn SET returningqty = returningqty + $qty WHERE itemid = '$itemid' AND userid = '$userid'";
+        if (mysqli_query($db, $sqlupdatep)) {
+            // $message = "Item added to return request.";
+            // $modalType = "success"; // Set modal type to success
+        } else {
+            $message = "Error adding item to return request.";
+            $modalType = "error"; // Set modal type to error
+        }
     }
 }
 
@@ -146,10 +162,6 @@ $listp = mysqli_query($db, $sqlgetp);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-     <!--CSS-->
-     <link rel="stylesheet" href="css/borrow-items.css">
      <link href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css" rel="stylesheet">
      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
      <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
@@ -164,157 +176,504 @@ $listp = mysqli_query($db, $sqlgetp);
      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
      <link href="https://fonts.googleapis.com/css2?family=Anta&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
            rel="stylesheet">
-     <link rel="stylesheet" href="css/borrow-items.css">
-
-
-
-    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Anta&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
-          rel="stylesheet">
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
-            integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-            integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-            crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
-            integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
-            crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="css/borrow-items.css"> -->
     <title>Auxiliary | Borrow/Request</title>
+
+    <style>
+/* Global Styles */
+body {
+    background-color: #ed8383;
+    background-image: url('images/LOCKER.jpg');
+    background-size: cover;
+    background-position: center;
+    font-family: Arial, sans-serif;
+    color: #fff;
+}
+/* Navbar Styles */
+.navbar {
+    background-color: #9e1b32;
+    padding: 10px 20px;
+    z-index: 1000;
+}
+
+.navbar .container-fluid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navLogo {
+    display: flex;
+    align-items: center;
+}
+
+.navLogo img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 3px solid #555;
+}
+
+.navLogo p {
+    color: white;
+    padding-left: 10px;
+    font-size: 1.2rem;
+}
+
+.navbar-toggler {
+    color: white;
+    border: 1px solid #fff;
+    background-color: #9e1b32;
+}
+
+.navbar-toggler-icon {
+    background-color: transparent;
+    border: none;
+}
+
+.navbar-toggler-icon::before, 
+.navbar-toggler-icon::after {
+    background-color: white;
+}
+
+.navbar-toggler-icon span {
+    background-color: white;
+}
+
+/* Navbar Dropdown Menu */
+.navdiv .dropdown .btn {
+    color: white;
+    background-color: #9e1b32;
+    border: 1px solid #fff;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.navdiv .dropdown .btn:hover {
+    background-color: #7a1623;
+    color: white;
+}
+
+.navdiv .dropdown .btn:focus {
+    background-color: #7a1623;
+    color: white;
+    box-shadow: none;
+}
+
+.dropdown-menu {
+    background-color: #9e1b32;
+    border: 1px solid #7a1623;
+}
+
+.dropdown-item {
+    color: white;
+    background-color: #9e1b32;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #7a1623;
+    color: white;
+}
+
+/* Mobile Navbar Adjustment */
+@media (max-width: 767px) {
+    .navbar .container-fluid {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .navLogo {
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+    }
+
+    .navbar-toggler {
+        margin-left: 10px;
+    }
+
+    .navdiv {
+        display: none;
+        flex-direction: column;
+    }
+
+    .collapse.show .navdiv {
+        display: flex;
+    }
+
+    .divLogin {
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .divLogin .loginBtn button {
+        width: 100%;
+    }
+}
+
+/* Form Styles */
+.card {
+    background-color: #fff; /* White background for the form */
+    color: #000; /* Black text for the form */
+    border-radius: 15px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2); /* Lighter shadow */
+    padding: 25px;
+    max-width: 32rem;
+    margin: 20px auto;
+    position: relative; /* Add position relative for form element adjustments */
+    overflow: hidden; /* Prevents overflow of content */
+}
+
+.card-body {
+    padding: 20px;
+}
+
+/* Form Labels */
+.borrow-label, .return-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.4rem;
+    color: #000; /* Black text */
+    text-align: left;
+    padding-bottom: 0.8rem;
+}
+
+label {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #000; /* Black text */
+}
+
+
+/* Focus effect on inputs */
+select:focus, input:focus {
+    outline: none;
+    border-color: #9e1b32; /* Cardinal Red on focus */
+}
+
+/* Hover effect for inputs */
+select:hover, input:hover {
+    background-color: #e8e8e8; /* Slightly darker background on hover */
+}
+
+/* Pincode Input Specific Styling (ensure same size for password/text inputs) */
+input[type="password"], input[type="text"], input[type="number"] {
+    font-size: 1rem; /* Set font size for consistency */
+}
+
+/* Ensure no conflict with form control styling */
+input.form-control {
+    width: 100%;
+    font-size: 1rem;
+    margin-bottom: 15px;
+}
+
+/* Submit Buttons */
+.borrow-submit, .return-submit {
+    background-color: #9e1b32; /* Cardinal Red */
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    width: 100%;
+    text-align: center;
+}
+
+.borrow-submit:hover, .return-submit:hover {
+    background-color: #7a1623; /* Darker red on hover */
+    transform: scale(1.05);
+}
+
+/* Footer */
+footer {
+    background-color: #2d2d2d;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    margin-top: auto;
+}
+
+footer p {
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* Modal Styling */
+.modal-content {
+    border-radius: 12px;
+    color: white;
+}
+
+.modal-header {
+    border-bottom: 1px solid #9e1b32;
+}
+
+.modal-title {
+    color: #fff;
+    font-size: 1.5rem;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-footer {
+    border-top: 1px solid #9e1b32;
+    background-color: #333;
+}
+
+button.btn-secondary {
+    background-color: #555;
+    border-color: #555;
+}
+
+/* Responsive Styling */
+@media (max-width: 767px) {
+    .card {
+        width: 90%;
+        padding: 20px;
+    }
+    .borrow-submit, .return-submit {
+        padding: 10px;
+        font-size: 1rem;
+    }
+}
+
+/* Hover Effects */
+.card:hover {
+    box-shadow: 0px 15px 35px rgba(0, 0, 0, 0.9);
+}
+
+/* Navbar Hover Effect */
+.navbar .navbar-nav .nav-link:hover {
+    color: #d8d8d8;
+}
+
+/* Mobile View Adjustments */
+@media (max-width: 767px) {
+    .navbar .navbar-nav {
+        text-align: center;
+    }
+
+    .card {
+        width: 90%;
+        padding: 15px;
+    }
+
+    .borrow-submit, .return-submit {
+        padding: 10px;
+        font-size: 1rem;
+    }
+}
+
+/* Additional Specific Styling for Borrow Request Form */
+.card-body .row {
+    margin-bottom: 15px;
+}
+
+/* Table Styles */
+.table th, .table td {
+    text-align: center;
+    padding: 12px 8px;
+}
+
+/* Make Sure the Form Add Button and Table don't Overflow the Form */
+.borrow-table {
+    max-height: 200px; /* Limit height */
+    overflow-y: auto; /* Allow scroll if content exceeds */
+}
+
+.borrow-container {
+    max-width: 30rem;
+    margin: auto;
+}
+
+/* Modify the form button and input spacing to ensure proper alignment inside the form box */
+.submitBtn, .borrow-submit {
+    margin-top: 20px;
+}
+
+/* Add some space between the form elements */
+.card .row input, .card .row select {
+    margin-bottom: 15px;
+}
+
+/* Adjust the Add Item Form Layout */
+form .row .col-4 {
+    margin-bottom: 15px;
+}
+
+/* Error message styling */
+.error {
+    color: red;
+    font-size: 1rem;
+}
+
+/* Modal for Error Messages */
+.modal-content {
+    border-radius: 12px;
+    color: white;
+}
+
+.modal-header {
+    border-bottom: 1px solid #9e1b32;
+}
+
+.modal-title {
+    color: #fff;
+    font-size: 1.5rem;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-footer {
+    border-top: 1px solid #9e1b32;
+    background-color: #333;
+}
+
+button.btn-secondary {
+    background-color: #555;
+    border-color: #555;
+}
+.small-label {
+    font-size: 0.85rem; /* Smaller text size for labels */
+    color: #555; /* Slightly darker color for better readability */
+}
+    </style>
 </head>
 <body>
-
-    <nav class="navbar navbar-expand-md bg-dark">
-        <div class="container-fluid">
-            <div class="navLogo d-flex">
-            <img src="images/TUP-LOGO-modified.png" alt="" style="width: 55px; height: 55px;">
-            <p class="me-auto mb-2 mb-lg-0" style="color: white; padding-left: 10px; padding-right: 10px; position:relative; top:15px;">Auxiliary System</p>
-            </div>
-            <button class="navbar-toggler text-white border-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <i class="bi bi-list"></i>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+<!-- Navbar -->
+<nav class="navbar navbar-expand-md navbar-dark">
+    <div class="container-fluid">
+        <div class="navLogo d-flex">
+            <img src="images/TUP-LOGO-modified.png" alt="TUP Logo">
+            <p class="me-auto mb-2 mb-lg-0">Auxiliary System</p>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
             <div class="navdiv d-flex justify-content-center w-100">
                 <div class="dropdown mx-auto">
-                <button class="btn dropdown-toggle text-white serviceDropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Services
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" value="borrowANDreturn.php">Borrow/Get Items</a></li>
-                    <li><a class="dropdown-item" value="minor-repair.php">Request a minor repair</a></li>
-                </ul>
+                    <button class="btn dropdown-toggle text-white btn-outline-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">Services</button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="borrowANDreturn.php">Borrow/Get Items</a></li>
+                        <li><a class="dropdown-item" href="minor-repair.php">Request a minor repair</a></li>
+                    </ul>
                 </div>
                 <div class="divLogin d-flex justify-content-center">
-                <a href="login.php" class="loginBtn" style="text-decoration: none;">
-                    <button class="btn btn-outline-success" type="button" id="login">Login</button>
-                </a>
+                    <a href="login.php" class="loginBtn" style="text-decoration: none;">
+                        <button class="btn btn-outline-light" type="button" id="login">Login</button>
+                    </a>
                 </div>
             </div>
-            </div>
         </div>
+    </div>
 </nav>
 
-    <div class="card borrow-container mx-auto mt-5 mb-5" style="width: 30rem; height: 36rem; border: 3px solid #0e0e0f; ">
-        <h3 class="card-title borrow-label">REQUEST ITEMS (RETURN)</h3>
-        <hr>
-        <div class="card-body borrow-content" style="z-index: 1; height: 10px;">
-            <div class="row">
-                <div class="col-6">
-                    <label>Name:</label><br>
-                    <input type="hidden" maxlength="4" name="upid" disabled value="<?php echo $listcu['id'] ?>">
-                    <input type="text" maxlength="4" disabled name="upname" value="<?php echo $listcu['name'] ?>">
-
-                </div>
-
+<!-- Return Items Form -->
+<div class="card borrow-container mx-auto mt-5 mb-5" style="width: 30rem; border: 3px solid #0e0e0f;">
+    <h3 class="card-title borrow-label text-center mb-4">REQUEST ITEMS (RETURN)</h3>
+    <hr>
+    <div class="card-body borrow-content">
+        <!-- User Info Section -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <label for="name" class="borrow-label small-label">Name:</label>
+                <input type="text" id="name" name="upname" class="form-control" disabled value="<?php echo $listcu['name'] ?>">
             </div>
         </div>
-        <hr style="position: relative; top: 60px;">
-        <div class="borrow-table mx-auto">
-            <table class="table" style="margin-top: 60px;">
-                <thead style="text-align: center;">
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Return</th>
-                    <th scope="col">Unit</th>
-                    <th scope="col">Action</th>
-                </tr>
+        <hr>
+        <!-- Return Table Section -->
+        <div class="borrow-table mx-auto mb-4">
+            <table class="table table-bordered text-center" style="margin-top: 20px;">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Return</th>
+                        <th scope="col">Unit</th>
+                        <th scope="col">Action</th>
+                    </tr>
                 </thead>
                 <tbody>
-                <?php while ($data = mysqli_fetch_assoc($listresult)) { ?>
-                    <tr>
-                    <td><?php echo $data['name'] ?></td>
-                    <td><span class="text-success"><?php echo $data['returningqty'] ?></span></td>
-                    <td><?php echo $data['unit'] ?></td>
-                    <td>
-                            <form action="" method="POST">
-                                <input type="hidden"
-                                    class="form-control"
-                                    value="<?php echo $data['id']; ?>"
-                                    name="delete"
-                                    required>
-                                <button type="submit"
-                                        class="btn btn-danger mb-1">
-                                    Delete
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                <?php } ?>
-
+                    <?php while ($data = mysqli_fetch_assoc($listresult)) { ?>
+                        <tr>
+                            <td><?php echo $data['name'] ?></td>
+                            <td><span class="text-success"><?php echo $data['returningqty'] ?></span></td>
+                            <td><?php echo $data['unit'] ?></td>
+                            <td>
+                                <form action="" method="POST">
+                                    <input type="hidden" value="<?php echo $data['id']; ?>" name="delete">
+                                    <button type="submit" class="btn btn-danger mb-1">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php } ?>
                 </tbody>
             </table>
+        </div>
 
-            <img src="images/TUP-LOGO-modified.png" unselectable="on" id="bg-logo"
-                style=" height: 20rem; width: 20rem; z-index:-1; opacity: 0.1;">
-            <div class="row">
+        <!-- Add Item Section -->
+        <form method="post" action="" class="mt-4">
+            <div class="row mb-3">
                 <div class="col-4">
-                    <label>Items:</label><br>
-                    <div class="name-dropdown">
-                        <form method="post" action="">
-                        <select id="unitDropdown" name="additem" class="form-select">
-                            <option value="">- Select -</option>
-                            <?php while ($data = mysqli_fetch_assoc($listp)) { ?>
-                                echo "ID: " . $row["id"]. " - Name: " . $row["name"]. " - Returnable: " . $row["borrowqty"]. "<br>";
-                                <option value="<?php echo $data["id"]; ?>" data-quantity="<?php echo $data['borrowqty'] ?>"><?php echo $data["name"]; ?> | Qty: <?php echo $data["borrowqty"]; ?></option>
-                            <?php } ?>
-                        </select>
-
-                    </div>
+                    <label for="unitDropdown" class="borrow-label small-label">Items:</label>
+                    <select id="unitDropdown" name="additem" class="form-select" required>
+                        <option value="">- Select -</option>
+                        <?php while ($data = mysqli_fetch_assoc($listp)) { ?>
+                            <option value="<?php echo $data['id'] ?>" data-quantity="<?php echo $data['quantity'] ?>"><?php echo $data['name'] ?> | <?php echo $data['unit'] ?>: <?php echo $data['quantity'] ?></option>
+                        <?php } ?>
+                    </select>
                 </div>
                 <div class="col-4">
-                    <label>Quantity:</label><br>
-                    <input type="number" style="z-index:1;" required id="quantity" name="qty" placeholder="">
+                    <label for="quantity" class="borrow-label small-label">Quantity:</label>
+                    <input class="form-control" type="number" id="quantity" name="qty" placeholder="Enter quantity" required>
                 </div>
                 <div class="col-4">
-                    <br>    
+                    <br>
                     <button type="submit" id="add" class="btn btn-danger">Add</button>
                 </div>
-                </form>
             </div>
-        </div>
-        <div class="submitBtn mx-auto mt-5">
+        </form>
+
+        <!-- Submit Button -->
+        <div class="submitBtn mx-auto mt-4">
             <form method="post" action="">
-
-                <input type="hidden"
-                    class="form-control"
-                    value="<?php echo $_GET['userid']; ?>"
-                    name="finalizerequest"
-                    required>
-
-                <button type="submit" class="borrow-submit">Submit</button>
+                <input type="hidden" class="form-control" value="<?php echo $_GET['userid']; ?>" name="finalizerequest" required>
+                <button type="submit" class="borrow-submit w-100">Submit</button>
             </form>
         </div>
-
-
     </div>
+</div>
+ 
+<!-- Footer -->
+<footer>
+    <p>&copy; 2024 Auxiliary System. All rights reserved.</p>
+</footer>
 
-<script src="js/borrow-items.js" type="module"></script>
+<!-- Modal -->
+<div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger" id="messageModalLabel">Error Message:</h5>
+            </div>
+            <div class="modal-body text-dark" id="modalMessage">
+                <!-- The message will be inserted here dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- <script src="js/borrow-items.js" type="module"></script> -->
 <script>
     $(document).ready(function() {
     $('#unitDropdown').change(function() {
@@ -333,6 +692,18 @@ $listp = mysqli_query($db, $sqlgetp);
             // alert("You cannot enter a quantity higher than " + placeholderQuantity);
         }
     });
+});
+</script>
+<script>
+$(document).ready(function() {
+    // Check if there's a message to show
+    <?php if (!empty($message)) { ?>
+        // Set the modal message content
+        $('#modalMessage').text("<?php echo $message; ?>");
+        
+        // Show the modal
+        $('#messageModal').modal('show');
+    <?php } ?>
 });
 </script>
 </body>

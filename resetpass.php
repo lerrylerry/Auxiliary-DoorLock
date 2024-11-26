@@ -2,85 +2,60 @@
 require('dbcred/db.php');
 session_start();
 
-// Redirect to homepage if user is already logged in
-if (isset($_SESSION['loginid'])) {
-    header("location: admin/homepage.php");
-    exit;
-}
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+$error = "";
+// Get the token from the URL (this should be the token passed in the password reset link)
+$token = isset($_GET['token']) ? mysqli_real_escape_string($db, $_GET['token']) : '';
 
-require 'vendor/autoload.php';
-$mail = new PHPMailer(true);
-
-$error = ''; // Initialize error message variable
-
-// Process the form submission
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $myusername = mysqli_real_escape_string($db, $_POST['username']);
-    $myemail = mysqli_real_escape_string($db, $_POST['email']);
+// Check if the token exists in the database and is not expired or already used
+if ($token) {
+    // Query to check if the token exists, is not used, and hasn't expired
+    $query = "SELECT * FROM tbadmin WHERE token='$token' AND token_used=FALSE";
+    $result = mysqli_query($db, $query);
     
-    // Query to check if the username exists in the database
-    $login = "SELECT id, username, password, email, role FROM tbadmin WHERE username='$myusername'";
-    $result = mysqli_query($db, $login);
-    $count = mysqli_num_rows($result);
-    
-    // If the username exists, proceed to check email
-    if ($count == 1) {
-        // Fetch the user details
-        while ($results = mysqli_fetch_array($result)) {
-            if ($myemail == $results['email']) {
-                // Generate a secure 32-character token
-                $token = bin2hex(random_bytes(16)); // 32 characters long
+    if (mysqli_num_rows($result) == 1) {
+        // Token is valid, allow the user to reset their password
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            $new_password = mysqli_real_escape_string($db, $_POST['password']);
+            $confirm_password = mysqli_real_escape_string($db, $_POST['confirm_password']);
 
-                // Update the database with the token
-                $sqlupdater = "UPDATE tbadmin SET token='$token', token_used=FALSE WHERE username='$myusername' AND email='$myemail'";
-                mysqli_query($db, $sqlupdater);
-
-
-                try {
-                    // PHPMailer Configuration
-                    $mail->SMTPDebug = false;
-                    $mail->isSMTP();
-                    $mail->Host = 'smtp.gmail.com';
-                    $mail->SMTPAuth = true;
-                    $mail->Username = 'projxacts12@gmail.com'; // Replace with your email
-                    $mail->Password = 'vdbwgupzfybcixsk'; // Replace with your email password
-                    $mail->SMTPSecure = 'tls';
-                    $mail->Port = 587;
-
-                    $mail->setFrom('projxacts12@gmail.com', 'TUP Auxiliary System');
-                    $mail->addAddress($myemail, $results['name']);
-                    $mail->isHTML(true);
-                    $mail->Subject = 'Password Reset Request';
-                    $mail->Body = 'Click <a href="http://127.0.0.1/Auxiliary-DoorLock/resetpass.php?token='. $token . '">here</a> to reset your password. The link will be use once.';
-
-                    // Send email
-                    $mail->send();
-
-                    // Redirect with success message
+            // Check if passwords match
+            if ($new_password == $confirm_password) {
+                // Don't hash the password, store it as plain text (not recommended)
+                
+                // Update the password and mark the token as used
+                $update_query = "UPDATE tbadmin SET password='$new_password', token_used=TRUE WHERE token='$token'";
+                if (mysqli_query($db, $update_query)) {
+                    // Password updated successfully, redirect to success page
                     $_SESSION['status'] = 'success';
-                    $_SESSION['message'] = 'A password reset link has been sent to your email address.';
-                    header("Location: forgotpass.php");
+                    $_SESSION['message'] = 'Your password has been successfully reset!';
+                    header("Location: 200.php"); // Redirect to 200.php on success
                     exit();
-
-                } catch (Exception $e) {
-                    // Handle email sending error
+                } else {
+                    // Error updating password
                     $_SESSION['status'] = 'error';
-                    $_SESSION['message'] = 'Message could not be sent. Mailer Error: ' . $mail->ErrorInfo;
-                    header("Location: forgotpass.php");
+                    $_SESSION['message'] = 'Error resetting password.';
+                    header("Location: 404.php"); // Redirect to 404.php on error
                     exit();
                 }
             } else {
-                // If email does not match, show error
-                $error = "The email address does not match our records.";
+                // Passwords don't match
+                $error = 'Passwords do not match.';
             }
         }
     } else {
-        // If username is not found, show error
-        $error = "Username not found.";
+        // Invalid or expired token
+        $_SESSION['status'] = 'error';
+        $_SESSION['message'] = 'Invalid or expired token. Please request a new password reset link.';
+        header("Location: 404.php"); // Redirect to 404.php on error
+        exit();
     }
+} else {
+    // No token provided in URL
+    $_SESSION['status'] = 'error';
+    $_SESSION['message'] = 'No token provided.';
+    header("Location: 404.php"); // Redirect to 404.php on error
+    exit();
 }
 ?>
 
@@ -90,9 +65,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css" rel="stylesheet">
+    <title>Reset Password</title>
     <style>
-/* General Body and Layout */
+    /* General Body and Layout */
     body {
         background-color: #dedede; /* Light grey background to match locker theme */
         background-image: url('images/LOCKER.jpg');
@@ -374,6 +349,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     footer a:hover {
         text-decoration: underline;
     }
+
+        /* Styling for alert messages */
+        .alert {
+            padding: 10px;
+            font-size: 1.1rem;
+            margin: 10px 0;
+        }
+        .alert-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .alert-error {
+            background-color: #dc3545;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -410,7 +400,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <!-- Display status messages -->
 <?php if (isset($_SESSION['status'])): ?>
     <div class="status-message">
-        <div class="alert alert-<?php echo $_SESSION['status']; ?> text-center alert-dismissible fade show" role="alert">
+        <div class="alert alert-<?php echo $_SESSION['status'] == 'success' ? 'success' : 'error'; ?> alert-dismissible fade show text-center" role="alert">
             <?php
             echo $_SESSION['message'];
             unset($_SESSION['status']);
@@ -421,30 +411,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 <?php endif; ?>
 
-<!-- Forgot Password Form -->
+<!-- Reset Password Form -->
 <div class="card mx-auto">
     <div class="card-body">
-        <h1 class="card-title">Forgot Password</h1>
+        <h1 class="card-title">Reset Your Password</h1>
 
         <?php if ($error): ?>
-            <div class="error"><?php echo $error; ?></div>
+            <div class="error text-left"><?php echo $error; ?></div>
         <?php endif; ?>
+
 
         <form method="post" action="">
             <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" placeholder="Enter Username" required>
+                <label for="password">New Password:</label>
+                <input type="password" id="password" name="password" class="form-control" required>
             </div>
             <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" placeholder="Enter Email" required>
+                <label for="confirm_password">Confirm Password:</label>
+                <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
             </div>
             <div class="form-group submitBtn">
-                <button type="submit">Send Reset Link</button>
+                <button type="submit">Reset Password</button>
             </div>
         </form>
-
-        <p class="sulink">Back to login? <a href="login.php">Click here</a></p>
     </div>
 </div>
 

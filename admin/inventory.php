@@ -56,8 +56,6 @@ $listtemp = mysqli_query($db, $sqltemp);
 
 ?>
 
-<?php include 'success.php'?>
-<?php include 'error.php'?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -76,6 +74,33 @@ $listtemp = mysqli_query($db, $sqltemp);
   <!-- DataTables CSS -->
   <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 </head>
+<style>
+    .table {
+            margin-top: 15px;
+        }
+
+        .table th, .table td {
+            text-align: center;
+            padding: 12px;
+        }
+
+        .table th {
+            background-color: #9e1b32;
+            color: white;
+        }
+
+        .table td {
+            background-color: #f9f9f9;
+        }
+        .active>.page-link, .page-link.active{
+            background-color: #9e1b32;
+            border-color: #9e1b32; 
+        }
+        .page-link {
+            color: #9e1b32;
+        }
+        
+  </style>
 <body>
 <?php include('static/sidebar.php')?>
 
@@ -231,6 +256,25 @@ $(document).ready(function() {
         <h5 class="modal-title text-white" id="massAddProductModalLabel">Receiving Items</h5>
       </div>
       <div class="modal-body">
+        <!-- Input Fields for Delivery Receipt, Added By, and Date Added -->
+        <div class="container-fluid mt-3">
+          <div class="row">
+            <div class="col-4">
+              <label class="mb-2">Delivery Receipt No.:</label>
+              <input type="text" class="form-control" id="deliveryReceiptNo" name="deliveryReceiptNo">
+            </div>
+            <div class="col-4">
+              <label class="mb-2">Added by:</label>
+              <input type="text" class="form-control" id="addedBy" name="addedBy" disabled>
+            </div>
+            <div class="col-4">
+              <label class="mb-2">Date Added:</label>
+              <input type="text" class="form-control" id="dateAdded" name="dateAdded" disabled>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Table for displaying products -->
         <div class="table-responsive text-center mt-3" style="max-height: 400px;">
           <table id="productsTable" class="table table-striped">
             <thead class="table-dark">
@@ -252,8 +296,6 @@ $(document).ready(function() {
                   echo "<td>" . $row['category'] . "</td>";
                   echo "<td>";
                   echo "<button type='button' class='btn btn-danger delete-btn' data-id='" . $row['id'] . "'><i class='bi bi-trash3-fill'></i></button>";
-
-
                   echo "</td>";
                   echo "</tr>";
               }
@@ -261,43 +303,44 @@ $(document).ready(function() {
             </tbody>
           </table>
         </div>
+
         <form action="" method="post">
-        <div class="container-fluid mt-3">
-          <hr class="fw-bold">
-          <div class="row">
-            <div class="col-6">
-            <label class="mb-2">Product Description:</label>
-              <select class="form-select mb-3" id="name" name="name" required>
-                <option value="">Select here</option>
-                <?php
-                  while ($row = mysqli_fetch_assoc($listprod)) {
-                      echo '<option value="' . $row['name'] . '">' . $row['name'] . '</option>';
-                  }
-                ?>
-              </select>
+          <div class="container-fluid mt-3">
+            <hr class="fw-bold">
+            <div class="row">
+              <div class="col-6">
+                <label class="mb-2">Product Description:</label>
+                <select class="form-select mb-3" id="name" name="name" required>
+                  <option value="">Select here</option>
+                  <?php
+                    while ($row = mysqli_fetch_assoc($listprod)) {
+                        echo '<option value="' . $row['name'] . '">' . $row['name'] . '</option>';
+                    }
+                  ?>
+                </select>
+              </div>
+              <div class="col">
+                <label class="mb-2">Quantity:</label>
+                <input type="number" class="form-control plus mb-3" id="quantity" min="1" name="quantity" required>
+              </div>
             </div>
-            <div class="col">
-            <label class="mb-2">Quantity:</label>
-              <input type="number" class="form-control plus mb-3" id="quantity" min="1" name="quantity" required>
+            <div class="row">
+              <div class="col-5">
+                <label class="mb-2">Units:</label>
+                <input type="text" class="form-control" id="units" name="units" disabled>
+              </div>
+              <div class="col-5">
+                <label class="mb-2">Category:</label>
+                <input type="text" class="form-control" id="category" name="category" disabled>
+              </div>
+              <div class="col">
+                <label class="mb-2">Add Product</label>
+                <button type="button" class="form-control bg-success text-white add-btn" id="addProductBtn"><i class="bi bi-plus-lg"> Add</i></button>
+              </div>
             </div>
           </div>
-          <div class="row">
-            <div class="col-5">
-            <label class="mb-2">Units:</label>
-              <input type="text" class="form-control" id="units" name="units" disabled>
-            </div>
-            <div class="col-5">
-            <label class="mb-2">Category:</label>
-              <input type="text" class="form-control" id="category" name="category" disabled>
-            </div>
-            <div class="col">
-            <label class="mb-2">Add Product</label>
-              <button type="button" class="form-control bg-success text-white add-btn" id="addProductBtn"><i class="bi bi-plus-lg"> Add</i></button>
-            </div>
-          </div>
-        </div>
+        </form>
       </div>
-      </form>
       <div class="modal-footer d-flex justify-content-between">
         <button type="button" class="btn btn-outline-danger deleteall-btn" id="deleteAllBtn">Delete All</button>
         <button type="submit" class="btn btn-primary addnow-btn" id="addStocksBtn">Add Stocks</button>

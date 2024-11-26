@@ -132,8 +132,6 @@ $listmr = mysqli_query($db, $sqlgetmr);
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Auxiliary | Minor Repair</title>
   <link rel="stylesheet" href="../css/styles.css">
-  <!-- <link rel="stylesheet" href="../css/forms.css"> -->
-   <link rel="stylesheet" href="../css/forms2.css">
   <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css" rel="stylesheet">
@@ -141,6 +139,33 @@ $listmr = mysqli_query($db, $sqlgetmr);
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- DataTables CSS -->
   <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+  <style>
+        .table {
+            margin-top: 15px;
+        }
+
+        .table th, .table td {
+            text-align: center;
+            padding: 12px;
+        }
+
+        .table th {
+            background-color: #9e1b32;
+            color: white;
+        }
+
+        .table td {
+            background-color: #f9f9f9;
+        }
+        .active>.page-link, .page-link.active{
+            background-color: #9e1b32;
+            border-color: #9e1b32; 
+        }
+        .page-link {
+            color: #9e1b32;
+        }
+        
+  </style>
 </head>
     <body>
         <?php include('static/sidebar.php')?>

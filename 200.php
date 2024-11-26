@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Success | Assessment Submitted</title>
+    <title>Success</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
@@ -63,20 +63,21 @@
             font-size: 0.9rem;
         }
 
-        /* Style for the back button */
-        .back-btn {
-            font-size: 1.2rem;
+        /* Go back button */
+        .go-back-btn {
+            font-size: 1.1rem;
             text-decoration: none;
             color: #fff;
-            background-color: #2196F3; /* Blue color for back button */
-            padding: 12px 30px;
+            background-color: #f44336; /* Red color for 'Go Back' button */
+            padding: 10px 30px;
             border-radius: 5px;
             margin-top: 20px;
+            display: inline-block;
             transition: background-color 0.3s;
         }
 
-        .back-btn:hover {
-            background-color: #1976D2; /* Darker blue on hover */
+        .go-back-btn:hover {
+            background-color: #e53935; /* Darker red on hover */
         }
     </style>
 </head>
@@ -88,13 +89,11 @@
                 <i class="bi bi-check-circle"></i> <!-- Check icon for success -->
             </div>
             <h1>Success!</h1>
-            <p>Your assessment has been successfully submitted and the admin has been notified.</p>
+            <p>Your password has been successfully reset.</p>
             <br>
-
-            <!-- Back to Login Button -->
-            <a href="login.php" class="back-btn">Back to Login</a>
-
-            <br><br>
+            <!-- Go Back button to login.php -->
+            <a href="login.php" class="go-back-btn">Go Back to Login</a>
+            <br>
             <small>&copy; 2024 Auxiliary System</small>
         </div>
     </div>
