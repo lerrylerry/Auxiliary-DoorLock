@@ -99,55 +99,7 @@ $listtemp = mysqli_query($db, $sqltemp);
         .page-link {
             color: #9e1b32;
         }
-        /* Ensure modal labels are left-aligned */
-        .modal-body .form-label .namezzz {
-            text-align: left !important;
-            font-weight: bold;
-        }
-
-        /* Ensure form controls take the full width */
-        .modal-body .form-control, 
-        .modal-body .form-select {
-            width: 100%;
-        }
-
-        /* Adjust modal dialog and content styling */
-        .modal-dialog-centered {
-            display: flex;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .modal-content {
-            padding: 20px;
-            border-radius: 8px;
-        }
-
-        /* Modal header styling */
-        .modal-header {
-            border-bottom: 2px solid #9e1b32;
-            background-color: #f8f9fa;
-        }
-
-        /* Title styling in the modal header */
-        .modal-title {
-            color: #9e1b32;
-            font-weight: bold;
-        }
-
-        /* Button styling */
-        .modal-footer .btn {
-            padding: 8px 20px;
-            font-weight: 600;
-        }
-
-        /* Modal footer flex to align buttons */
-        .modal-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
+        
   </style>
 <body>
 <?php include('static/sidebar.php')?>
@@ -186,18 +138,19 @@ $listtemp = mysqli_query($db, $sqltemp);
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="editModalLabel1"><span class="text-danger fw-bold">Edit a quantity?</span></h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             <!-- Edit Form -->
                             <form method="post" action="">
                                 <div class="mb-3">
-                                    <label for="productName1" class="form-label fw-bold namezzz">Product:</label>
+                                    <label for="productName1" class="form-label fw-bold">Product:</label>
                                     <input type="hidden" class="form-control" id="productName1" name="updatepid" value="<?php echo $data['id']?>">
                                     <input type="hidden" class="form-control" id="productName1" name="updatename" value="<?php echo $data['name']?>">
                                     <input type="text" class="form-control" id="productName1" name="updatename" value="<?php echo $data['name']?>" disabled>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="unit1" class="form-label fw-bold namezzz">Unit:</label>
+                                    <label for="unit1" class="form-label fw-bold">Unit:</label>
                                     <input type="hidden" name="updateunit" class="form-select" value="<?php echo $data['unit']?>">
                                     <select id="unitDropdown" name="updateunit" class="form-select" disabled>
                                         <option value="<?php echo $data['unit']?>"><?php echo $data['unit']?></option>
@@ -213,11 +166,11 @@ $listtemp = mysqli_query($db, $sqltemp);
                                     </select>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="quantity1" class="form-label fw-bold namezzz">Quantity:</label>
+                                    <label for="quantity1" class="form-label fw-bold">Quantity:</label>
                                     <input type="number" class="form-control" name="updateqty" id="quantity1" value="<?php echo $data['quantity']?>" required min="1">
                                 </div>
                                 <div class="mb-3">
-                                  <label for="unit2" class="form-label fw-bold namezzz">Category:</label>
+                                  <label for="unit2" class="form-label fw-bold">Category:</label>
                                   <input type="hidden" name="updatecat" class="form-select" value="<?php echo $data['category']?>">
                                   <select id="unitDropdown" name="updatecat" class="form-select" disabled>
                                     <option value="<?php echo $data['category']?>"><?php echo $data['category']?></option>
@@ -243,6 +196,7 @@ $listtemp = mysqli_query($db, $sqltemp);
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="deleteModalLabel1"><span class="text-danger">Delete a product ?</span></h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             Are you sure you want to delete <span class="text-primary"><?php echo $data['name']?> </span>?
@@ -296,7 +250,7 @@ $(document).ready(function() {
 
 <!-- Mass Add Modal -->
 <div class="modal fade" id="massAddProductModal" tabindex="-1" aria-labelledby="massAddProductModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-scrollable modal-xl modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header" style="background: #580606;">
         <h5 class="modal-title text-white" id="massAddProductModalLabel">Receiving Items</h5>
@@ -306,7 +260,7 @@ $(document).ready(function() {
         <div class="container-fluid mt-3">
           <div class="row">
             <div class="col-4">
-              <label class="mb-2">DRNo.:</label>
+              <label class="mb-2">Delivery Receipt No.:</label>
               <input type="text" class="form-control" id="deliveryReceiptNo" name="deliveryReceiptNo">
             </div>
             <div class="col-4">
@@ -321,8 +275,8 @@ $(document).ready(function() {
         </div>
         
         <!-- Table for displaying products -->
-        <div class="table-responsive" style="max-height: 300px; overflow-y: auto; margin-top: 15px;">
-          <table id="productsTable" class="table table-striped text-center">
+        <div class="table-responsive text-center mt-3" style="max-height: 400px;">
+          <table id="productsTable" class="table table-striped">
             <thead class="table-dark">
               <tr>
                 <th>PRODUCT DESCRIPTION</th>
@@ -394,7 +348,6 @@ $(document).ready(function() {
     </div>
   </div>
 </div>
-
 
 <!-- response modal -->
 <div class="modal fade" id="responseModal" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">
