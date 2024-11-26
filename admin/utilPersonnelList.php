@@ -81,6 +81,31 @@ $listup = mysqli_query($db, $sqlgetup);
     .fa-eye {
     cursor: pointer;
   }
+  .table {
+            margin-top: 15px;
+        }
+
+        .table th, .table td {
+            text-align: center;
+            padding: 12px;
+        }
+
+        .table th {
+            background-color: #9e1b32;
+            color: white;
+        }
+
+        .table td {
+            background-color: #f9f9f9;
+        }
+        .active>.page-link, .page-link.active{
+            background-color: #9e1b32;
+            border-color: #9e1b32; 
+        }
+        .page-link {
+            color: #9e1b32;
+        }
+        
   </style>
 </head>
 <body>
