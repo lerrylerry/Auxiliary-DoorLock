@@ -72,12 +72,12 @@
             </ul>
         </li>
         <li>
-            <a href="camera.php">
-                <i class='bx bx-video-plus'></i>
+            <a href="recorded.php">
+                <i class='bx bx-video-plus' ></i>
                 <span class="link_name">Camera</span>
             </a>
             <ul class="sub-menu blank">
-                <li><a class="link_name" href="camera.php">Camera</a></li>
+                <li><a class="link_name" href="recorded.php">Camera</a></li>
             </ul>
         </li>
         <li>

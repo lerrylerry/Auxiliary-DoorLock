@@ -634,8 +634,9 @@ button.btn-secondary {
                     <label for="quantity" class="borrow-label small-label">Quantity:</label>
                     <input class="form-control" type="number" id="quantity" name="qty" placeholder="Enter quantity" required>
                 </div>
-                <div class="col-4 d-flex align-items-end">
-                    <button type="submit" id="add" class="btn btn-danger w-100">Add</button>
+                <div class="col-4">
+                    <br>
+                    <button type="submit" id="add" class="btn btn-danger">Add</button>
                 </div>
             </div>
         </form>
