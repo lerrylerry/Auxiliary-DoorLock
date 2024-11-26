@@ -3,234 +3,425 @@ require('dbcred/db.php');
 session_start();
 
 if (isset($_SESSION['loginid'])) {
-  header("location: admin/homepage.php");
+    header("location: admin/homepage.php");
+    exit();
 }
+
+$error = ''; // Initialize error message variable
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $myusername = mysqli_real_escape_string($db, $_POST['username']);
     $mypassword = mysqli_real_escape_string($db, $_POST['password']);
-    $login = "SELECT id,username,name,password,email,role FROM tbadmin WHERE username='" . $myusername . "'";
+    
+    $login = "SELECT id, username, name, password, email, role FROM tbadmin WHERE username='$myusername'";
     $result = mysqli_query($db, $login);
-    $count = @mysqli_num_rows($result);
-    if ($count == 1) {
-        while ($results = mysqli_fetch_array($result)) {
-            if ($mypassword == $results['password']) {
-                $_SESSION['user'] = $myusername;
-                $_SESSION['name'] = $results['name'];
-                $_SESSION['email'] = $results['email'];
-                $_SESSION['loginid'] = $results['id'];
-                if ($results['role'] =="assistant") {
-                    header("location: assistant/homepage.php");
-                } elseif ($results['role'] =="admin") {
-                    header("location: admin/homepage.php");
-                }else {
-                    $_SESSION['errMsg'] = "You are not allowed to access this page";
-                    header("location:  index.php");
-                }
-            }else{
-                $error = "Invalid Login";
-            }
+    
+    if ($result && mysqli_num_rows($result) == 1) {
+        $results = mysqli_fetch_assoc($result);
+        if ($mypassword == $results['password']) {
+            $_SESSION['user'] = $myusername;
+            $_SESSION['name'] = $results['name'];
+            $_SESSION['email'] = $results['email'];
+            $_SESSION['loginid'] = $results['id'];
+            $_SESSION['role'] = $results['role'];
+            
+            // Set success message and prepare for redirection
+            $_SESSION['status'] = 'success';
+            $_SESSION['message'] = 'Login successful! Redirecting...';
+            
+            // Determine destination based on role
+            $redirect = ($results['role'] == "assistant") ? "assistant/homepage.php" : "admin/homepage.php";
+            
+            echo "<script>
+                    setTimeout(function() {
+                        window.location.href = '$redirect';
+                    }, 2000); // Delay redirect by 2 seconds
+                  </script>";
+        } else {
+            $error = 'Wrong password. Please try again.';
         }
     } else {
-        $error = "Invalid Login";
+        $error = 'Username does not exist.';
     }
 }
 ?>
-
-
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Anta&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="css/login.css">
-    <title>Auxiliary | Login</title>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg bg-dark">
-        <div class="container-fluid">
-          <div class="navLogo d-flex">
-            <img src="images/TUP-LOGO-modified.png" alt="" style="width: 60px; height: 60px;">
-            <p class="me-auto mb-2 mb-lg-0" style="color: white; padding-left: 10px; padding-right: 10px; position:relative; top:15px;">Auxiliary System</p>
-          </div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <i class="bi bi-list"></i>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <div class="dropdown">
-                <button class="btn dropdown-toggle serviceDropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false" >
-                  Services
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" value="borrowANDreturn.php">Borrow/Get Items</a></li>
-                  <li><a class="dropdown-item" value="repair - userTOadmin.php">Request a minor repair</a></li>
-                  <li><a class="dropdown-item" value="vehicle-reservation.php">Request for vehicle</a></li>
-                </ul>
-            </div> 
-            <div class="d-flex loginBtn">
-              <button class="btn btn-outline-success" type="button">Login</button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <nav class="navbar navbar-expand-md bg-dark">
-        <div class="container-fluid">
-          <div class="navLogo d-flex">
-            <img src="images/TUP-LOGO-modified.png" alt="" style="width: 55px; height: 55px;">
-            <p class="me-auto mb-2 mb-lg-0" style="color: white; padding-left: 10px; padding-right: 10px; position:relative; top:15px;">Auxiliary System</p>
-          </div>
-          <button class="navbar-toggler text-white border-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <i class="bi bi-list"></i>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <div class="navdiv d-flex justify-content-center w-100">
-              <div class="dropdown mx-auto">
-                <button class="btn dropdown-toggle text-white serviceDropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Services
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" value="borrowANDreturn.php">Borrow/Get Items</a></li>
-                  <li><a class="dropdown-item" value="repair - userTOadmin.php">Request a minor repair</a></li>
-                  <li><a class="dropdown-item" value="vehicle-reservation.php">Request for vehicle</a></li>
-                </ul>
-              </div>
-              <div class="divLogin d-flex justify-content-center">
-                <a href="login.php" class="loginBtn" style="text-decoration: none;">
-                  <button class="btn btn-outline-success" type="button" id="login">Login</button>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-    </nav>
-       
-    <div class="card login-container" style="width: 25rem; height: 33rem; border: 3px solid #0e0e0f;">
-        
-        <div class="card-body login-content" style="z-index: 1;">
-            <h1 class="card-title login-label">LOG IN</h1>
-            <form method="post" action="">
-            <div class="login-form">
-                <label>Username:</label><br>
-                <input type="text" id="username" name="username" placeholder="Enter Username"><br>
-                <div id="usernameError" class="error"></div>
-                <label>Password:</label><br>
-                <input type="password" id="password" name="password" placeholder="Enter password"><br>
-                <div id="passwordError" class="error"></div>
-                <label class="rmbr" style="position: relative; top: 15px;">Remember Me</label>
-                <input type="checkbox" id="rmbr" style="position: relative; top: 15px;"><br>
-                <button class="submit" id="loginBtn" style="position: relative; top:15px;">Log In</button><br>
-            </form>
-                <p class="sulink" style="position: relative; top:25px;">Forgot password? Click <a href="forgotpass.php" id="sulink">"here"</a> to change!!</p>
-            </div>
-        </div>
-        <img src="images/TUP-LOGO-modified.png" id="bg-logo" style=" height: 20rem; width: 20rem; opacity: 0.1;"> 
-    </div>
-</body>
-<script src="js/login.js" type="module"></script>
-</html> -->
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!--CSS-->
-    
     <link href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Anta&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
-          rel="stylesheet">
-
-    <!--JS-->
-    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
-    <script src="https://cdn.datatables.net/2.0.3/js/dataTables.bootstrap5.js"></script>
-    <link rel="stylesheet" href="css/login.css">
-
-    <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Anta&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"> -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script> -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
-    <script src="https://cdn.datatables.net/2.0.3/js/dataTables.bootstrap5.js"></script>>
-    <link rel="stylesheet" href="css/login.css"> -->
-    <title>Auxiliary | Login</title>
+
+    <style>
+/* General Body and Layout */
+body {
+    background-color: #dedede; /* Light grey background to match locker theme */
+    background-image: url('images/LOCKER.jpg');
+    background-size: cover;
+    background-position: center;
+    font-family: Arial, sans-serif;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    position: relative; /* Ensure the overlay is above the background image */
+    min-height: 100vh; /* Make sure the body takes at least full height of the viewport */
+    display: flex;
+    flex-direction: column; /* Use flexbox layout */
+}
+
+/* Add a semi-transparent overlay to the body */
+body::before {
+    content: ''; /* Empty content for the overlay */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
+    z-index: -1; /* Place it behind the content */
+}
+
+/* Navbar Styles */
+.navbar {
+    background-color: #9e1b32;
+    padding: 10px 20px;
+    z-index: 1000;
+}
+
+.navbar .container-fluid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navLogo {
+    display: flex;
+    align-items: center;
+}
+
+.navLogo img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 3px solid #555;
+}
+
+.navLogo p {
+    color: white;
+    padding-left: 10px;
+    font-size: 1.2rem;
+}
+
+.navbar-toggler {
+    color: white;
+    border: 1px solid #fff;
+    background-color: #9e1b32;
+}
+
+.navbar-toggler-icon {
+    background-color: transparent;
+    border: none;
+}
+
+.navbar-toggler-icon::before, 
+.navbar-toggler-icon::after {
+    background-color: white;
+}
+
+.navbar-toggler-icon span {
+    background-color: white;
+}
+
+/* Navbar Dropdown Menu */
+.navdiv .dropdown .btn {
+    color: white;
+    background-color: #9e1b32;
+    border: 1px solid #fff;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.navdiv .dropdown .btn:hover {
+    background-color: #7a1623;
+    color: white;
+}
+
+.navdiv .dropdown .btn:focus {
+    background-color: #7a1623;
+    color: white;
+    box-shadow: none;
+}
+
+.dropdown-menu {
+    background-color: #9e1b32;
+    border: 1px solid #7a1623;
+}
+
+.dropdown-item {
+    color: white;
+    background-color: #9e1b32;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #7a1623;
+    color: white;
+}
+
+/* Mobile Navbar Adjustment */
+@media (max-width: 767px) {
+    .navbar .container-fluid {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .navLogo {
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+    }
+
+    .navbar-toggler {
+        margin-left: 10px;
+    }
+
+    .navdiv {
+        display: none;
+        flex-direction: column;
+    }
+
+    .collapse.show .navdiv {
+        display: flex;
+    }
+
+    .divLogin {
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .divLogin .loginBtn button {
+        width: 100%;
+    }
+}
+
+/* Card and Form Styles */
+.card {
+    background-color: rgba(255, 255, 255, 0.9); /* Light form card to stand out */
+    border-radius: 8px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); /* Darker shadow for contrast */
+    padding: 30px;
+    margin-top: 50px;
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 30px;
+    box-sizing: border-box;
+}
+
+.card-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #9e1b32;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Input Styles */
+input, textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+input:focus, textarea:focus {
+    border-color: #9e1b32;
+    box-shadow: 0 0 10px rgba(158, 27, 50, 0.5);
+    outline: none;
+}
+
+/* Label Styles */
+label {
+    color: #333;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* Submit Button */
+.submitBtn button {
+    width: 100%;
+    padding: 12px;
+    background-color: #9e1b32;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submitBtn button:hover {
+    background-color: #7a1623;
+}
+
+/* Forgot Password Link */
+.sulink {
+    text-align: center;
+    margin-top: 10px;
+    color: #333;
+}
+
+.sulink a {
+    color: #9e1b32;
+    text-decoration: none;
+}
+
+.sulink a:hover {
+    text-decoration: underline;
+}
+
+/* Remember Me Checkbox */
+.rmbr {
+    display: inline-block;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    margin-right: 5px;
+}
+
+#rmbr {
+    vertical-align: middle;
+}
+
+/* Error Message Styles */
+.error {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 5px;
+    text-align: center;
+}
+
+/* Background Logo */
+#bg-logo {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    opacity: 0.1;
+    z-index: -1;
+    width: 120px;
+}
+
+/* Footer Styles */
+footer {
+    background-color: #2d2d2d;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    margin-top: auto; /* Push footer to the bottom of the page */
+}
+
+footer p {
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+footer a {
+    color: #ed8383;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+   </style>
 </head>
 <body>
 
-      <nav class="navbar navbar-expand-md bg-dark">
-        <div class="container-fluid">
-          <div class="navLogo d-flex">
-            <img src="images/TUP-LOGO-modified.png" alt="" style="width: 55px; height: 55px;">
-            <p class="me-auto mb-2 mb-lg-0" style="color: white; padding-left: 10px; padding-right: 10px; position:relative; top:15px;">Auxiliary System</p>
-          </div>
-          <button class="navbar-toggler text-white border-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <i class="bi bi-list"></i>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+<!-- Navbar -->
+<nav class="navbar navbar-expand-md navbar-dark">
+    <div class="container-fluid">
+        <div class="navLogo d-flex">
+            <img src="images/TUP-LOGO-modified.png" alt="TUP Logo">
+            <p class="me-auto mb-2 mb-lg-0">Auxiliary System</p>
+        </div>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
             <div class="navdiv d-flex justify-content-center w-100">
-              <div class="dropdown mx-auto">
-                <button class="btn dropdown-toggle text-white serviceDropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Services
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" value="borrowANDreturn.php">Borrow/Get Items</a></li>
-                  <li><a class="dropdown-item" value="minor-repair.php">Request a minor repair</a></li>
-                </ul>
-              </div>
-              <div class="divLogin d-flex justify-content-center">
-                <a href="login.php" class="loginBtn" style="text-decoration: none;">
-                  <button class="btn btn-outline-success" type="button" id="login">Login</button>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-    </nav>
-       
-    <div class="card login-container mx-auto mt-5 mb-5 " style="width: 25rem; height: 33rem; border: 3px solid #0e0e0f;">
-        
-        <div class="card-body login-content" style="z-index: 1;">
-            <h1 class="card-title login-label">LOG IN</h1>
-            <form method="post" action="">
-            <div class="login-form">
-                <label>Username:</label><br>
-                <input type="text" id="username" name="username" placeholder="Enter Username"><br>
-                <div id="usernameError" class="error"></div>
-                <label>Password:</label><br>
-                <input type="password" id="password" name="password" placeholder="Enter password"><br>
-                <div id="passwordError" class="error"></div>
-                <label class="rmbr" style="position: relative; top: 15px;">Remember Me</label>
-                <input type="checkbox" id="rmbr" style="position: relative; top: 15px;"><br>
-                <button class="submit" id="loginBtn" style="position: relative; top:15px;">Log In</button><br>
-            </form>
-                <p class="sulink" style="position: relative; top:25px;">Forgot password? Click <a href="forgotpass.php" id="sulink">"here"</a> to change!!</p>
+                <div class="dropdown mx-auto">
+                    <button class="btn dropdown-toggle text-white" type="button" data-bs-toggle="dropdown" aria-expanded="false">Services</button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="borrowANDreturn.php">Borrow/Get Items</a></li>
+                        <li><a class="dropdown-item" href="minor-repair.php">Request a minor repair</a></li>
+                    </ul>
+                </div>
+                <div class="divLogin d-flex justify-content-center">
+                    <a href="login.php" class="loginBtn" style="text-decoration: none;">
+                        <button class="btn btn-outline-light" type="button" id="login">Login</button>
+                    </a>
+                </div>
             </div>
         </div>
-        <img src="images/TUP-LOGO-modified.png" id="bg-logo" style=" height: 20rem; width: 20rem; opacity: 0.1;"> 
     </div>
+</nav>
+
+<!-- Display status messages -->
+<?php if (isset($_SESSION['status'])): ?>
+    <div class="status-message">
+        <div class="alert alert-<?php echo $_SESSION['status']; ?> alert-dismissible fade show text-center" role="alert">
+            <?php
+            echo $_SESSION['message'];
+            unset($_SESSION['status']);
+            unset($_SESSION['message']);
+            ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+<?php endif; ?>
+
+<!-- Login Form -->
+<div class="card mx-auto">
+    <div class="card-body">
+        <h1 class="card-title">Log In</h1>
+
+        <?php if ($error): ?>
+            <div class="error"><?php echo $error; ?></div>
+        <?php endif; ?>
+
+        <form method="post" action="">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" placeholder="Enter Username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" placeholder="Enter password" required>
+            </div>
+            <div class="form-group submitBtn">
+                <button type="submit">Log In</button>
+            </div>
+        </form>
+        <p class="sulink">Forgot password? Click <a href="forgotpass.php">here</a> to reset it.</p>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <p>&copy; 2024 Auxiliary System. All rights reserved.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
-<script src="js/login.js" type="module"></script>
 </html>
