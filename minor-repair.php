@@ -314,54 +314,54 @@ if (isset($_POST['name'])) {
         <h4 class="card-title">REQUEST BY</h4>
         <hr>
         <div class="form-section">
-            <label>Name:</label>
+            <label>Name:<span class="text-danger">*</span></label>
             <input type="text" id="name" name="name" placeholder="Enter name" required>
         </div>
         <div class="form-section">
-            <label>Position:</label>
+            <label>Position:<span class="text-danger">*</span></label>
             <input type="text" id="position" name="position" placeholder="Enter position" required>
         </div>
         <div class="form-section">
-            <label>Department:</label>
+            <label>Department:<span class="text-danger">*</span></label>
             <input type="text" id="department" name="department" placeholder="Enter department" required>
         </div>
         <div class="form-section">
-            <label>Email:</label>
+            <label>Email:<span class="text-danger">*</span></label>
             <input type="text" id="email" name="email" placeholder="Enter email" required>
         </div>
 
         <h4 class="card-title">DESCRIPTION OF PROPERTY</h4>
         <hr>
         <div class="form-section">
-            <label>Type:</label>
+            <label>Type:<span class="text-danger">*</span></label>
             <input type="text" id="type" name="type" placeholder="Enter type" required>
         </div>
         <div class="form-section">
-            <label>Brand Model:</label>
+            <label>Brand Model:<span class="text-danger">*</span></label>
             <input type="text" id="model" name="model" placeholder="Enter brand model" required>
         </div>
         <div class="form-section">
-            <label>Serial No.:</label>
-            <input type="text" id="serial" name="serial" placeholder="Enter serial" required>
+            <label>Serial No. (Optional).:</label>
+            <input type="text" id="serial" name="serial" placeholder="Enter serial">
         </div>
         <div class="form-section">
-            <label>Property No.:</label>
-            <input type="text" id="property" name="propertyno" placeholder="Enter property number" required>
+            <label>Property No. (Optional):</label>
+            <input type="text" id="property" name="propertyno" placeholder="Enter property number">
         </div>
         <div class="form-section">
-            <label>Acquisition Date:</label>
-            <input type="date" id="acqusitionDate" name="acqusitionDate" required>
+            <label>Acquisition Date (Optional):</label>
+            <input type="date" id="acqusitionDate" name="acqusitionDate">
         </div>
         <div class="form-section">
-            <label>Acquisition Cost:</label>
-            <input type="text" id="acqusitionCost" name="acqusitionCost" placeholder="Enter acquisition cost" required>
+            <label>Acquisition Cost (Optional):</label>
+            <input type="text" id="acqusitionCost" name="acqusitionCost" placeholder="Enter acquisition cost">
         </div>
 
         <h4 class="card-title">DEFECTS AND COMPLAINTS</h4>
         <hr>
         <div class="form-section">
-            <label>Nature and Scope of Works to be done:</label>
-            <textarea id="message" name="message" placeholder="Explanation message" required></textarea>
+            <label>Nature and Scope of Works to be done:<span class="text-danger">*</span></label>
+            <textarea id="message" name="message" placeholder="Explanation message" rows="" required></textarea>
         </div>
 
         <div class="submitBtn">

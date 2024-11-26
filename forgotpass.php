@@ -410,12 +410,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <!-- Display status messages -->
 <?php if (isset($_SESSION['status'])): ?>
     <div class="status-message">
-        <div class="alert alert-<?php echo $_SESSION['status']; ?>" role="alert">
+        <div class="alert alert-<?php echo $_SESSION['status']; ?> text-center alert-dismissible fade show" role="alert">
             <?php
             echo $_SESSION['message'];
             unset($_SESSION['status']);
             unset($_SESSION['message']);
             ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     </div>
 <?php endif; ?>

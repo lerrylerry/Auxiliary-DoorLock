@@ -2,6 +2,8 @@
 require('dbcred/db.php');
 session_start();
 
+
+$error = "";
 // Get the token from the URL (this should be the token passed in the password reset link)
 $token = isset($_GET['token']) ? mysqli_real_escape_string($db, $_GET['token']) : '';
 
@@ -38,8 +40,7 @@ if ($token) {
                 }
             } else {
                 // Passwords don't match
-                $_SESSION['status'] = 'error';
-                $_SESSION['message'] = 'Passwords do not match.';
+                $error = 'Passwords do not match.';
             }
         }
     } else {
@@ -399,12 +400,13 @@ if ($token) {
 <!-- Display status messages -->
 <?php if (isset($_SESSION['status'])): ?>
     <div class="status-message">
-        <div class="alert alert-<?php echo $_SESSION['status'] == 'success' ? 'success' : 'error'; ?>" role="alert">
+        <div class="alert alert-<?php echo $_SESSION['status'] == 'success' ? 'success' : 'error'; ?> alert-dismissible fade show text-center" role="alert">
             <?php
             echo $_SESSION['message'];
             unset($_SESSION['status']);
             unset($_SESSION['message']);
             ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     </div>
 <?php endif; ?>
@@ -414,10 +416,10 @@ if ($token) {
     <div class="card-body">
         <h1 class="card-title">Reset Your Password</h1>
 
-        <!-- Error message for password mismatch -->
-        <?php if (isset($_SESSION['status']) && $_SESSION['status'] == 'error'): ?>
-            <div class="error"><?php echo $_SESSION['message']; ?></div>
+        <?php if ($error): ?>
+            <div class="error text-left"><?php echo $error; ?></div>
         <?php endif; ?>
+
 
         <form method="post" action="">
             <div class="form-group">
