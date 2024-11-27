@@ -28,17 +28,12 @@
             </ul>
         </li>
         <li>
-            <div class="iocn-link">
-                <a>
-                    <i class='bx bx-user nav_icon'></i>
-                    <span class="link_name">Personnels</span>
-                </a>
-                <i class='bx bxs-chevron-down arrow'></i>
-            </div>
-            <ul class="sub-menu">
-                <li><a class="link_name">Personnels</a></li>
-                <li><a href="utilPersonnelList.php">Utility Personnels</a></li>
-                <li><a href="mainPersonnelList.php">Maintenance Personnels</a></li>
+            <a href="utilPersonnelList.php">
+                <i class='bx bx-user nav_icon' ></i>
+                <span class="link_name">Utility Personnels</span>
+            </a>
+            <ul class="sub-menu blank">
+                <li><a class="link_name" href="utilPersonnelList.php">Utility Personnels</a></li>
             </ul>
         </li>
         <li>

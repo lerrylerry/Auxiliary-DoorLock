@@ -164,6 +164,62 @@ $listmr = mysqli_query($db, $sqlgetmr);
         .page-link {
             color: #9e1b32;
         }
+        .modal-header {
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .modal-footer {
+            border-top: 2px solid #dee2e6;
+        }
+
+        .card {
+            border-radius: 10px;
+        }
+
+        .card-header {
+            border-radius: 10px 10px 0 0;
+        }
+
+        .card-body {
+            background-color: #f8f9fa;
+        }
+
+        .text-muted {
+            font-size: 0.95rem;
+        }
+
+        .fw-bold {
+            font-weight: bold;
+        }
+
+        .modal-header {
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .modal-footer {
+            border-top: 2px solid #dee2e6;
+        }
+
+        .card {
+            border-radius: 10px;
+        }
+
+        .card-header {
+            border-radius: 10px 10px 0 0;
+        }
+
+        .card-body {
+            background-color: #f8f9fa;
+        }
+
+        .text-muted {
+            font-size: 0.95rem;
+        }
+
+        .fw-bold {
+            font-weight: bold;
+        }
+
         
   </style>
 </head>
@@ -201,57 +257,62 @@ $listmr = mysqli_query($db, $sqlgetmr);
                             <div class="row justify-content-center">
                                 <div class="col-md-8 col-lg-6">
                                     <!-- Card container with shadow and rounded corners -->
-                                    <div class="card shadow-md">
+                                    <div class="card shadow-md border border-secondary rounded">
                                         <!-- Card Header with title -->
                                         <div class="card-header text-center">
                                             <h3>Assessment Form</h3>
                                         </div>
 
                                         <!-- Card Body with form details -->
-                                        <div class="card-body">
-                                            <h4 class="mb-4">Request Details</h4>
+                                        <div class="card-body" style="background-color: #f5f5f5; border: 1px solid #ddd; border-radius: 10px; padding: 20px;">
+                                            <h4 class="mb-4 text-center" style="color: #9e1b32;">Request Details</h4>
 
-                                            <!-- Form Rows for request details -->
-                                            <div class="row">
-                                                <div class="col-sm-4"><strong>Name:</strong></div>
-                                                <div class="col-sm-8"><?php echo $data['name']; ?></div>
+                                            <!-- Form Rows for request details (Inline Layout) -->
+                                            <div class="form-group mb-3 p-2 border rounded" style="background-color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
+                                                <label><strong>Name:</strong></label>
+                                                <div><?php echo $data['name']; ?></div>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-sm-4"><strong>Position:</strong></div>
-                                                <div class="col-sm-8"><?php echo $data['position']; ?></div>
+                                            <div class="form-group mb-3 p-2 border rounded" style="background-color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
+                                                <label><strong>Position:</strong></label>
+                                                <div><?php echo $data['position']; ?></div>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-sm-4"><strong>Department:</strong></div>
-                                                <div class="col-sm-8"><?php echo $data['department']; ?></div>
+                                            <div class="form-group mb-3 p-2 border rounded" style="background-color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
+                                                <label><strong>Department:</strong></label>
+                                                <div><?php echo $data['department']; ?></div>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-sm-4"><strong>Type:</strong></div>
-                                                <div class="col-sm-8"><?php echo $data['type']; ?></div>
+                                            <div class="form-group mb-3 p-2 border rounded" style="background-color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
+                                                <label><strong>Type:</strong></label>
+                                                <div><?php echo $data['type']; ?></div>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-sm-4"><strong>Serial No:</strong></div>
-                                                <div class="col-sm-8"><?php echo $data['serial']; ?></div>
+                                            <div class="form-group mb-3 p-2 border rounded" style="background-color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
+                                                <label><strong>Serial No:</strong></label>
+                                                <div><?php echo $data['serial']; ?></div>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-sm-4"><strong>Brand/Model:</strong></div>
-                                                <div class="col-sm-8"><?php echo $data['brandmodel']; ?></div>
+                                            <div class="form-group mb-3 p-2 border rounded" style="background-color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
+                                                <label><strong>Brand/Model:</strong></label>
+                                                <div><?php echo $data['brandmodel']; ?></div>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-sm-4"><strong>Property No:</strong></div>
-                                                <div class="col-sm-8"><?php echo $data['propertyno']; ?></div>
+                                            <div class="form-group mb-3 p-2 border rounded" style="background-color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
+                                                <label><strong>Property No:</strong></label>
+                                                <div><?php echo $data['propertyno']; ?></div>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-sm-4"><strong>Acquisition Cost:</strong></div>
-                                                <div class="col-sm-8"><?php echo $data['acqcost']; ?></div>
+                                            <div class="form-group mb-3 p-2 border rounded" style="background-color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
+                                                <label><strong>Acquisition Cost:</strong></label>
+                                                <div><?php echo $data['acqcost']; ?></div>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-sm-4"><strong>Acquisition Date:</strong></div>
-                                                <div class="col-sm-8"><?php echo $data['acqdate']; ?></div>
+                                            <div class="form-group mb-3 p-2 border rounded" style="background-color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
+                                                <label><strong>Acquisition Date:</strong></label>
+                                                <div><?php echo $data['acqdate']; ?></div>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-sm-4"><strong>Defects and Complaints:</strong></div>
-                                                <div class="col-sm-8"><?php echo $data['scope']; ?></div>
+                                            <div class="form-group mb-3 p-2 border rounded" style="background-color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
+                                                <label><strong>Defects and Complaints:</strong></label>
+                                                <div><?php echo $data['scope']; ?></div>
                                             </div>
+                                        </div>
+
+                                        <!-- Card Footer with Close button -->
+                                        <div class="card-footer text-center">
+                                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
                                         </div>
                                     </div>
                                 </div>
@@ -259,6 +320,12 @@ $listmr = mysqli_query($db, $sqlgetmr);
                         </div>
                     </div>
                 </div>
+
+
+
+
+
+
 
 
 
