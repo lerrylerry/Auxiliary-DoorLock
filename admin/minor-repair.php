@@ -192,6 +192,34 @@ $listmr = mysqli_query($db, $sqlgetmr);
             font-weight: bold;
         }
 
+        .modal-header {
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .modal-footer {
+            border-top: 2px solid #dee2e6;
+        }
+
+        .card {
+            border-radius: 10px;
+        }
+
+        .card-header {
+            border-radius: 10px 10px 0 0;
+        }
+
+        .card-body {
+            background-color: #f8f9fa;
+        }
+
+        .text-muted {
+            font-size: 0.95rem;
+        }
+
+        .fw-bold {
+            font-weight: bold;
+        }
+
         
   </style>
 </head>
@@ -231,8 +259,8 @@ $listmr = mysqli_query($db, $sqlgetmr);
                                     <!-- Card container with shadow and rounded corners -->
                                     <div class="card shadow-md border border-secondary rounded">
                                         <!-- Card Header with title -->
-                                        <div class="card-header text-center text-white" style="background-color: #ff4d4d;">
-                                            <h3>Minor Repair Requests</h3>
+                                        <div class="card-header text-center">
+                                            <h3>Assessment Form</h3>
                                         </div>
 
                                         <!-- Card Body with form details -->

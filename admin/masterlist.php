@@ -107,6 +107,55 @@ $listp = mysqli_query($db, $sqlgetp);
         .page-link {
             color: #9e1b32;
         }
+        /* Ensure modal labels are left-aligned */
+        .modal-body .form-label .namezzz {
+            text-align: left !important;
+            font-weight: bold;
+        }
+
+        /* Ensure form controls take the full width */
+        .modal-body .form-control, 
+        .modal-body .form-select {
+            width: 100%;
+        }
+
+        /* Adjust modal dialog and content styling */
+        .modal-dialog-centered {
+            display: flex;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .modal-content {
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        /* Modal header styling */
+        .modal-header {
+            border-bottom: 2px solid #9e1b32;
+            background-color: #f8f9fa;
+        }
+
+        /* Title styling in the modal header */
+        .modal-title {
+            color: #9e1b32;
+            font-weight: bold;
+        }
+
+        /* Button styling */
+        .modal-footer .btn {
+            padding: 8px 20px;
+            font-weight: 600;
+        }
+
+        /* Modal footer flex to align buttons */
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
         
   </style>
 </head>
@@ -138,78 +187,74 @@ $listp = mysqli_query($db, $sqlgetp);
         <td>
           <!-- Edit Button -->
           <button type="button" class="btn btn-primary btn-sm editBtn bi bi-pencil-fill" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $data['id']?>"></button>
-            <!-- Edit Modals -->
-            <div class="modal fade" id="editModal<?php echo $data['id']?>" tabindex="-1" aria-labelledby="editModalLabel1" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="editModalLabel1"><span class="text-danger fw-bold">Edit a product?</span></h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <!-- Edit Form -->
-                            <form method="post" action="">
-                                <div class="mb-3">
-                                    <label for="productName1" class="form-label fw-bold">Product:</label>
-                                    <input type="hidden" class="form-control" id="productName1" name="updatepid" value="<?php echo $data['id']?>" required>
-                                    <input type="text" class="form-control" id="productName1" name="updatename" value="<?php echo $data['name']?>" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="unit1" class="form-label fw-bold">Unit:</label>
-                                    <select id="unitDropdown" name="updateunit" class="form-select">
-                                        <option value="<?php echo $data['unit']?>"><?php echo $data['unit']?></option>
-                                        <option value="kls">kls</option>
-                                        <option value="gal">gal</option>
-                                        <option value="pcs">pcs</option>
-                                        <option value="tubes">tubes</option>
-                                        <option value="rolls">rolls</option>
-                                        <option value="can">can</option>
-                                        <option value="ltrs">ltrs</option>
-                                        <option value="pairs">pairs</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                  <label for="unit2" class="form-label fw-bold">Category:</label>
-                                  <select id="unitDropdown" name="updatecat" class="form-select">
+          <div class="modal fade" id="editModal<?php echo $data['id']?>" tabindex="-1" aria-labelledby="editModalLabel1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel1"><span class="text-danger fw-bold">Edit a product?</span></h5>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" action="">
+                            <div class="mb-3">
+                                <label for="productName1" class="form-label">Product:</label>
+                                <input type="hidden" class="form-control" name="updatepid" value="<?php echo $data['id']?>" required>
+                                <input type="text" class="form-control" name="updatename" value="<?php echo $data['name']?>" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="unit1" class="form-label">Unit:</label>
+                                <select name="updateunit" class="form-select" required>
+                                    <option value="<?php echo $data['unit']?>"><?php echo $data['unit']?></option>
+                                    <option value="kls">kls</option>
+                                    <option value="gal">gal</option>
+                                    <option value="pcs">pcs</option>
+                                    <option value="tubes">tubes</option>
+                                    <option value="rolls">rolls</option>
+                                    <option value="can">can</option>
+                                    <option value="ltrs">ltrs</option>
+                                    <option value="pairs">pairs</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="unit2" class="form-label">Category:</label>
+                                <select name="updatecat" class="form-select" required>
                                     <option value="<?php echo $data['category']?>"><?php echo $data['category']?></option>
                                     <option value="Consumables">Consumables (Products that can be consume)</option>
                                     <option value="Returnables">Returnables (Products that can be return)</option>
                                     <option value="Unknown">Unknown</option>
-                                  </select>
-                                </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Save changes</button>
-                            </form>
-                        </div>
+                                </select>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                        </form>
                     </div>
                 </div>
             </div>
-          <!-- Delete Button -->
-          <button type="button" class="btn btn-danger btn-sm deleteBtn bi bi-trash-fill" data-bs-toggle="modal" data-bs-target="#deleteModal<?php echo $data['id']?>"></button>
-            <!-- Delete Modals -->
-            <div class="modal fade" id="deleteModal<?php echo $data['id']?>" tabindex="-1" aria-labelledby="deleteModalLabel1" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="deleteModalLabel1"><span class="text-danger fw-bold">Delete a product ?</span></h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            Are you sure you want to delete <span class="text-primary"><?php echo $data['name']?> </span>?
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <form method="post" action="" >
-                                <input type="hidden" class="form-control" id="" name="deleteid" value="<?php echo $data['id']?>">
+        </div>
+
+        <!-- Delete Button -->
+        <button type="button" class="btn btn-danger btn-sm deleteBtn bi bi-trash-fill" data-bs-toggle="modal" data-bs-target="#deleteModal<?php echo $data['id']?>"></button>
+        <div class="modal fade" id="deleteModal<?php echo $data['id']?>" tabindex="-1" aria-labelledby="deleteModalLabel1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel1"><span class="text-danger fw-bold">Delete a product?</span></h5>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete <span class="text-primary"><?php echo $data['name']?> </span>?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <form method="post" action="" >
+                            <input type="hidden" name="deleteid" value="<?php echo $data['id']?>">
                             <button type="submit" class="btn btn-danger">Delete</button>
-                            </form>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
+        </div>
         </td>
       </tr>
     <?php } ?>
@@ -239,63 +284,59 @@ $listp = mysqli_query($db, $sqlgetp);
   });
 </script>
 
-<!-- Add Product Modal -->
 <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addProductModalLabel"><span class="text-danger">Add New Product?</span></h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <!-- Add Product Form -->
-        <form id="addProductForm" action="" method="post">
-            <div class="row">
-                <div class="mb-3">
-                    <label for="productName" class="form-label fw-bold">Product Name</label>
-                    <input type="text" class="form-control" id="productName" name="productName" placeholder="Ex: Soap" required>
-                </div>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addProductModalLabel"><span class="text-danger">Add New Product?</span></h5>
             </div>
-            <div class="row">
-                <div class="col-sm-6">
-                    <div class="mb-3">
-                        <label for="unit1" class="form-label fw-bold">Unit</label>
-                        <select id="unitDropdown" name="unit" class="form-select" required>
-                        <option value="">Select here</option>
-                        <option value="kls">kls</option>
-                        <option value="gal">gal</option>
-                        <option value="pcs">pcs</option>
-                        <option value="tubes">tubes</option>
-                        <option value="rolls">rolls</option>
-                        <option value="can">can</option>
-                        <option value="trs">ltrs</option>
-                        <option value="pairs">pairs</option>
-                        <option value="other">other</option>
-                        </select>
+            <div class="modal-body">
+                <form id="addProductForm" action="" method="post">
+                    <div class="row">
+                        <div class="mb-3">
+                            <label for="productName" class="form-label">Product Name</label>
+                            <input type="text" class="form-control" id="productName" name="productName" placeholder="Ex: Soap" required>
+                        </div>
                     </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="mb-3">
-                        <label for="unit2" class="form-label fw-bold">Category</label>
-                        <select id="unitDropdown" name="cat" class="form-select" required>
-                        <option value="">Select here</option>
-                        <option value="Consumables">Consumables (Products that can be scarce)</option>
-                        <option value="Returnables">Returnables (Products that can be return)</option>
-                        <option value="Unknown">Unknown</option>
-                        </select>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="mb-3">
+                                <label for="unit1" class="form-label">Unit</label>
+                                <select id="unitDropdown" name="unit" class="form-select" required>
+                                    <option value="">Select here</option>
+                                    <option value="kls">kls</option>
+                                    <option value="gal">gal</option>
+                                    <option value="pcs">pcs</option>
+                                    <option value="tubes">tubes</option>
+                                    <option value="rolls">rolls</option>
+                                    <option value="can">can</option>
+                                    <option value="trs">ltrs</option>
+                                    <option value="pairs">pairs</option>
+                                    <option value="other">other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="mb-3">
+                                <label for="unit2" class="form-label">Category</label>
+                                <select id="unitDropdown" name="cat" class="form-select" required>
+                                    <option value="">Select here</option>
+                                    <option value="Consumables">Consumables (Products that can be scarce)</option>
+                                    <option value="Returnables">Returnables (Products that can be returned)</option>
+                                    <option value="Unknown">Unknown</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                </div>
             </div>
-          
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-success" id="addProductBtn"><i class="bi bi-plus-circle-fill"></i> Add Product</button>
-          </form>
-      </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-success">Add Product</button>
+            </div>
+        </form>
     </div>
-  </div>
 </div>
+
 </section>
 
 <script>
