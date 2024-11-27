@@ -6,6 +6,70 @@ if (!isset($_SESSION['loginid'])) {
     header("location: ../index.html");
 }
 
+// Set the current user
+$currentUser = $_SESSION['name']; // Adjust according to how the current user is stored
+
+
+
+
+// Fetch the drnum from tbdrnum where id = 1
+$query = "SELECT `name` FROM `tbdrnum` WHERE `id` = 1";
+$result = mysqli_query($db, $query);
+$drnum = ''; // Default to empty if no value is found
+
+if ($result && mysqli_num_rows($result) > 0) {
+    $row = mysqli_fetch_assoc($result);
+    $drnum = $row['name']; // Get the drnum from the database
+}
+
+// If drnum is not empty, set the flag to lock the field
+$isLocked = !empty($drnum); // If drnum is not empty, lock the field
+
+
+
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Get the drnum from POST (either from input field or from the database value)
+    $drnum = $_POST['drnum'];
+
+    // If drnum is empty, that means the user is allowed to input a new one
+    if (empty($drnum)) {
+        // Fetch the value from the database (fallback to the value already set)
+        $query = "SELECT `name` FROM `tbdrnum` WHERE `id` = 1";
+        $result = mysqli_query($db, $query);
+        $row = mysqli_fetch_assoc($result);
+        $drnum = $row['name'];  // Use the existing drnum from DB if not set by the user
+    } else {
+        // If the user entered a new drnum, update the database with the new value
+        $query = "UPDATE `tbdrnum` SET `name` = ? WHERE `id` = 1";
+        if ($stmt = mysqli_prepare($db, $query)) {
+            mysqli_stmt_bind_param($stmt, "s", $drnum);
+            if (mysqli_stmt_execute($stmt)) {
+                echo "DRNum updated successfully!";
+            } else {
+                echo "Error updating DRNum!";
+            }
+            mysqli_stmt_close($stmt);
+        }
+    }
+
+    // Insert or update other form data (like products) here...
+}
+
+
+// Fetch the latest 'drnum' from the tbdrnum table
+$sql = "SELECT name FROM tbdrnum WHERE id = 1"; // Adjust the WHERE clause to fit your logic (e.g., use the latest drnum)
+$result = mysqli_query($db, $sql);
+
+// Initialize $drnum to an empty string
+$drnum = '';
+
+// Check if the query is successful and we have a result
+if ($result && mysqli_num_rows($result) > 0) {
+    $row = mysqli_fetch_assoc($result);
+    $drnum = $row['name']; // Assign the fetched drnum value
+}
+
 //---------------------------------------------------------------------------------------ADD STOCKS//
 if (isset($_POST['insertid'])) {
   $sqlinsert = "INSERT INTO `tbpendingadd`(`name`, `quantity`) 
@@ -302,55 +366,60 @@ $(document).ready(function() {
         <h5 class="modal-title text-white" id="massAddProductModalLabel">Receiving Items</h5>
       </div>
       <div class="modal-body">
-        <!-- Input Fields for Delivery Receipt, Added By, and Date Added -->
-        <div class="container-fluid mt-3">
-          <div class="row">
+        <form action="" method="post">
+          <div class="container-fluid mt-3">
+            <div class="row">
+            <!-- DRNo. Input Field -->
             <div class="col-4">
-              <label class="mb-2">DRNo.:</label>
-              <input type="text" class="form-control" id="deliveryReceiptNo" name="deliveryReceiptNo">
+            <label class="mb-2">DRNo.:</label>
+            <input type="text" class="form-control" id="drnum" name="drnum" value="<?php echo htmlspecialchars($drnum); ?>" <?php echo ($isLocked) ? 'disabled' : ''; ?> required>
+            <input type="hidden" id="hiddenDrnum" name="drnum" value="<?php echo htmlspecialchars($drnum); ?>">
             </div>
-            <div class="col-4">
-              <label class="mb-2">Added by:</label>
-              <input type="text" class="form-control" id="addedBy" name="addedBy" disabled>
-            </div>
-            <div class="col-4">
-              <label class="mb-2">Date Added:</label>
-              <input type="text" class="form-control" id="dateAdded" name="dateAdded" disabled>
+              <!-- Added By Input Field -->
+              <div class="col-4">
+                <label class="mb-2">Added by:</label>
+                <input type="text" class="form-control" id="addedBy" name="addedBy" value="<?= $currentUser; ?>" disabled>
+              </div>
+              <!-- Date Added Input Field -->
+              <div class="col-4">
+                <label class="mb-2">Date Added:</label>
+                <input type="text" class="form-control" id="dateAdded" name="dateAdded" value="<?= date('m/d/Y'); ?>" disabled>
+              </div>
             </div>
           </div>
-        </div>
-        
-        <!-- Table for displaying products -->
-        <div class="table-responsive" style="max-height: 300px; overflow-y: auto; margin-top: 15px;">
-          <table id="productsTable" class="table table-striped text-center">
-            <thead class="table-dark">
-              <tr>
-                <th>PRODUCT DESCRIPTION</th>
-                <th>UNIT</th>
-                <th>QUANTITY</th>
-                <th>CATEGORY</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-            <?php
-              while ($row = mysqli_fetch_assoc($listtemp)) {
-                  echo "<tr id='" . $row['id'] . "'>"; // Add ID attribute to the table row
-                  echo "<td>" . $row['name'] . "</td>";
-                  echo "<td>" . $row['units'] . "</td>";
-                  echo "<td>" . $row['quantity'] . "</td>";
-                  echo "<td>" . $row['category'] . "</td>";
-                  echo "<td>";
-                  echo "<button type='button' class='btn btn-danger delete-btn' data-id='" . $row['id'] . "'><i class='bi bi-trash3-fill'></i></button>";
-                  echo "</td>";
-                  echo "</tr>";
-              }
-            ?>
-            </tbody>
-          </table>
-        </div>
 
-        <form action="" method="post">
+          <!-- Product Table and Product Fields -->
+          <div class="table-responsive" style="max-height: 300px; overflow-y: auto; margin-top: 15px;">
+            <table id="productsTable" class="table table-striped text-center">
+              <thead class="table-dark">
+                <tr>
+                  <th>PRODUCT DESCRIPTION</th>
+                  <th>UNIT</th>
+                  <th>QUANTITY</th>
+                  <th>CATEGORY</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php
+                  // Display products from the database
+                  while ($row = mysqli_fetch_assoc($listtemp)) {
+                      echo "<tr id='" . $row['id'] . "'>";
+                      echo "<td>" . $row['name'] . "</td>";
+                      echo "<td>" . $row['units'] . "</td>";
+                      echo "<td>" . $row['quantity'] . "</td>";
+                      echo "<td>" . $row['category'] . "</td>";
+                      echo "<td>";
+                      echo "<button type='button' class='btn btn-danger delete-btn' data-id='" . $row['id'] . "'><i class='bi bi-trash3-fill'></i></button>";
+                      echo "</td>";
+                      echo "</tr>";
+                  }
+                ?>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Add Product Form -->
           <div class="container-fluid mt-3">
             <hr class="fw-bold">
             <div class="row">
@@ -359,6 +428,7 @@ $(document).ready(function() {
                 <select class="form-select mb-3" id="name" name="name" required>
                   <option value="">Select here</option>
                   <?php
+                    // List product options from the database
                     while ($row = mysqli_fetch_assoc($listprod)) {
                         echo '<option value="' . $row['name'] . '">' . $row['name'] . '</option>';
                     }
@@ -385,15 +455,24 @@ $(document).ready(function() {
               </div>
             </div>
           </div>
+
+          <!-- Submit Button -->
+          <div class="modal-footer d-flex justify-content-between">
+            <button type="button" class="btn btn-outline-danger deleteall-btn" id="deleteAllBtn">Delete All</button>
+            <button type="submit" class="btn btn-primary addnow-btn" id="addStocksBtn">Add Stocks</button>
+          </div>
         </form>
-      </div>
-      <div class="modal-footer d-flex justify-content-between">
-        <button type="button" class="btn btn-outline-danger deleteall-btn" id="deleteAllBtn">Delete All</button>
-        <button type="submit" class="btn btn-primary addnow-btn" id="addStocksBtn">Add Stocks</button>
       </div>
     </div>
   </div>
 </div>
+
+<button type="button" class="btn btn-danger mb-3 mt-3" data-bs-toggle="modal" data-bs-target="#massAddProductModal">Add Stocks</button>
+
+
+<button type="button" class="btn btn-danger mb-3 mt-3" data-bs-toggle="modal" data-bs-target="#massAddProductModal">Add Stocks</button>
+
+<button type="button" class="btn btn-danger mb-3 mt-3" data-bs-toggle="modal" data-bs-target="#massAddProductModal">Add Stocks</button>
 
 
 <!-- response modal -->
@@ -482,52 +561,7 @@ $(document).ready(function() {
         });
     });
 
-    $('.add-btn').click(function() {
-    var name = $.trim($('select[name="name"]').val());
-    var units = $.trim($('input[name="units"]').val());
-    var quantity = $.trim($('input[name="quantity"]').val());
-    var category = $.trim($('input[name="category"]').val());
-
-    if (!name || !units || !quantity || !category) {
-      // Show modal to enter product description
-      $('#descriptionModal').modal('show');
-      return;
-    }
-
-    // Proceed with AJAX call if all fields are filled
-    $.ajax({
-      type: 'POST',
-      url: 'add.php',
-      data: { name: name, units: units, quantity: quantity, category: category },
-      success: function(response) {
-        var responseData = JSON.parse(response);
-        if (responseData.message.trim() === "Data inserted successfully") {
-          $('select[name="name"]').val('');
-          $('input[name="units"]').val('');
-          $('input[name="quantity"]').val('');
-          $('input[name="category"]').val('');
-
-          var newRow = "<tr id='" + responseData.id + "'>";
-          newRow += "<td>" + name + "</td>";
-          newRow += "<td>" + units + "</td>";
-          newRow += "<td>" + quantity + "</td>";
-          newRow += "<td>" + category + "</td>";
-          newRow += "<td><button type='button' class='btn btn-danger delete-btn' data-id='" + responseData.id + "'><i class='bi bi-trash3-fill'></i></button></td>";
-          newRow += "</tr>";
-
-          $('#productsTable').append(newRow);
-        } else {
-          alert("Failed to add row. Server response: " + responseData.message);
-        }
-      },
-      error: function(xhr, status, error) {
-        console.error(xhr.responseText);
-        alert("An error occurred while processing the request.");
-      }
-    });
-  });
-
-  // Handle product description submission
+      // Handle product description submission
   $('#submitDescription').click(function() {
     var description = $.trim($('#productDescription').val());
     if (description) {
@@ -540,6 +574,79 @@ $(document).ready(function() {
     }
   });
   
+
+
+    $('.add-btn').click(function() {
+        var name = $.trim($('select[name="name"]').val());
+        var units = $.trim($('input[name="units"]').val());
+        var quantity = $.trim($('input[name="quantity"]').val());
+        var category = $.trim($('input[name="category"]').val());
+        var drnum = $.trim($('#hiddenDrnum').val());  // Will contain either the value from database or user input
+        var addedBy = $.trim($('#addedBy').val());
+        var dateAdded = $.trim($('#dateAdded').val());
+
+        // Log the values being sent
+        console.log("Sending data to server:");
+        console.log("DRNum:", drnum);
+        console.log("Name:", name);
+        console.log("Units:", units);
+        console.log("Quantity:", quantity);
+        console.log("Category:", category);
+        console.log("Added By:", addedBy);
+        console.log("Date Added:", dateAdded);
+
+        if (!name || !units || !quantity || !category || !drnum) {
+            alert("Please fill out all required fields.");
+            return;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: 'add.php',
+            data: { 
+                drnum: drnum,  
+                name: name, 
+                units: units, 
+                quantity: quantity, 
+                category: category, 
+                addedBy: addedBy, 
+                dateAdded: dateAdded 
+            },
+            success: function(response) {
+                var responseData = JSON.parse(response);
+                if (responseData.message.trim() === "Data inserted successfully") {
+                    // Handle success
+                    $('select[name="name"]').val('');
+                    $('input[name="units"]').val('');
+                    $('input[name="quantity"]').val('');
+                    $('input[name="category"]').val('');
+
+                    var newRow = "<tr id='" + responseData.id + "'>";
+                    newRow += "<td>" + name + "</td>";
+                    newRow += "<td>" + units + "</td>";
+                    newRow += "<td>" + quantity + "</td>";
+                    newRow += "<td>" + category + "</td>";
+                    newRow += "<td><button type='button' class='btn btn-danger delete-btn' data-id='" + responseData.id + "'><i class='bi bi-trash3-fill'></i></button></td>";
+                    newRow += "</tr>";
+
+                    $('#productsTable').append(newRow);
+                } else {
+                    alert("Failed to add row. Server response: " + responseData.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                alert("An error occurred while processing the request.");
+            }
+        });
+    });
+
+
+
+
+
+
+
     // Add stocks button click event
 $('#addStocksBtn').click(function() {
     $.ajax({

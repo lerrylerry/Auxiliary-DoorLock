@@ -1,44 +1,41 @@
 <?php
 require('../dbcred/db.php'); // Include your database connection file
 
-// Check if the 'add' parameter is set in the POST request
-if (isset($_POST['name'], $_POST['units'], $_POST['quantity'], $_POST['category'])) {
+// Check if the 'drnum', 'name', 'units', 'quantity', 'category', 'addedBy', and 'dateAdded' parameters are set in the POST request
+if (isset($_POST['drnum'], $_POST['name'], $_POST['units'], $_POST['quantity'], $_POST['category'], $_POST['addedBy'], $_POST['dateAdded'])) {
     // Sanitize the input to prevent SQL injection
+    $drnum = mysqli_real_escape_string($db, $_POST['drnum']); // Use 'drnum' instead of 'hiddendrnum'
     $name = mysqli_real_escape_string($db, $_POST['name']);
     $units = mysqli_real_escape_string($db, $_POST['units']);
     $quantity = mysqli_real_escape_string($db, $_POST['quantity']);
     $category = mysqli_real_escape_string($db, $_POST['category']);
+    $addedBy = mysqli_real_escape_string($db, $_POST['addedBy']);
+    $dateAdded = mysqli_real_escape_string($db, $_POST['dateAdded']);
     
-    // Construct the SQL query with prepared statements
-    $sqlinsert = "INSERT INTO `tbpendingadd` (`name`, `units`, `quantity`, `category`) VALUES (?, ?, ?, ?)";
+    // Construct the SQL query to insert into the `tbpendingadd` table
+    $sqlinsert = "INSERT INTO `tbpendingadd` (`drnum`, `name`, `units`, `quantity`, `category`, `addedBy`, `dateAdded`) 
+                  VALUES (?, ?, ?, ?, ?, ?, ?)";
     
-    // Prepare the statement
+    // Prepare the query
     if ($stmt = mysqli_prepare($db, $sqlinsert)) {
-        // Bind parameters
-        mysqli_stmt_bind_param($stmt, "ssis", $name, $units, $quantity, $category);
-
+        mysqli_stmt_bind_param($stmt, "sssssss", $drnum, $name, $units, $quantity, $category, $addedBy, $dateAdded);
+        
         // Execute the statement
         if (mysqli_stmt_execute($stmt)) {
-            // If the adding is successful, send a success response along with the inserted item's ID
-            // After successful insertion
-            $inserted_id = mysqli_insert_id($db); // Get the ID of the last inserted row
-            echo json_encode(array("message" => "Data inserted successfully", "id" => $inserted_id));
+            echo json_encode(['message' => 'Data inserted successfully']);
         } else {
-            // If an error occurs during insertion, send an error response
-            echo "Error adding row: " . mysqli_error($db);
+            echo json_encode(['message' => 'Error inserting data']);
         }
-
+        
         // Close the statement
         mysqli_stmt_close($stmt);
     } else {
-        // If the prepared statement fails, send an error response
-        echo "Error preparing statement: " . mysqli_error($db);
+        echo json_encode(['message' => 'Error preparing statement']);
     }
 } else {
-    // If the required parameters are not set, send a response indicating invalid request
-    echo "Invalid request";
+    echo json_encode(['message' => 'Missing required fields']);
 }
 
-// Close the database connection (optional)
+// Close the database connection
 mysqli_close($db);
 ?>
