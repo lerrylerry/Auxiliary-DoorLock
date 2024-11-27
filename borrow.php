@@ -5,15 +5,11 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 require 'vendor/autoload.php';
 
-// if (isset($_POST['additem'])) {
-//     $sqlinsertp = "INSERT INTO `tbpendingborrow`(`itemid`, `userid`,`borrowqty`) VALUES ('" . $_POST['additem'] . "','" . $_GET['userid'] . "','" . $_POST['qty'] . "')";
-//     mysqli_query($db, $sqlinsertp);
-// }
-
 // Initialize message and modal type variables
 $message = ""; 
 $modalType = ""; 
 
+// Handle add item to pending borrow list
 if (isset($_POST['additem'])) {
     $itemid = $_POST['additem'];
     $userid = $_GET['userid'];
@@ -45,7 +41,7 @@ if (isset($_POST['additem'])) {
     }
 }
 
-
+// Handle finalizing the borrow request
 if (isset($_POST['finalizerequest'])) {
     // Insert the borrow request into tbborrow table
     $sqlsubmitrequest = "INSERT INTO `tbborrow`(`userid`, `status`) 
@@ -74,7 +70,7 @@ if (isset($_POST['finalizerequest'])) {
                     AND tbpendingborrow.transid = '$transid'";
     $itemsresult = mysqli_query($db, $sqlgetitems);
 
-    // Prepare email content
+    // Prepare user email content
     $emailContent = "Dear " . $listcu['name'] . ",\n\n";
     $emailContent .= "Your borrow request has been processed. Below are the details of the items you have requested:\n\n";
 
@@ -82,9 +78,9 @@ if (isset($_POST['finalizerequest'])) {
         $emailContent .= "Item: " . $item['name'] . " | Quantity: " . $item['borrowqty'] . "\n";
     }
 
-    $emailContent .= "\nThank you for using our service.\n\nBest regards,\nTUP Auxillary System";
+    $emailContent .= "\nThank you for using our service.\n\nBest regards,\nTUP Auxiliary System";
 
-    // Send email notification
+    // Send email to the user
     try {
         $mail = new PHPMailer(true);
         // Server settings
@@ -93,27 +89,65 @@ if (isset($_POST['finalizerequest'])) {
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
         $mail->Username = 'projxacts12@gmail.com';
-        $mail->Password = 'vdbwgupzfybcixsk';
+        $mail->Password = 'vdbwgupzfybcixsk'; // Use an App password for security
         $mail->SMTPSecure = 'tls';
         $mail->Port = 587;
 
         // Recipients
-        $mail->setFrom('projxacts12@gmail.com', 'TUP Auxillary System');
+        $mail->setFrom('projxacts12@gmail.com', 'TUP Auxiliary System');
         $mail->addAddress($listcu['email'], $listcu['name']);
 
         // Email content
         $mail->isHTML(false);
         $mail->Subject = 'Borrow Request Confirmation';
-        $mail->Body    = $emailContent;
+        $mail->Body = $emailContent;
 
         // Send email
         $mail->send();
 
-        // Set success message and modal type
+        // Set success message for the user
         $message = "Your borrow request has been successfully submitted!";
         $modalType = "success"; // Set modal type to success
     } catch (Exception $e) {
         $message = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        $modalType = "error"; // Set modal type to error
+    }
+
+    // Fetch admin's email (assuming the admin's id is 1)
+    $sqlgetAdminEmail = "SELECT email FROM tbadmin WHERE id = 1";
+    $adminResult = mysqli_query($db, $sqlgetAdminEmail);
+    $adminEmailData = mysqli_fetch_assoc($adminResult);
+    $adminEmail = $adminEmailData['email'];
+
+    // Prepare the admin's email content
+    $adminEmailContent = "Dear Admin,\n\n";
+    $adminEmailContent .= "You have received a new borrow request. Please review the request below:\n\n";
+    $adminEmailContent .= "User: " . $listcu['name'] . "\n";
+    $adminEmailContent .= "User Email: " . $listcu['email'] . "\n";
+    $adminEmailContent .= "Borrow Items:\n";
+
+    // Reset itemsresult query to get borrow items again
+    $itemsresult = mysqli_query($db, $sqlgetitems);
+
+    while ($item = mysqli_fetch_assoc($itemsresult)) {
+        $adminEmailContent .= "Item: " . $item['name'] . " | Quantity: " . $item['borrowqty'] . "\n";
+    }
+
+    $adminEmailContent .= "\nTo review the borrow request, please visit the following link:\n";
+    $adminEmailContent .= "http://127.0.0.1/Auxiliary-DoorLock/index.php\n\n";
+    $adminEmailContent .= "Thank you,\nTUP Auxiliary System";
+
+    // Send email to admin
+    try {
+        $mail->clearAddresses();
+        $mail->addAddress($adminEmail, 'Admin');
+        $mail->Subject = 'New Borrow Request Submitted';
+        $mail->Body = $adminEmailContent;
+
+        // Send email
+        $mail->send();
+    } catch (Exception $e) {
+        $message = "Message could not be sent to admin. Mailer Error: {$mail->ErrorInfo}";
         $modalType = "error"; // Set modal type to error
     }
 
@@ -122,26 +156,30 @@ if (isset($_POST['finalizerequest'])) {
     exit();
 }
 
+// Handle item deletion from pending borrow list
 if (isset($_POST['delete'])) {
     $sqldeleteitem = "DELETE FROM `tbpendingborrow` WHERE id='" . $_POST['delete'] . "'";
     mysqli_query($db, $sqldeleteitem);
 }
 
-$sqlgetitems = "SELECT tbproductlist.*,tbpendingborrow.* FROM tbpendingborrow LEFT JOIN tbproductlist ON tbpendingborrow.itemid = tbproductlist.id WHERE userid = '" . $_GET['userid'] . "' AND transid ='0';";
+// Fetch list of pending borrow items for the user
+$sqlgetitems = "SELECT tbproductlist.*, tbpendingborrow.* 
+                FROM tbpendingborrow 
+                LEFT JOIN tbproductlist ON tbpendingborrow.itemid = tbproductlist.id 
+                WHERE userid = '" . $_GET['userid'] . "' 
+                AND transid = '0';";
 $listresult = mysqli_query($db, $sqlgetitems);
 
-$sqlgetcu = "SELECT id,name,pincode,status,email FROM `tbup` WHERE id ='" . $_GET['userid'] . "';";
+// Fetch user details
+$sqlgetcu = "SELECT id, name, pincode, status, email FROM `tbup` WHERE id ='" . $_GET['userid'] . "';";
 $listcu = mysqli_fetch_assoc(mysqli_query($db, $sqlgetcu));
 
-$sqlgetp = "
-    SELECT id, unit, name, quantity, category 
-    FROM `tbproductlist` 
-    WHERE quantity > 0 
-    ORDER BY name ASC;
-";
-
+// Fetch available products to borrow
+$sqlgetp = "SELECT id, unit, name, quantity, category 
+            FROM `tbproductlist` 
+            WHERE quantity > 0 
+            ORDER BY name ASC;";
 $listp = mysqli_query($db, $sqlgetp);
-
 ?>
 
 <!DOCTYPE html>

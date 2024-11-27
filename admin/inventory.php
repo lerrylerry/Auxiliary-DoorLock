@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // If drnum is empty, that means the user is allowed to input a new one
     if (empty($drnum)) {
         // Fetch the value from the database (fallback to the value already set)
-        $query = "SELECT `name` FROM `tbdrnum` WHERE `id` = 1";
+        $query = "UPDATE `name` FROM `tbdrnum` WHERE `id` = 1";
         $result = mysqli_query($db, $query);
         $row = mysqli_fetch_assoc($result);
         $drnum = $row['name'];  // Use the existing drnum from DB if not set by the user
@@ -459,18 +459,13 @@ $(document).ready(function() {
           <!-- Submit Button -->
           <div class="modal-footer d-flex justify-content-between">
             <button type="button" class="btn btn-outline-danger deleteall-btn" id="deleteAllBtn">Delete All</button>
-            <button type="submit" class="btn btn-primary addnow-btn" id="addStocksBtn">Add Stocks</button>
+            <button type="button" class="btn btn-primary addnow-btn" id="addStocksBtn">Add Stocks</button>
           </div>
         </form>
       </div>
     </div>
   </div>
 </div>
-
-<button type="button" class="btn btn-danger mb-3 mt-3" data-bs-toggle="modal" data-bs-target="#massAddProductModal">Add Stocks</button>
-
-
-<button type="button" class="btn btn-danger mb-3 mt-3" data-bs-toggle="modal" data-bs-target="#massAddProductModal">Add Stocks</button>
 
 <button type="button" class="btn btn-danger mb-3 mt-3" data-bs-toggle="modal" data-bs-target="#massAddProductModal">Add Stocks</button>
 
@@ -494,6 +489,43 @@ $(document).ready(function() {
     </div>
   </div>
 </div>
+
+<!-- Response Modal for add stocks all-->
+<div class="modal fade" id="responseModal3" tabindex="-1" aria-labelledby="responseModalLabel2" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header" style="background: #580606;">
+        <h5 class="modal-title text-white" id="responseModalLabel2">Response</h5>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Response message will be injected here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for displaying messages add stock indiv -->
+<div class="modal fade" id="responseModal4" tabindex="-1" aria-labelledby="responseModalLabel5" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="responseModalLabel5">Response</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- The response message will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 <script src="static/script.js"></script>
 <script>
@@ -576,96 +608,9 @@ $(document).ready(function() {
   
 
 
-    $('.add-btn').click(function() {
-        var name = $.trim($('select[name="name"]').val());
-        var units = $.trim($('input[name="units"]').val());
-        var quantity = $.trim($('input[name="quantity"]').val());
-        var category = $.trim($('input[name="category"]').val());
-        var drnum = $.trim($('#hiddenDrnum').val());  // Will contain either the value from database or user input
-        var addedBy = $.trim($('#addedBy').val());
-        var dateAdded = $.trim($('#dateAdded').val());
-
-        // Log the values being sent
-        console.log("Sending data to server:");
-        console.log("DRNum:", drnum);
-        console.log("Name:", name);
-        console.log("Units:", units);
-        console.log("Quantity:", quantity);
-        console.log("Category:", category);
-        console.log("Added By:", addedBy);
-        console.log("Date Added:", dateAdded);
-
-        if (!name || !units || !quantity || !category || !drnum) {
-            alert("Please fill out all required fields.");
-            return;
-        }
-
-        $.ajax({
-            type: 'POST',
-            url: 'add.php',
-            data: { 
-                drnum: drnum,  
-                name: name, 
-                units: units, 
-                quantity: quantity, 
-                category: category, 
-                addedBy: addedBy, 
-                dateAdded: dateAdded 
-            },
-            success: function(response) {
-                var responseData = JSON.parse(response);
-                if (responseData.message.trim() === "Data inserted successfully") {
-                    // Handle success
-                    $('select[name="name"]').val('');
-                    $('input[name="units"]').val('');
-                    $('input[name="quantity"]').val('');
-                    $('input[name="category"]').val('');
-
-                    var newRow = "<tr id='" + responseData.id + "'>";
-                    newRow += "<td>" + name + "</td>";
-                    newRow += "<td>" + units + "</td>";
-                    newRow += "<td>" + quantity + "</td>";
-                    newRow += "<td>" + category + "</td>";
-                    newRow += "<td><button type='button' class='btn btn-danger delete-btn' data-id='" + responseData.id + "'><i class='bi bi-trash3-fill'></i></button></td>";
-                    newRow += "</tr>";
-
-                    $('#productsTable').append(newRow);
-                } else {
-                    alert("Failed to add row. Server response: " + responseData.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error(xhr.responseText);
-                alert("An error occurred while processing the request.");
-            }
-        });
-    });
 
 
 
-
-
-
-
-    // Add stocks button click event
-$('#addStocksBtn').click(function() {
-    $.ajax({
-        type: 'POST',
-        url: 'addnow.php',
-        dataType: 'json',
-        success: function(response) {
-            console.log('Response:', response); // For debugging
-            $('#modalBody').text(response && response.status === 'success' ? response.message : (response.message || 'Unknown error'));
-            $('#responseModal').modal('show');
-
-            if (response && response.status === 'success') {
-                setTimeout(function() {
-                    location.reload();
-                }, 2000); // Reload after 2 seconds
-            }
-        }
-    });
-});
 
 
 
@@ -674,6 +619,134 @@ $('#addStocksBtn').click(function() {
 
 
 </script>
+
+<script>
+$(document).ready(function() {
+    $('.add-btn').click(function() {
+        // Get values from the form
+        var name = $.trim($('select[name="name"]').val());
+        var units = $.trim($('input[name="units"]').val());
+        var quantity = $.trim($('input[name="quantity"]').val());
+        var category = $.trim($('input[name="category"]').val());
+        var drnum = $.trim($('#hiddenDrnum').val()) || $.trim($('#drnum').val());
+        var addedBy = $.trim($('#addedBy').val());
+        var dateAdded = $.trim($('#dateAdded').val());
+
+        // Validate all fields
+        if (!name || !units || !quantity || !category || !drnum) {
+            showModal("Error", "Please fill out all required fields.");
+            return;
+        }
+
+        // AJAX Request
+        $.ajax({
+            type: 'POST',
+            url: 'add.php',
+            data: { 
+                drnum: drnum, 
+                name: name, 
+                units: units, 
+                quantity: quantity, 
+                category: category, 
+                addedBy: addedBy, 
+                dateAdded: dateAdded 
+            },
+            success: function(response) {
+                // Parse the response if it's JSON
+                var responseData = JSON.parse(response);
+
+                // If there is a message or error, show it in the modal
+                if (responseData.message) {
+                    showModal("Error", responseData.message);
+                    return;
+                }
+
+                // If the insert is successful (no message in response), clear form fields and add new row
+                $('select[name="name"]').val('');
+                $('input[name="units"]').val('');
+                $('input[name="quantity"]').val('');
+                $('input[name="category"]').val('');
+
+                // Lock the drnum field by disabling it
+                $('#drnum').prop('disabled', true);
+                $('#hiddenDrnum').prop('disabled', true);
+
+                // Add new row to the table
+                var newRow = "<tr id='" + responseData.id + "'>";
+                newRow += "<td>" + responseData.name + "</td>";
+                newRow += "<td>" + responseData.units + "</td>";
+                newRow += "<td>" + responseData.quantity + "</td>";
+                newRow += "<td>" + responseData.category + "</td>";
+                newRow += "<td><button type='button' class='btn btn-danger delete-btn' data-id='" + responseData.id + "'><i class='bi bi-trash3-fill'></i></button></td>";
+                newRow += "</tr>";
+
+                $('#productsTable').append(newRow);
+            },
+            error: function(xhr, status, error) {
+                showModal("Error", "An error occurred while processing the request.");
+            }
+        });
+    });
+
+    // Function to show the modal with dynamic message
+    function showModal(title, message) {
+        $('#responseModalLabel').text(title);  // Set modal title
+        $('#modalBody').text(message);  // Set modal body content
+        $('#responseModal').modal('show');  // Show the modal
+    }
+});
+
+
+</script>
+
+<script>
+$(document).ready(function() {
+    // Add stocks button click event
+    $('.addnow-btn').click(function() {
+        $.ajax({
+            type: 'POST',
+            url: 'addnow.php',
+            dataType: 'json',
+            success: function(response) {
+                console.log('Response:', response); // For debugging
+
+                if (response) {
+                    // Handle the response based on the status
+                    if (response.status === 'success') {
+                        // Show the success message in the modal
+                        $('#modalBody').text(response.message);
+                        $('#responseModal').modal('show');
+
+                        // Reload the page after 2 seconds
+                        setTimeout(function() {
+                            location.reload();
+                        }, 2000); // Reload after 2 seconds
+                    } else if (response.status === 'no_data_added') {
+                        // Handle no valid data message
+                        $('#modalBody').text(response.message);
+                        $('#responseModal').modal('show');
+                    } else if (response.status === 'error') {
+                        // Handle error messages
+                        $('#modalBody').text(response.message);
+                        $('#responseModal').modal('show');
+                    }
+                } else {
+                    // Handle unexpected or empty response
+                    console.error('Unexpected response:', response);
+                    alert('Unexpected error, please try again later.');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error in AJAX request:", xhr.responseText);
+                alert("An error occurred while processing the request.");
+            }
+        });
+    });
+});
+
+
+</script>
+
 
 <script>
     $(document).ready(function() {
