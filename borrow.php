@@ -339,16 +339,32 @@ input.form-control {
 
 /* Footer */
 footer {
-    background-color: #2d2d2d;
-    color: #fff;
-    text-align: center;
-    padding: 10px 0;
-    margin-top: auto;
+    display: flex; /* Flexbox layout */
+    justify-content: center; /* Center the content horizontally */
+    align-items: center; /* Center the content vertically */
+    padding: 10px 20px; /* Add padding for spacing */
+    background-color: #343a40; /* Dark background for contrast */
+    color: #ffffff; /* White text for readability */
+    font-size: 16px; /* Adjust font size for readability */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
 }
 
 footer p {
-    font-size: 1rem;
-    margin: 0;
+    margin: 0; 
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    footer {
+        font-size: 12px; 
+        padding: 8px 15px; 
+    }
+}
+
+@media (max-width: 480px) {
+    footer {
+        font-size: 10px; /* Further reduce font size for very small screens */
+    }
 }
 
 /* Modal Styling */
@@ -521,7 +537,7 @@ button.btn-secondary {
 </nav>
 
 <!-- Borrow Items Form -->
-<div class="card borrow-container mx-auto mt-5 mb-5" style="width: 30rem; border: 3px solid #0e0e0f;">
+<div class="card borrow-container mx-auto mt-5 mb-5" style="max-width: 90%; width: 30rem; border: 3px solid #0e0e0f;">
     <h3 class="card-title borrow-label text-center mb-4">REQUEST ITEMS (BORROW)</h3>
     <hr>
     <div class="card-body borrow-content">
@@ -534,7 +550,7 @@ button.btn-secondary {
         </div>
         <hr>
         <!-- Borrow Table Section -->
-        <div class="borrow-table mx-auto mb-4">
+        <div class="borrow-table table-responsive mx-auto mb-4">
             <table class="table table-bordered text-center" style="margin-top: 20px;">
                 <thead>
                     <tr>
@@ -564,25 +580,34 @@ button.btn-secondary {
 
         <!-- Add Item Section -->
         <form method="post" action="" class="mt-4">
+            <!-- Row for Items and Quantity -->
             <div class="row mb-3">
-                <div class="col-4">
+                <div class="col-md-6">
                     <label for="unitDropdown" class="borrow-label small-label">Items:</label>
                     <select id="unitDropdown" name="additem" class="form-select" required>
                         <option value="">- Select -</option>
                         <?php while ($data = mysqli_fetch_assoc($listp)) { ?>
-                            <option value="<?php echo $data['id'] ?>" data-quantity="<?php echo $data['quantity'] ?>"><?php echo $data['name'] ?> | <?php echo $data['unit'] ?>: <?php echo $data['quantity'] ?></option>
+                            <option value="<?php echo $data['id'] ?>" data-quantity="<?php echo $data['quantity'] ?>">
+                                <?php echo $data['name'] ?> | <?php echo $data['unit'] ?>: <?php echo $data['quantity'] ?>
+                            </option>
                         <?php } ?>
                     </select>
                 </div>
-                <div class="col-4">
+                <div class="col-md-6">
                     <label for="quantity" class="borrow-label small-label">Quantity:</label>
                     <input class="form-control" type="number" id="quantity" name="qty" placeholder="Enter quantity" required>
                 </div>
-                <div class="col-4 d-flex align-items-end">
-                    <button type="submit" id="add" class="btn btn-danger w-100">Add</button>
+            </div>
+
+            <!-- Add Button below Quantity -->
+            <div class="row">
+                <div class="col-md-6 offset-md-6 d-flex justify-content-end">
+                    <button type="submit" id="add" class="btn btn-primary w-50">Add</button>
                 </div>
             </div>
         </form>
+
+
 
         <!-- Submit Button -->
         <div class="submitBtn mx-auto mt-4">

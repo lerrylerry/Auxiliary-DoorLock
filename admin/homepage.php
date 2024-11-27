@@ -217,7 +217,7 @@ $listp = mysqli_query($db, $sqlgetp);
                   <i class="fas fa-camera fa-3x mb-3"></i>
                   <h5 class="card-title">Camera</h5>
                   <p class="card-text">View live of the stockroom.</p>
-                  <a href="camera.php" type="button" class="btn btn-danger"><i class="fas fa-info-circle"></i> More Info</a>
+                  <a href="recorded.php" type="button" class="btn btn-danger"><i class="fas fa-info-circle"></i> More Info</a>
                 </div>
               </div>
             </div>
