@@ -582,7 +582,7 @@ button.btn-secondary {
                     <button class="btn dropdown-toggle text-white btn-outline-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">Services</button>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="borrowANDreturn.php">Borrow/Get Items</a></li>
-                        <li><a class="dropdown-item" href="minor-repair.php">Request a minor repair</a></li>
+                        <li><a class="dropdown-item" href="minorRepair.php">Request a minor repair</a></li>
                     </ul>
                 </div>
                 <div class="divLogin d-flex justify-content-center">
