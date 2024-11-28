@@ -260,7 +260,7 @@ $listp = mysqli_query($db, $sqlgetp);
     <?php } ?>
     </tbody>
   </table>
-  <button type="button" class="btn btn-danger mb-3 mt-3" data-bs-toggle="modal" data-bs-target="#addProductModal">Add New Product</button>
+  <button type="button" class="btn btn-danger mb-3 mt-3 bottom-button" data-bs-toggle="modal" data-bs-target="#addProductModal">Add New Product</button>
 </div>
 
 <!-- Bootstrap JS (jQuery is required) -->
@@ -375,6 +375,23 @@ $listp = mysqli_query($db, $sqlgetp);
     function redirectToPage() {
         window.location.href = 'masterlist.php';
     }
+</script>
+<script>
+  $(document).ready(function() {
+    // Check window size and disable toggle functionality for smaller screens
+    if ($(window).width() <= 768) {
+        // If the window is mobile-sized, disable the open/close functionality
+        $(".sidebar").removeClass("close");
+    }
+
+    // Add your sidebar toggle functionality here for larger screens if needed
+    $(window).resize(function() {
+        if ($(window).width() <= 768) {
+            $(".sidebar").removeClass("close");
+        }
+    });
+});
+
 </script>
 
 <script src="static/script.js"></script>

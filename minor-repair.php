@@ -70,135 +70,90 @@ if (isset($_POST['name'])) {
         }
 
 
-                .navbar {
-            background-color: #9e1b32;
-            padding: 10px 20px;
-            z-index: 1000;
-        }
+/* Navbar */
+.navbar {
+    background-color: #9e1b32; /* Cardinal Red */
+}
 
-        .navbar .container-fluid {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+.navbar .container-fluid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-        .navLogo {
-            display: flex;
-            align-items: center;
-        }
+.navbar .navbar-toggler {
+    border: 1px solid #fff;
+    background-color: #9e1b32;
+}
 
-        .navLogo img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 3px solid #555;
-        }
+/* Navbar Dropdown Menu */
+.navdiv .dropdown .btn {
+    color: white;
+    background-color: #9e1b32;
+    border: 1px solid #fff;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
 
-        .navLogo p {
-            color: white;
-            padding-left: 10px;
-            font-size: 1.2rem;
-        }
+.navdiv .dropdown .btn:hover {
+    background-color: #7a1623;
+    color: white;
+}
 
-        .navbar-toggler {
-            color: white;
-            border: 1px solid #fff;
-            background-color: #9e1b32;
-        }
+.navdiv .dropdown .btn:focus {
+    background-color: #7a1623;
+    color: white;
+    box-shadow: none;
+}
 
-        .navbar-toggler-icon {
-            background-color: transparent;
-            border: none;
-        }
+.dropdown-menu {
+    background-color: #9e1b32;
+    border: 1px solid #7a1623;
+}
 
-        .navbar-toggler-icon::before, 
-        .navbar-toggler-icon::after {
-            background-color: white;
-        }
+.dropdown-item {
+    color: white;
+    background-color: #9e1b32;
+    transition: background-color 0.3s ease;
+}
 
-        .navbar-toggler-icon span {
-            background-color: white;
-        }
+.dropdown-item:hover {
+    background-color: #7a1623;
+    color: white;
+}
 
-        /* Navbar Dropdown Menu */
-        .navdiv .dropdown .btn {
-            color: white;
-            background-color: #9e1b32;
-            border: 1px solid #fff;
-            font-size: 1rem;
-            transition: background-color 0.3s ease;
-        }
+/* Navbar Logo */
+.navLogo {
+    display: flex;
+    align-items: center;
+}
 
-        .navdiv .dropdown .btn:hover {
-            background-color: #7a1623;
-            color: white;
-        }
+.navLogo img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 3px solid #555;
+}
 
-        .navdiv .dropdown .btn:focus {
-            background-color: #7a1623;
-            color: white;
-            box-shadow: none;
-        }
+.navLogo p {
+    color: white;
+    padding-left: 10px;
+    font-size: 1.2rem;
+}
 
-        .dropdown-menu {
-            background-color: #9e1b32;
-            border: 1px solid #7a1623;
-        }
+.navbar .navbar-nav .nav-item {
+    margin: 0 10px;
+}
 
-        .dropdown-item {
-            color: white;
-            background-color: #9e1b32;
-            transition: background-color 0.3s ease;
-        }
+.navbar .navbar-nav .nav-link {
+    color: white;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+}
 
-        .dropdown-item:hover {
-            background-color: #7a1623;
-            color: white;
-        }
-
-        /* Mobile Navbar Adjustment */
-        @media (max-width: 767px) {
-            .navbar .container-fluid {
-                flex-direction: row;
-                align-items: center;
-            }
-
-            .navLogo {
-                flex-grow: 1;
-                display: flex;
-                align-items: center;
-            }
-
-            .navbar-toggler {
-                margin-left: 10px;
-            }
-
-            .navdiv {
-                display: none;
-                flex-direction: column;
-            }
-
-            .collapse.show .navdiv {
-                display: flex;
-            }
-
-            .divLogin {
-                display: flex;
-                justify-content: center;
-                margin-top: 10px;
-            }
-
-            .divLogin .loginBtn button {
-                width: 100%;
-            }
-        }
-
-
-        .navbar .container-fluid {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+.navbar .navbar-nav .nav-link:hover {
+    color: #d8d8d8;
+}
 
         /* Card Styles */
         .card {

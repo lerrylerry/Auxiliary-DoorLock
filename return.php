@@ -233,11 +233,22 @@ body {
     font-family: Arial, sans-serif;
     color: #fff;
 }
-/* Navbar Styles */
+
+/* Add a semi-transparent overlay to the body */
+body::before {
+    content: ''; /* Empty content for the overlay */
+    position: fixed; /* Fixed position to cover the entire viewport */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%; /* Cover the entire viewport height */
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
+    z-index: -1; /* Place it behind the content */
+}
+
+/* Navbar */
 .navbar {
-    background-color: #9e1b32;
-    padding: 10px 20px;
-    z-index: 1000;
+    background-color: #9e1b32; /* Cardinal Red */
 }
 
 .navbar .container-fluid {
@@ -246,42 +257,9 @@ body {
     align-items: center;
 }
 
-.navLogo {
-    display: flex;
-    align-items: center;
-}
-
-.navLogo img {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    border: 3px solid #555;
-}
-
-.navLogo p {
-    color: white;
-    padding-left: 10px;
-    font-size: 1.2rem;
-}
-
-.navbar-toggler {
-    color: white;
+.navbar .navbar-toggler {
     border: 1px solid #fff;
     background-color: #9e1b32;
-}
-
-.navbar-toggler-icon {
-    background-color: transparent;
-    border: none;
-}
-
-.navbar-toggler-icon::before, 
-.navbar-toggler-icon::after {
-    background-color: white;
-}
-
-.navbar-toggler-icon span {
-    background-color: white;
 }
 
 /* Navbar Dropdown Menu */
@@ -320,41 +298,37 @@ body {
     color: white;
 }
 
-/* Mobile Navbar Adjustment */
-@media (max-width: 767px) {
-    .navbar .container-fluid {
-        flex-direction: row;
-        align-items: center;
-    }
+/* Navbar Logo */
+.navLogo {
+    display: flex;
+    align-items: center;
+}
 
-    .navLogo {
-        flex-grow: 1;
-        display: flex;
-        align-items: center;
-    }
+.navLogo img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 3px solid #555;
+}
 
-    .navbar-toggler {
-        margin-left: 10px;
-    }
+.navLogo p {
+    color: white;
+    padding-left: 10px;
+    font-size: 1.2rem;
+}
 
-    .navdiv {
-        display: none;
-        flex-direction: column;
-    }
+.navbar .navbar-nav .nav-item {
+    margin: 0 10px;
+}
 
-    .collapse.show .navdiv {
-        display: flex;
-    }
+.navbar .navbar-nav .nav-link {
+    color: white;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+}
 
-    .divLogin {
-        display: flex;
-        justify-content: center;
-        margin-top: 10px;
-    }
-
-    .divLogin .loginBtn button {
-        width: 100%;
-    }
+.navbar .navbar-nav .nav-link:hover {
+    color: #d8d8d8;
 }
 
 /* Form Styles */
@@ -622,7 +596,7 @@ button.btn-secondary {
 </nav>
 
 <!-- Return Items Form -->
-<div class="card borrow-container mx-auto mt-5 mb-5" style="width: 30rem; border: 3px solid #0e0e0f;">
+<div class="card borrow-container mx-auto mt-5 mb-5" style="border: 3px solid #0e0e0f;">
     <h3 class="card-title borrow-label text-center mb-4">REQUEST ITEMS (RETURN)</h3>
     <hr>
     <div class="card-body borrow-content">

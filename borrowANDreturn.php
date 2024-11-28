@@ -81,6 +81,13 @@ $listupr = mysqli_query($db, $sqlgetupr);
 
     <style>
 /* Global Styles */
+/* Ensure the html and body are at full height */
+html, body {
+    height: 100%; /* Ensure full viewport height */
+    margin: 0; /* Remove default margin */
+}
+
+/* Body styles */
 body {
     display: flex;
     flex-direction: column;
@@ -91,18 +98,18 @@ body {
     background-position: center;
     font-family: Arial, sans-serif;
     color: #fff;
-    margin: 0;
     padding: 0;
+    position: relative; /* Ensure the body is a reference point for the pseudo-element */
 }
 
 /* Add a semi-transparent overlay to the body */
 body::before {
     content: ''; /* Empty content for the overlay */
-    position: absolute;
+    position: fixed; /* Fixed position to cover the entire viewport */
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: 100%; /* Cover the entire viewport height */
     background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
     z-index: -1; /* Place it behind the content */
 }
@@ -159,7 +166,7 @@ body::before {
     color: white;
 }
 
-
+/* Navbar Logo */
 .navLogo {
     display: flex;
     align-items: center;
@@ -211,7 +218,6 @@ body::before {
     margin-bottom: 20px;
     text-align: center;
 }
-
 
 .optionModal .modal-content {
     background-color: #444;  /* Slightly lighter background for content */
@@ -301,6 +307,7 @@ body::before {
     font-size: 1rem;
     border: 2px solid #ccc; /* Add border for password field */
 }
+
 .card .submitBtn {
     text-align: center;
 }
@@ -383,6 +390,7 @@ footer p {
     text-align: center;
     border-radius: 5px;
 }
+
 /* Ensure the footer is hidden when the modal is visible */
 
     </style>
@@ -437,7 +445,7 @@ footer p {
     </div>
 
     <!-- Borrow Card -->
-    <div class="card borrow-container mx-auto mt-5 mb-5" style="width: 30rem; height: 36rem; border: 3px solid #0e0e0f; display: none;">
+    <div class="card borrow-container mx-auto mt-5 mb-5" style="height: 36rem; border: 3px solid #0e0e0f; display: none;">
         <h3 class="card-title borrow-label">REQUEST ITEMS (BORROW)</h3>
         <hr>
         <div class="card-body borrow-content">
@@ -466,7 +474,7 @@ footer p {
     </div>
 
     <!-- Return Card -->
-    <div class="card return-container mx-auto mt-5 mb-5" style="width: 30rem; height: 36rem; border: 3px solid #0e0e0f; display: none;">
+    <div class="card return-container mx-auto mt-5 mb-5" style="height: 36rem; border: 3px solid #0e0e0f; display: none;">
         <h3 class="card-title return-label">REQUEST ITEMS (RETURN)</h3>
         <hr>
         <div class="card-body borrow-content">

@@ -36,103 +36,6 @@ $listp = mysqli_query($db, $sqlgetp);
   <!-- DataTables CSS -->
   <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 </head>
-    <style>
-        body {
-            background-color: #f4f4f7;
-        }
-
-        .home-section {
-            margin-top: 20px; /* Reduce margin for top space */
-        }
-
-        .card {
-            border-radius: 20px; /* Smooth curves on the card */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .card-body {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 20px; /* Rounded corners on the inside of the card */
-        }
-
-        .card-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-
-        .btn-danger {
-            background-color: #9e1b32;
-            border-color: #9e1b32;
-            transition: background-color 0.3s ease;
-            border-radius: 20px; /* Rounded corners on the button */
-        }
-
-        .btn-danger:hover {
-            background-color: #7f1427;
-            border-color: #7f1427;
-        }
-
-        .table {
-            margin-top: 15px;
-        }
-
-        .table th, .table td {
-            text-align: center;
-            padding: 12px;
-        }
-
-        .table th {
-            background-color: #9e1b32;
-            color: white;
-        }
-
-        .table td {
-            background-color: #f9f9f9;
-        }
-
-        .card-text {
-            font-size: 1rem;
-            margin-bottom: 15px;
-        }
-
-        .container {
-            margin-top: 30px;
-        }
-
-        .home-content i {
-            font-size: 2rem;
-        }
-
-        .row .col-lg-4 {
-            padding: 15px;
-        }
-
-        .ellipsis-row {
-            text-align: center;
-            font-weight: bold;
-            background-color: #f9f9f9;
-        }
-
-        .col-lg-4 {
-            margin-bottom: 30px; /* Add bottom margin to each card */
-        }
-
-        .table td a {
-            color: #9e1b32; /* Red text for links */
-            text-decoration: none;
-        }
-
-        .table td a:hover {
-            text-decoration: underline;
-        }
-    </style>
 </head>
 <body>
 <?php include('static/sidebar.php')?>
@@ -253,6 +156,23 @@ $listp = mysqli_query($db, $sqlgetp);
 <!-- Bootstrap Bundle (Popper.js is required) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  $(document).ready(function() {
+    // Check window size and disable toggle functionality for smaller screens
+    if ($(window).width() <= 768) {
+        // If the window is mobile-sized, disable the open/close functionality
+        $(".sidebar").removeClass("close");
+    }
+
+    // Add your sidebar toggle functionality here for larger screens if needed
+    $(window).resize(function() {
+        if ($(window).width() <= 768) {
+            $(".sidebar").removeClass("close");
+        }
+    });
+});
+
+</script>
 
   <script src="static/script.js"></script>
 </body>

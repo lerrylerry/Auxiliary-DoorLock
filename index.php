@@ -34,11 +34,9 @@ body {
     overflow-x: hidden;
 }
 
-/* Navbar Styles */
+/* Navbar */
 .navbar {
     background-color: #9e1b32; /* Cardinal Red */
-    padding: 10px 20px;
-    z-index: 1000;
 }
 
 .navbar .container-fluid {
@@ -47,6 +45,48 @@ body {
     align-items: center;
 }
 
+.navbar .navbar-toggler {
+    border: 1px solid #fff;
+    background-color: #9e1b32;
+}
+
+/* Navbar Dropdown Menu */
+.navdiv .dropdown .btn {
+    color: white;
+    background-color: #9e1b32;
+    border: 1px solid #fff;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.navdiv .dropdown .btn:hover {
+    background-color: #7a1623;
+    color: white;
+}
+
+.navdiv .dropdown .btn:focus {
+    background-color: #7a1623;
+    color: white;
+    box-shadow: none;
+}
+
+.dropdown-menu {
+    background-color: #9e1b32;
+    border: 1px solid #7a1623;
+}
+
+.dropdown-item {
+    color: white;
+    background-color: #9e1b32;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #7a1623;
+    color: white;
+}
+
+/* Navbar Logo */
 .navLogo {
     display: flex;
     align-items: center;
@@ -55,8 +95,8 @@ body {
 .navLogo img {
     width: 50px;
     height: 50px;
-    border-radius: 50%; /* Circular logo */
-    border: 3px solid #555; /* Gray border inside the circle */
+    border-radius: 50%;
+    border: 3px solid #555;
 }
 
 .navLogo p {
@@ -65,99 +105,20 @@ body {
     font-size: 1.2rem;
 }
 
-.navbar-toggler {
+.navbar .navbar-nav .nav-item {
+    margin: 0 10px;
+}
+
+.navbar .navbar-nav .nav-link {
     color: white;
-    border: 1px solid #fff;
-    background-color: #9e1b32; /* Same as navbar background */
+    font-size: 1.1rem;
+    text-transform: uppercase;
 }
 
-.navbar-toggler-icon {
-    background-color: transparent; /* Transparent background */
-    border: none;
+.navbar .navbar-nav .nav-link:hover {
+    color: #d8d8d8;
 }
 
-.navbar-toggler-icon::before, 
-.navbar-toggler-icon::after {
-    background-color: white; /* Make the bars white */
-}
-
-.navbar-toggler-icon span {
-    background-color: white; /* Make the bars white */
-}
-
-/* Dropdown Button Style */
-.navdiv .dropdown .btn {
-    color: white;
-    background-color: #9e1b32; /* Cardinal Red */
-    border: 1px solid #fff;
-    font-size: 1rem;
-    transition: background-color 0.3s ease;
-}
-
-.navdiv .dropdown .btn:hover {
-    background-color: #7a1623; /* Darker red for hover */
-    color: white;
-}
-
-.navdiv .dropdown .btn:focus {
-    background-color: #7a1623; /* Darker red on focus/active */
-    color: white;
-    box-shadow: none; /* Remove the default blue focus shadow */
-}
-
-/* Dropdown Menu */
-.dropdown-menu {
-    background-color: #9e1b32; /* Same red as button */
-    border: 1px solid #7a1623; /* Darker border to match hover effect */
-}
-
-.dropdown-item {
-    color: white; /* Text color inside dropdown */
-    background-color: #9e1b32; /* Same red as button */
-    transition: background-color 0.3s ease;
-}
-
-.dropdown-item:hover {
-    background-color: #7a1623; /* Darker red on hover */
-    color: white;
-}
-
-/* Mobile Navbar Adjustment */
-@media (max-width: 767px) {
-    .navbar .container-fluid {
-        flex-direction: row;
-        align-items: center;
-    }
-
-    .navLogo {
-        flex-grow: 1;
-        display: flex;
-        align-items: center;
-    }
-
-    .navbar-toggler {
-        margin-left: 10px;
-    }
-
-    .navdiv {
-        display: none;
-        flex-direction: column;
-    }
-
-    .collapse.show .navdiv {
-        display: flex;
-    }
-
-    .divLogin {
-        display: flex;
-        justify-content: center;
-        margin-top: 10px;
-    }
-
-    .divLogin .loginBtn button {
-        width: 100%;
-    }
-}
 
 /* Footer Styles */
 footer {

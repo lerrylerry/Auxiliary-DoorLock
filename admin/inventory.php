@@ -156,6 +156,9 @@ $listtemp = mysqli_query($db, $sqltemp);
         .table td {
             background-color: #f9f9f9;
         }
+        table.dataTable{
+          margin-right: 10px !important;
+        }
         .active>.page-link, .page-link.active{
             background-color: #9e1b32;
             border-color: #9e1b32; 
@@ -327,7 +330,7 @@ $listtemp = mysqli_query($db, $sqltemp);
     </tbody>
   </table>
   <!-- <button type="button" class="btn btn-danger mb-3 mt-3" data-bs-toggle="modal" data-bs-target="#addProductModal">Add Stocks</button> -->
-<button type="button" class="btn btn-danger mb-3 mt-3" data-bs-toggle="modal" data-bs-target="#massAddProductModal">Add Stocks</button>
+<button type="button" class="btn btn-danger mb-3 mt-3 bottom-button" data-bs-toggle="modal" data-bs-target="#massAddProductModal">Add Stocks</button>
 </div>
 </section>
 <!-- Bootstrap JS (jQuery is required) -->
@@ -784,6 +787,23 @@ $(document).ready(function() {
     function redirectToPage() {
         window.location.href = 'inventory.php';
     }
+</script>
+<script>
+  $(document).ready(function() {
+    // Check window size and disable toggle functionality for smaller screens
+    if ($(window).width() <= 768) {
+        // If the window is mobile-sized, disable the open/close functionality
+        $(".sidebar").removeClass("close");
+    }
+
+    // Add your sidebar toggle functionality here for larger screens if needed
+    $(window).resize(function() {
+        if ($(window).width() <= 768) {
+            $(".sidebar").removeClass("close");
+        }
+    });
+});
+
 </script>
 
 </body>

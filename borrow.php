@@ -215,6 +215,17 @@ body {
     font-family: Arial, sans-serif;
     color: #fff;
 }
+/* Add a semi-transparent overlay to the body */
+body::before {
+    content: ''; /* Empty content for the overlay */
+    position: fixed; /* Fixed position to cover the entire viewport */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%; /* Cover the entire viewport height */
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
+    z-index: -1; /* Place it behind the content */
+}
 
 .navbar {
     background-color: #9e1b32; /* Cardinal Red */
@@ -542,6 +553,10 @@ button.btn-secondary {
     font-size: 0.85rem; /* Smaller text size for labels */
     color: #555; /* Slightly darker color for better readability */
 }
+
+element.style {
+    width: 0rem !important;
+}
     </style>
 </head>
 <body>
@@ -575,7 +590,7 @@ button.btn-secondary {
 </nav>
 
 <!-- Borrow Items Form -->
-<div class="card borrow-container mx-auto mt-5 mb-5" style="max-width: 90%; width: 30rem; border: 3px solid #0e0e0f;">
+<div class="card borrow-container mx-auto mt-5 mb-5">
     <h3 class="card-title borrow-label text-center mb-4">REQUEST ITEMS (BORROW)</h3>
     <hr>
     <div class="card-body borrow-content">
