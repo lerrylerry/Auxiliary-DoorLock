@@ -723,7 +723,7 @@ button.btn-secondary {
     $(document).ready(function() {
     $('#unitDropdown').change(function() {
         var selectedOption = $(this).find('option:selected');
-        var quantity = selectedOption.data('quantity');
+        var quantity = selectedOption.data('borrowqty');
         $('#quantity').attr('placeholder', 'borrowed: ' + quantity).val(''); // Update placeholder
     });
 
