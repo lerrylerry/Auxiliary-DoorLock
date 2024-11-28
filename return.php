@@ -78,20 +78,20 @@ if (isset($_POST['finalizerequest'])) {
     $itemsresult = mysqli_query($db, $sqlgetitems);
 
     // Step 3: Prepare the email content
-    $emailContent = "Dear " . $listcu['name'] . ",\n\n";
+    $emailContent = "Dear " . $user['name'] . ",\n\n"; // Using $user here for name
     $emailContent .= "Your return request has been successfully processed. Below are the details of the items you have returned:\n\n";
 
     // Debugging output to check if the items are being retrieved correctly
     if (mysqli_num_rows($itemsresult) > 0) {
-    while ($item = mysqli_fetch_assoc($itemsresult)) {
-    // Append item name and quantity to the email content
-    $emailContent .= "Item: " . $item['name'] . " | Quantity: " . $item['borrowqty'] . "\n";
-    }
+        while ($item = mysqli_fetch_assoc($itemsresult)) {
+            // Append item name and quantity to the email content
+            $emailContent .= "Item: " . $item['name'] . " | Quantity: " . $item['borrowqty'] . "\n";
+        }
     } else {
-    $emailContent .= "No items were returned or there was an issue fetching the items.\n";
+        $emailContent .= "No items were returned or there was an issue fetching the items.\n";
     }
 
-    $emailContent .= "\nThank you for using our service.\n\nBest regards,\nTUP Auxillary System";
+    $emailContent .= "\nThank you for using our service.\n\nBest regards,\nTUP Auxiliary System";
 
     // Debugging: Output the email content to ensure it's correctly populated
     echo "<pre>" . htmlspecialchars($emailContent) . "</pre>";
@@ -111,7 +111,7 @@ if (isset($_POST['finalizerequest'])) {
         $mail->Port = 587;  // SMTP port for TLS
 
         // Recipients
-        $mail->setFrom('projxacts12@gmail.com', 'TUP Auxillary System');
+        $mail->setFrom('projxacts12@gmail.com', 'TUP Auxiliary System');
         $mail->addAddress($user['email'], $user['name']);  // Add recipient email dynamically
 
         // Email content
@@ -121,56 +121,58 @@ if (isset($_POST['finalizerequest'])) {
 
         // Send email
         $mail->send();
-    // Set success message for the user
-    $message = "Your return request has been successfully submitted!";
-    $modalType = "success"; // Set modal type to success
-} catch (Exception $e) {
-    $message = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
-    $modalType = "error"; // Set modal type to error
+
+        // Set success message for the user
+        $message = "Your return request has been successfully submitted!";
+        $modalType = "success"; // Set modal type to success
+    } catch (Exception $e) {
+        $message = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        $modalType = "error"; // Set modal type to error
+    }
+
+    // Fetch admin's email (assuming the admin's id is 1)
+    $sqlgetAdminEmail = "SELECT email FROM tbadmin WHERE id = 1";
+    $adminResult = mysqli_query($db, $sqlgetAdminEmail);
+    $adminEmailData = mysqli_fetch_assoc($adminResult);
+    $adminEmail = $adminEmailData['email'];
+
+    // Prepare the admin's email content
+    $adminEmailContent = "Dear Admin,\n\n";
+    $adminEmailContent .= "You have received a new return request. Please review the request below:\n\n";
+    $adminEmailContent .= "User: " . $user['name'] . "\n"; // Using $user here for name
+    $adminEmailContent .= "User Email: " . $user['email'] . "\n"; // Using $user for email
+    $adminEmailContent .= "Return Items:\n";
+
+    // Reset itemsresult query to get return items again
+    $itemsresult = mysqli_query($db, $sqlgetitems);
+
+    while ($item = mysqli_fetch_assoc($itemsresult)) {
+        $adminEmailContent .= "Item: " . $item['name'] . " | Quantity: " . $item['borrowqty'] . "\n";
+    }
+
+    $adminEmailContent .= "\nTo review the return request, please visit the following link:\n";
+    $adminEmailContent .= "https://tupcauxiliary.com/Auxiliary/index.php\n\n";
+    $adminEmailContent .= "Thank you,\nTUP Auxiliary System";
+
+    // Send email to admin
+    try {
+        $mail->clearAddresses();
+        $mail->addAddress($adminEmail, 'Admin');
+        $mail->Subject = 'New Return Request Submitted';
+        $mail->Body = $adminEmailContent;
+
+        // Send email
+        $mail->send();
+    } catch (Exception $e) {
+        $message = "Message could not be sent to admin. Mailer Error: {$mail->ErrorInfo}";
+        $modalType = "error"; // Set modal type to error
+    }
+
+    // Redirect after showing the modal
+    header("Location: borrowANDreturn.php");
+    exit();
 }
 
-// Fetch admin's email (assuming the admin's id is 1)
-$sqlgetAdminEmail = "SELECT email FROM tbadmin WHERE id = 1";
-$adminResult = mysqli_query($db, $sqlgetAdminEmail);
-$adminEmailData = mysqli_fetch_assoc($adminResult);
-$adminEmail = $adminEmailData['email'];
-
-// Prepare the admin's email content
-$adminEmailContent = "Dear Admin,\n\n";
-$adminEmailContent .= "You have received a new return request. Please review the request below:\n\n";
-$adminEmailContent .= "User: " . $listcu['name'] . "\n";
-$adminEmailContent .= "User Email: " . $listcu['email'] . "\n";
-$adminEmailContent .= "Borrow Items:\n";
-
-// Reset itemsresult query to get return items again
-$itemsresult = mysqli_query($db, $sqlgetitems);
-
-while ($item = mysqli_fetch_assoc($itemsresult)) {
-    $adminEmailContent .= "Item: " . $item['name'] . " | Quantity: " . $item['returningqty'] . "\n";
-}
-
-$adminEmailContent .= "\nTo review the return request, please visit the following link:\n";
-$adminEmailContent .= "https://tupcauxiliary.com/Auxiliary/index.php\n\n";
-$adminEmailContent .= "Thank you,\nTUP Auxiliary System";
-
-// Send email to admin
-try {
-    $mail->clearAddresses();
-    $mail->addAddress($adminEmail, 'Admin');
-    $mail->Subject = 'New Return Request Submitted';
-    $mail->Body = $adminEmailContent;
-
-    // Send email
-    $mail->send();
-} catch (Exception $e) {
-    $message = "Message could not be sent to admin. Mailer Error: {$mail->ErrorInfo}";
-    $modalType = "error"; // Set modal type to error
-}
-
-// Redirect after showing the modal
-header("Location: borrowANDreturn.php");
-exit();
-}
 
 if (isset($_POST['delete'])) {  
     $sqlupdateqty = "UPDATE `tbpendingreturn` SET returningqty = 0 WHERE id = '" . $_POST['delete'] . "'";
