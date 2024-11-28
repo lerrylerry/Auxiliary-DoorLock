@@ -3,7 +3,7 @@ require('../dbcred/db.php');
 
 session_start();
 if (!isset($_SESSION['loginid'])) {
-    header("location: /login.php");
+    header("location: ../login.php");
 }
 
 $sqlgetborrow = "SELECT id FROM tbborrow  WHERE status ='Pending'";
