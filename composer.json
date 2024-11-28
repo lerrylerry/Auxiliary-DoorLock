@@ -4,16 +4,6 @@
         "google/apiclient": "2.0"
     },
     "config": {
-        "preferred-install": "dist",
-        "optimize-autoloader": true,
-        "classmap-authoritative": true
-    },
-    "scripts": {
-        "post-install-cmd": [
-            "composer dump-autoload --optimize"
-        ],
-        "post-update-cmd": [
-            "composer dump-autoload --optimize"
-        ]
+        "preferred-install": "dist"
     }
 }
