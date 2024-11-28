@@ -54,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $mail->addAddress($myemail, $results['name']);
                     $mail->isHTML(true);
                     $mail->Subject = 'Password Reset Request';
-                    $mail->Body = 'Click <a href="http://127.0.0.1/Auxiliary-DoorLock/resetpass.php?token='. $token . '">here</a> to reset your password. The link will be use once.';
+                    $mail->Body = 'Click <a href="https://tupcauxiliary.com/Auxiliary/resetpass.php?token='. $token . '">here</a> to reset your password. The link will be use once.';
 
                     // Send email
                     $mail->send();

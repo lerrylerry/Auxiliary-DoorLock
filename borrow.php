@@ -134,7 +134,7 @@ if (isset($_POST['finalizerequest'])) {
     }
 
     $adminEmailContent .= "\nTo review the borrow request, please visit the following link:\n";
-    $adminEmailContent .= "http://127.0.0.1/Auxiliary-DoorLock/index.php\n\n";
+    $adminEmailContent .= "https://tupcauxiliary.com/Auxiliary/index.php\n\n";
     $adminEmailContent .= "Thank you,\nTUP Auxiliary System";
 
     // Send email to admin

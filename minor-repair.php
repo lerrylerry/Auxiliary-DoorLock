@@ -1,18 +1,32 @@
 <?php
 require('dbcred/db.php');
 
+// Start session
+session_start();
+
 // Check if already logged in
 if (isset($_SESSION['loginid'])) {
     header("location: admin/homepage.php");
+    exit();
 }
 
 // Insert data into database if form is submitted
 if (isset($_POST['name'])) {
     $sqlinsert = "INSERT INTO `tbminorrepair`(`name`, `position`, `department`, `email`, `type`, `serial`, `brandmodel`, `propertyno`, `acqdate`, `acqcost`, `scope`, `endUser`) 
     VALUES ('" . $_POST['name'] . "','" . $_POST['position'] . "','" . $_POST['department'] . "','" . $_POST['email'] . "','" . $_POST['type'] . "','" . $_POST['serial'] . "','" . $_POST['model'] . "','" . $_POST['propertyno'] . "','" . $_POST['acqusitionDate'] . "','" . $_POST['acqusitionCost'] . "','" . $_POST['message'] . "','" . $_POST['name'] . "')";
-    mysqli_query($db, $sqlinsert);
+
+    // Execute the query and check for success
+    if (mysqli_query($db, $sqlinsert)) {
+        // Redirect to 200.php if successful
+        header("Location: success.php");
+        exit();
+    } else {
+        // Handle error (optional)
+        echo "Error: " . mysqli_error($db);
+    }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -327,7 +341,7 @@ if (isset($_POST['name'])) {
         </div>
         <div class="form-section">
             <label>Email:<span class="text-danger">*</span></label>
-            <input type="text" id="email" name="email" placeholder="Enter email" required>
+            <input type="email" id="email" name="email" placeholder="Enter email" required>
         </div>
 
         <h4 class="card-title">DESCRIPTION OF PROPERTY</h4>
