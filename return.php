@@ -121,11 +121,55 @@ if (isset($_POST['finalizerequest'])) {
 
         // Send email
         $mail->send();
-    } catch (Exception $e) {
-        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
-    }
+    // Set success message for the user
+    $message = "Your return request has been successfully submitted!";
+    $modalType = "success"; // Set modal type to success
+} catch (Exception $e) {
+    $message = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+    $modalType = "error"; // Set modal type to error
+}
 
-    header("location: borrowANDreturn.php");
+// Fetch admin's email (assuming the admin's id is 1)
+$sqlgetAdminEmail = "SELECT email FROM tbadmin WHERE id = 1";
+$adminResult = mysqli_query($db, $sqlgetAdminEmail);
+$adminEmailData = mysqli_fetch_assoc($adminResult);
+$adminEmail = $adminEmailData['email'];
+
+// Prepare the admin's email content
+$adminEmailContent = "Dear Admin,\n\n";
+$adminEmailContent .= "You have received a new return request. Please review the request below:\n\n";
+$adminEmailContent .= "User: " . $listcu['name'] . "\n";
+$adminEmailContent .= "User Email: " . $listcu['email'] . "\n";
+$adminEmailContent .= "Borrow Items:\n";
+
+// Reset itemsresult query to get return items again
+$itemsresult = mysqli_query($db, $sqlgetitems);
+
+while ($item = mysqli_fetch_assoc($itemsresult)) {
+    $adminEmailContent .= "Item: " . $item['name'] . " | Quantity: " . $item['returningqty'] . "\n";
+}
+
+$adminEmailContent .= "\nTo review the return request, please visit the following link:\n";
+$adminEmailContent .= "https://tupcauxiliary.com/Auxiliary/index.php\n\n";
+$adminEmailContent .= "Thank you,\nTUP Auxiliary System";
+
+// Send email to admin
+try {
+    $mail->clearAddresses();
+    $mail->addAddress($adminEmail, 'Admin');
+    $mail->Subject = 'New Return Request Submitted';
+    $mail->Body = $adminEmailContent;
+
+    // Send email
+    $mail->send();
+} catch (Exception $e) {
+    $message = "Message could not be sent to admin. Mailer Error: {$mail->ErrorInfo}";
+    $modalType = "error"; // Set modal type to error
+}
+
+// Redirect after showing the modal
+header("Location: borrowANDreturn.php");
+exit();
 }
 
 if (isset($_POST['delete'])) {  
