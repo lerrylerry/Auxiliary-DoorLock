@@ -98,6 +98,9 @@ $listup = mysqli_query($db, $sqlgetup);
         .table td {
             background-color: #f9f9f9;
         }
+        table.dataTable{
+          margin-right: 10px !important;
+        }
         .active>.page-link, .page-link.active{
             background-color: #9e1b32;
             border-color: #9e1b32; 
@@ -105,7 +108,54 @@ $listup = mysqli_query($db, $sqlgetup);
         .page-link {
             color: #9e1b32;
         }
-        
+        /* Ensure modal labels are left-aligned */
+        .modal-body .form-label .namezzz {
+            text-align: left !important;
+            font-weight: bold;
+        }
+
+        /* Ensure form controls take the full width */
+        .modal-body .form-control, 
+        .modal-body .form-select {
+            width: 100%;
+        }
+
+        /* Adjust modal dialog and content styling */
+        .modal-dialog-centered {
+            display: flex;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .modal-content {
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        /* Modal header styling */
+        .modal-header {
+            border-bottom: 2px solid #9e1b32;
+            background-color: #f8f9fa;
+        }
+
+        /* Title styling in the modal header */
+        .modal-title {
+            color: #9e1b32;
+            font-weight: bold;
+        }
+
+        /* Button styling */
+        .modal-footer .btn {
+            padding: 8px 20px;
+            font-weight: 600;
+        }
+
+        /* Modal footer flex to align buttons */
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
   </style>
 </head>
 <body>
