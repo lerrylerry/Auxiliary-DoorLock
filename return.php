@@ -720,14 +720,14 @@ button.btn-secondary {
 
 <!-- <script src="js/borrow-items.js" type="module"></script> -->
 <script>
+    <?php while ($data = mysqli_fetch_assoc($listp)) { ?>
     $(document).ready(function() {
     $('#unitDropdown').change(function() {
         var selectedOption = $(this).find('option:selected');
-        <?php while ($data = mysqli_fetch_assoc($listp)) { ?>
+        
             var quantity = selectedOption.data('<?php echo $data['borrowqty'] ?>');
-        <?php } ?>
-
-        $('#quantity').attr('placeholder', 'borrowed: ' + quantity).val(''); // Update placeholder
+            $('#quantity').attr('placeholder', 'borrowed: ' + quantity).val(''); // Update placeholder
+        
     });
 
     $('#quantity').on('input', function() {
@@ -741,6 +741,7 @@ button.btn-secondary {
         }
     });
 });
+<?php } ?> 
 </script>
 <script>
 $(document).ready(function() {
