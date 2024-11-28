@@ -49,7 +49,7 @@
                 <li><a class="link_name">Manage Requests</a></li>
                 <li><a href="borrowedItems.php">Borrow Request</a></li>
                 <li><a href="return-items.php">Return Request</a></li>
-                <li><a href="minorRepair.php">Minor Repair Request</a></li>
+                <li><a href="minor-repair.php">Minor Repair Request</a></li>
             </ul>
         </li>
         <li>
