@@ -723,7 +723,10 @@ button.btn-secondary {
     $(document).ready(function() {
     $('#unitDropdown').change(function() {
         var selectedOption = $(this).find('option:selected');
-        var quantity = selectedOption.data('borrowqty');
+        <?php while ($data = mysqli_fetch_assoc($listp)) { ?>
+            var quantity = selectedOption.data('<?php echo $data['borrowqty'] ?>');
+        <?php } ?>
+
         $('#quantity').attr('placeholder', 'borrowed: ' + quantity).val(''); // Update placeholder
     });
 
