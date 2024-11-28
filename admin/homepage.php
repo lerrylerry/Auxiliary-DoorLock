@@ -15,7 +15,7 @@ $getreturncount= mysqli_num_rows(mysqli_query($db, $sqlgetreturn));
 $sqlgetrepair= "SELECT id FROM tbminorrepair  WHERE status ='Pending'";
 $getrepairrequest= mysqli_num_rows(mysqli_query($db, $sqlgetrepair));
 
-$sqlgetp = "SELECT id, unit, name, quantity FROM `tbproductlist` WHERE quantity >= 0 ORDER BY quantity ASC LIMIT 10;";
+$sqlgetp = "SELECT id, unit, name, quantity FROM `tbproductlist` WHERE quantity >= 0 ORDER BY quantity ASC LIMIT 5;";
 $listp = mysqli_query($db, $sqlgetp);
 ?>
 
