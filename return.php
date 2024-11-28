@@ -611,7 +611,7 @@ button.btn-secondary {
                     <select id="unitDropdown" name="additem" class="form-select" required>
                         <option value="">- Select -</option>
                         <?php while ($data = mysqli_fetch_assoc($listp)) { ?>
-                            <option value="<?php echo $data['id'] ?>" data-quantity="<?php echo $data['quantity'] ?>"><?php echo $data['name'] ?> | <?php echo $data['unit'] ?>: <?php echo $data['quantity'] ?></option>
+                            <option value="<?php echo $data['id'] ?>" data-quantity="<?php echo $data['quantity'] ?>"><?php echo $data['name'] ?> | <?php echo $data['unit'] ?>: <?php echo $data['borrowqty'] ?></option>
                         <?php } ?>
                     </select>
                 </div>
