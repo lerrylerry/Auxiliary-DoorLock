@@ -78,7 +78,7 @@ if (isset($_POST['finalizerequest'])) {
     $itemsresult = mysqli_query($db, $sqlgetitems);
 
     // Step 3: Prepare the email content
-    $emailContent = "Dear " . $user['name'] . ",\n\n";
+    $emailContent = "Dear " . $listcu['name'] . ",\n\n";
     $emailContent .= "Your return request has been successfully processed. Below are the details of the items you have returned:\n\n";
 
     // Debugging output to check if the items are being retrieved correctly
