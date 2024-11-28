@@ -20,14 +20,28 @@ if (isset($_POST['additem'])) {
     $userid = $_GET['userid'];
     $qty = $_POST['qty'];
 
+    // Check if the item has already been borrowed
+    $sqlcheck = "SELECT * FROM `tbpendingreturn` 
+                 WHERE `itemid` = '$itemid' 
+                 AND `userid` = '$userid' 
+                 AND `returningqty` != '0'";  // Check only unprocessed (returningqty = 0) requests
+
+    $result = mysqli_query($db, $sqlcheck);
+
+    if (mysqli_num_rows($result) > 0) {
+        // Item already borrowed, don't insert
+        $message = "This item has already been added to your return request. Please delete the first entry and try again. Thank You!";
+        $modalType = "error"; // Set modal type to error
+    } else {
     // Update the returningqty field based on the itemid and userid
     $sqlupdatep = "UPDATE tbpendingreturn SET returningqty = returningqty + $qty WHERE itemid = '$itemid' AND userid = '$userid'";
-
-    if (mysqli_query($db, $sqlupdatep)) {
-        // Update successful, you can add a success message here
-    } else {
-        // Handle any errors, such as if the query failed
-        echo "Error: " . mysqli_error($db);
+        if (mysqli_query($db, $sqlupdatep)) {
+            // $message = "Item added to borrow request.";
+            // $modalType = "success"; // Set modal type to success
+        } else {
+            $message = "Error adding item to return request.";
+            $modalType = "error"; // Set modal type to error
+        }
     }
 }
 
