@@ -9,56 +9,45 @@ if (isset($_SESSION['loginid'])) {
     header("location: admin/homepage.php");
 }
 
-$message = ""; 
-$modalType = ""; 
+// if (isset($_POST['additem'])) {
+//     $sqlinsertp = "INSERT INTO `tbpendingreturn`(`itemid`, `userid`,`borrowqty`) VALUES ('" . $_POST['additem'] . "','" . $_GET['userid'] . "','" . $_POST['qty'] . "')";
+//     mysqli_query($db, $sqlinsertp);
+// }
 
-// Handle adding an item to the return request
 if (isset($_POST['additem'])) {
+    // Assuming 'returningqty' is the column to update
     $itemid = $_POST['additem'];
     $userid = $_GET['userid'];
     $qty = $_POST['qty'];
 
-    // Check if the item has already been returned
-    $sqlcheck = "SELECT * FROM `tbpendingreturn` 
-                 WHERE `itemid` = '$itemid' 
-                 AND `userid` = '$userid'";
+    // Update the returningqty field based on the itemid and userid
+    $sqlupdatep = "UPDATE tbpendingreturn SET returningqty = returningqty + $qty WHERE itemid = '$itemid' AND userid = '$userid'";
 
-    $result = mysqli_query($db, $sqlcheck);
-
-    if (mysqli_num_rows($result) > 0) {
-        // Item already added for return, don't insert again
-        $message = "This item has already been added to your return request. Please delete the first entry and try again. Thank You!";
-        $modalType = "error"; // Set modal type to error
+    if (mysqli_query($db, $sqlupdatep)) {
+        // Update successful, you can add a success message here
     } else {
-        // Item not added, proceed with updating the quantity
-        $sqlupdatep = "UPDATE tbpendingreturn SET returningqty = returningqty + $qty WHERE itemid = '$itemid' AND userid = '$userid'";
-        if (mysqli_query($db, $sqlupdatep)) {
-            // $message = "Item added to return request.";
-            // $modalType = "success"; // Set modal type to success
-        } else {
-            $message = "Error adding item to return request.";
-            $modalType = "error"; // Set modal type to error
-        }
+        // Handle any errors, such as if the query failed
+        echo "Error: " . mysqli_error($db);
     }
 }
 
-// Handle finalizing the return request
 if (isset($_POST['finalizerequest'])) {
-    // Insert a new return request with status 'Pending'
+    // Insert a new request into tbreturn with status 'Pending'
     $sqlsubmitrequest = "INSERT INTO `tbreturn`(`userid`, `status`) VALUES ('" . $_POST['finalizerequest'] . "','Pending')";
     mysqli_query($db, $sqlsubmitrequest);
 
-    // Get the transaction ID of the return request
+    // Get the transaction ID from the previous insert (this is used to link with tbpendingreturn)
     $transaction_id = mysqli_insert_id($db);
 
-    // Update tbpendingreturn with the transaction ID and reset returningqty to 0 after it's linked to the transaction
+    // Update tbpendingreturn to link the transaction ID for items where returningqty != 0
+    // Instead of setting transid = 0, we set transid to the new transaction ID
     $sqlupdatetransid = "UPDATE `tbpendingreturn` 
                          SET `transid` = '$transaction_id', `returningqty` = 0 
                          WHERE `userid` = '" . $_POST['finalizerequest'] . "' 
                          AND `returningqty` != 0";
     mysqli_query($db, $sqlupdatetransid);
 
-    // Reset door access to 'Rejected' for the user in tbup
+    // Reset the door access to 'Rejected' for the user in tbup
     $resetaccess = "UPDATE `tbup` SET `dooraccess` = 'Rejected' WHERE id = '" . $_POST['finalizerequest'] . "'";
     mysqli_query($db, $resetaccess);
 
@@ -78,16 +67,20 @@ if (isset($_POST['finalizerequest'])) {
     $emailContent = "Dear " . $user['name'] . ",\n\n";
     $emailContent .= "Your return request has been successfully processed. Below are the details of the items you have returned:\n\n";
 
-    // Check if any items were returned and append them to the email content
+    // Debugging output to check if the items are being retrieved correctly
     if (mysqli_num_rows($itemsresult) > 0) {
-        while ($item = mysqli_fetch_assoc($itemsresult)) {
-            $emailContent .= "Item: " . $item['name'] . " | Quantity: " . $item['borrowqty'] . "\n";
-        }
+    while ($item = mysqli_fetch_assoc($itemsresult)) {
+    // Append item name and quantity to the email content
+    $emailContent .= "Item: " . $item['name'] . " | Quantity: " . $item['borrowqty'] . "\n";
+    }
     } else {
-        $emailContent .= "No items were returned or there was an issue fetching the items.\n";
+    $emailContent .= "No items were returned or there was an issue fetching the items.\n";
     }
 
-    $emailContent .= "\nThank you for using our service.\n\nBest regards,\nTUP Auxiliary System";
+    $emailContent .= "\nThank you for using our service.\n\nBest regards,\nTUP Auxillary System";
+
+    // Debugging: Output the email content to ensure it's correctly populated
+    echo "<pre>" . htmlspecialchars($emailContent) . "</pre>";
 
     // Step 4: Send email notification using PHPMailer
     try {
@@ -104,7 +97,7 @@ if (isset($_POST['finalizerequest'])) {
         $mail->Port = 587;  // SMTP port for TLS
 
         // Recipients
-        $mail->setFrom('projxacts12@gmail.com', 'TUP Auxiliary System');
+        $mail->setFrom('projxacts12@gmail.com', 'TUP Auxillary System');
         $mail->addAddress($user['email'], $user['name']);  // Add recipient email dynamically
 
         // Email content
@@ -118,72 +111,26 @@ if (isset($_POST['finalizerequest'])) {
         echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
     }
 
-    // Step 5: Notify the admin about the return request
-    // Fetch the admin's email address
-    $sqlgetAdminEmail = "SELECT email FROM tbadmin WHERE id = 1";
-    $adminResult = mysqli_query($db, $sqlgetAdminEmail);
-    $adminEmailData = mysqli_fetch_assoc($adminResult);
-    $adminEmail = $adminEmailData['email'];
-
-    // Prepare the admin's email content
-    $adminEmailContent = "Dear Admin,\n\n";
-    $adminEmailContent .= "A new return request has been submitted. Please review the details below:\n\n";
-    $adminEmailContent .= "User: " . $user['name'] . "\n";
-    $adminEmailContent .= "User Email: " . $user['email'] . "\n";
-    $adminEmailContent .= "Returned Items:\n";
-
-    // Reset itemsresult query to get items again
-    $itemsresult = mysqli_query($db, $sqlgetitems);
-
-    while ($item = mysqli_fetch_assoc($itemsresult)) {
-        $adminEmailContent .= "Item: " . $item['name'] . " | Quantity: " . $item['borrowqty'] . "\n";
-    }
-
-    $adminEmailContent .= "\nTo review the return request, please visit the following link:\n";
-    $adminEmailContent .= "https://tupcauxiliary.com/Auxiliary/index.php\n\n";
-    $adminEmailContent .= "Thank you,\nTUP Auxiliary System";
-
-    // Send email to admin
-    try {
-        $mail->clearAddresses();
-        $mail->addAddress($adminEmail, 'Admin');
-        $mail->Subject = 'New Return Request Submitted';
-        $mail->Body = $adminEmailContent;
-
-        // Send email
-        $mail->send();
-    } catch (Exception $e) {
-        echo "Message could not be sent to admin. Mailer Error: {$mail->ErrorInfo}";
-    }
-
-    // Redirect after processing the return request
     header("location: borrowANDreturn.php");
-    exit();
 }
 
-// Handle item deletion from the return request
 if (isset($_POST['delete'])) {  
     $sqlupdateqty = "UPDATE `tbpendingreturn` SET returningqty = 0 WHERE id = '" . $_POST['delete'] . "'";
     mysqli_query($db, $sqlupdateqty);
 }
 
-// Fetch list of items in the pending return request
-$sqlgetitems = "SELECT tbproductlist.*, tbpendingreturn.* 
-                FROM tbpendingreturn 
-                LEFT JOIN tbproductlist ON tbpendingreturn.itemid = tbproductlist.id 
-                WHERE userid = '" . $_GET['userid'] . "' 
-                AND returningqty != 0;";
+
+$sqlgetitems = "SELECT tbproductlist.*,tbpendingreturn.* FROM tbpendingreturn LEFT JOIN tbproductlist ON tbpendingreturn.itemid = tbproductlist.id WHERE userid = '" . $_GET['userid'] . "' AND returningqty != 0;";
 $listresult = mysqli_query($db, $sqlgetitems);
 
-// Fetch user details for the return request
-$sqlgetcu = "SELECT id, name, pincode, status FROM `tbup` WHERE id ='" . $_GET['userid'] . "';";
+$sqlgetcu = "SELECT id,name,pincode,status FROM `tbup` WHERE id ='" . $_GET['userid'] . "';";
 $listcu = mysqli_fetch_assoc(mysqli_query($db, $sqlgetcu));
 
-// Fetch available products for return
+// return------------------------------------------------------------------------------------------------------
 $userId = filter_input(INPUT_GET, 'userid', FILTER_SANITIZE_NUMBER_INT);
 
 $sqlgetp = "
-    SELECT p.*, pl.unit, pl.*  
+    SELECT p.*, pl.unit, pl.*  -- Include pl.unit explicitly
     FROM tbpendingreturn p
     JOIN tbproductlist pl ON p.itemid = pl.id
     WHERE p.userid = '$userId' AND p.transid != 0
@@ -191,7 +138,9 @@ $sqlgetp = "
 ";
 
 $listp = mysqli_query($db, $sqlgetp);
+
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
