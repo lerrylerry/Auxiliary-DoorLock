@@ -2,5 +2,8 @@
     "require": {
         "phpmailer/phpmailer": "^6.9",
         "google/apiclient": "2.0"
+    },
+    "config": {
+        "preferred-install": "dist"
     }
 }
