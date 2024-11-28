@@ -5,7 +5,7 @@ session_start();
 
 // Ensure that the user is logged in by checking the session
 if (!isset($_SESSION['loginid'])) {
-    header("location: ../index.html");
+    header("location: ../login.php");
     exit();
 }
 

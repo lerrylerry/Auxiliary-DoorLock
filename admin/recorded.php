@@ -4,7 +4,7 @@ session_start();
 
 // Redirect if not logged in
 if (!isset($_SESSION['loginid'])) {
-    header("location: ../index.html");
+    header("location: ../login.php");
 }
 
 // Function to generate thumbnails

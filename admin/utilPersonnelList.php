@@ -6,7 +6,7 @@ require '../vendor/autoload.php';
 
 session_start();
 if (!isset($_SESSION['loginid'])) {
-    header("location: ../index.html");
+    header("location: ../login.php");
 }
 
 // if (isset($_POST['name'])) {
