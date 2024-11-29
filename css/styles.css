@@ -541,3 +541,51 @@ body {
     width: 52px;
   }
 }
+
+/* General styling for the button */
+.bottom-button {
+  display: block;
+  background-color: #580606;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  z-index: 101; /* Ensure it's on top */
+}
+
+/* Adjust mobile view layout */
+@media screen and (max-width: 768px) {
+
+  .bottom-button {
+    display: block;
+    position: fixed;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #580606;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    z-index: 101; /* Ensure it's on top */
+  }
+
+  /* Add padding to the container for mobile */
+  .container {
+    padding-bottom: 70px; /* Space for the fixed button */
+  }
+
+  /* Ensure modal content doesn't overlap */
+  .modal-dialog {
+    margin-top: 50px; /* Provide some space at the top for the modal */
+  }
+}
+
+/* For larger screens */
+@media screen and (min-width: 769px) {
+  .bottom-button {
+    margin-left: 20px;
+    position: static;  /* Reset position to normal flow */
+    margin: 20px auto; /* Optional: center it horizontally if you want */
+  }
+}

@@ -156,23 +156,8 @@ $listp = mysqli_query($db, $sqlgetp);
 <!-- Bootstrap Bundle (Popper.js is required) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-  $(document).ready(function() {
-    // Check window size and disable toggle functionality for smaller screens
-    if ($(window).width() <= 768) {
-        // If the window is mobile-sized, disable the open/close functionality
-        $(".sidebar").removeClass("close");
-    }
 
-    // Add your sidebar toggle functionality here for larger screens if needed
-    $(window).resize(function() {
-        if ($(window).width() <= 768) {
-            $(".sidebar").removeClass("close");
-        }
-    });
-});
 
-</script>
 
   <script src="static/script.js"></script>
 </body>
