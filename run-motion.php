@@ -1,9 +1,11 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 $pythonScriptPath = 'Auxiliary/motion-detection.py';
-$output = shell_exec("python " . escapeshellarg($pythonScriptPath));
-echo "<pre>$output</pre>";
+$command = "/c/Users/aryss/AppData/Local/Programs/Python/Python313/python " . escapeshellarg($pythonScriptPath);
+exec($command, $output, $return_var);
+
+if ($return_var !== 0) {
+    echo "Error: Unable to execute the script.";
+} else {
+    echo "<pre>" . implode("\n", $output) . "</pre>";
+}
 ?>
