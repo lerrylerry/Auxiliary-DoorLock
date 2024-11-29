@@ -1,5 +1,5 @@
 <?php
-$pythonScriptPath = 'Auxiliary/motion-detection.py';
+$pythonScriptPath = '/Auxiliary/motion-detection.py';
 $command = "/c/Users/aryss/AppData/Local/Programs/Python/Python313/python " . escapeshellarg($pythonScriptPath);
 exec($command, $output, $return_var);
 
