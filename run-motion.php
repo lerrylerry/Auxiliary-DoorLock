@@ -1,6 +1,6 @@
 <?php
 $pythonScriptPath = '/Auxiliary/motion-detection.py';
-$command = "/usr/bin/python " . escapeshellarg($pythonScriptPath);
+$command = "/usr/bin/python" . escapeshellarg($pythonScriptPath);
 exec($command, $output, $return_var);
 
 if ($return_var !== 0) {
