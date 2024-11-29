@@ -18,10 +18,14 @@ if not os.path.exists(thumbnail_dir):
 
 # Connect to MySQL database
 db = mysql.connector.connect(
+    # host="localhost",
+    # user="root",
+    # passwd="",
+    # database="dbauxsys",
     host="localhost",
-    user="root",
-    passwd="",
-    database="dbauxsys",
+    user="u553122496_root",
+    passwd="nedzlerry4B",
+    database="u553122496_dbauxsys",
     connection_timeout=60
 )
 cursor = db.cursor()
