@@ -404,7 +404,7 @@ body {
 
 
 /* Mobile view: Move sidebar to the top */
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 400px) {
   /* Sidebar on top for mobile */
   .sidebar {
     position: fixed;
@@ -554,7 +554,7 @@ body {
 }
 
 /* Adjust mobile view layout */
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 400px) {
   /* Add New Product button for mobile */
   .bottom-button {
     display: block;
