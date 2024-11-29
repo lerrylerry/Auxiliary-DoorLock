@@ -4,6 +4,13 @@ import mysql.connector
 import os
 from datetime import datetime
 
+import datetime
+
+# Log the execution of the script
+with open("/home/u553122496/domains/tupcauxiliary.com/public_html/Auxiliary/cron_log.txt", "a") as log_file:
+    log_file.write(f"Script executed successfully at {datetime.datetime.now()}\n")
+
+
 no_display = not os.environ.get('DISPLAY')
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -153,7 +160,10 @@ while True:
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
+
+
 # Release everything if job is finished
 camera.release()
 cv2.destroyAllWindows()
 db.close()
+
