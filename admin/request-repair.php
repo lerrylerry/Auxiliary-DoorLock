@@ -18,7 +18,7 @@ $listmr = mysqli_query($db, $sqlgetmr);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auxiliary | Repair History</title>
+    <title>Auxiliary | Minor Repair History</title>
     <link rel="stylesheet" href="../css/styles.css">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
@@ -120,7 +120,7 @@ $listmr = mysqli_query($db, $sqlgetmr);
             <th>Name</th>
             <th>Status</th>
             <th>Date</th>
-            <th>Action</th>
+            <!-- <th>Action</th> -->
         </tr>
         </thead>
         <tbody>
@@ -217,77 +217,7 @@ $listmr = mysqli_query($db, $sqlgetmr);
                     </div>
                 </div>
                 <td><?php echo $data['status']?></td>
-                <td><?php echo $data['datetime']?></td>
-                <td>
-                    <?php if ($data['status'] == "Pending") { ?>
-                        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#approveModal">
-                            <i class="bi bi-check-circle-fill"></i> Approve
-                        </button>
-                        <div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel<?php echo $data['id'] ?>"
-                             aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="approveModalLabel<?php echo $data['id'] ?>">Approve Repair</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        Are you sure you want to approve this request?
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel
-                                        </button>
-                                        <form method="post" action="">
-                                            <input type="hidden" class="form-control" name="approverepair"
-                                                   value="<?php echo $data['id'] ?>">
-                                            <button type="submit" class="btn btn-success">Approve</button>
-                                        </form>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#rejectModal">
-                            <i class="bi bi-x-circle-fill"></i> Reject
-                        </button>
-                    <?php } ?>
-                    <!-- Reject Modal -->
-                    <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel<?php echo $data['id'] ?>"
-                         aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="rejectModalLabel<?php echo $data['id'] ?>">Reject Request</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-
-                                    <form method="post" action="">
-                                        <label for="productName" class="form-label">Rejection Reason</label>
-                                        <input type="text" class="form-control" name="reason" required placeholder="Reason for Rejection">
-                                        Are you sure you want to reject this request?
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel
-                                    </button>
-                                    <form method="post" action="">
-                                        <input type="hidden" class="form-control" name="rejectmr"
-                                               value="<?php echo $data['id'] ?>">
-                                        <button type="submit" class="btn btn-danger">Reject</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <a href='../repair - userReview.php?repairid=<?php echo $data['id'];?>'><button type="submit" class="btn btn-success">View Form</button></a>
-                </td>
+                <td><?php echo date("F j, Y g:i A", strtotime($data['datetime'])); ?></td>
             </tr>
         <?php } ?>
         <!-- Add more rows as needed -->
@@ -350,23 +280,6 @@ $listmr = mysqli_query($db, $sqlgetmr);
         </div>
     </div>
 </div>
-<script>
-  $(document).ready(function() {
-    // Check window size and disable toggle functionality for smaller screens
-    if ($(window).width() <= 768) {
-        // If the window is mobile-sized, disable the open/close functionality
-        $(".sidebar").removeClass("close");
-    }
-
-    // Add your sidebar toggle functionality here for larger screens if needed
-    $(window).resize(function() {
-        if ($(window).width() <= 768) {
-            $(".sidebar").removeClass("close");
-        }
-    });
-});
-
-</script>
 <script src="static/script.js"></script>
 
 </body>

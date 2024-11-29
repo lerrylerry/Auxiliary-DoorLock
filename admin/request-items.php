@@ -20,7 +20,7 @@ $listreturn= mysqli_query($db, $sqlgetreturn);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auxiliary | Request History</title>
+    <title>Auxiliary | Borrow/Return Request History</title>
     <link rel="stylesheet" href="../css/styles.css">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
@@ -121,7 +121,7 @@ $listreturn= mysqli_query($db, $sqlgetreturn);
             <th>Person</th>
             <th>Service</th>
             <th>Status</th>
-            <th>Datetime</th>
+            <th>Date</th>
         </tr>
         <br>
         </thead>
@@ -174,7 +174,7 @@ $listreturn= mysqli_query($db, $sqlgetreturn);
                 </td>
                 <td>Borrow</td>
                 <td><?php echo $data['status'] ?></td>
-                <td> <?php echo $data['datetime'] ?></td>
+                <td><?php echo date("F j, Y g:i A", strtotime($data['datetime'])); ?></td>
             </tr>
         <?php } ?>
         <?php while ($datar = mysqli_fetch_assoc($listreturn)) { ?>
@@ -262,23 +262,7 @@ $listreturn= mysqli_query($db, $sqlgetreturn);
         });
     });
 </script>
-<script>
-  $(document).ready(function() {
-    // Check window size and disable toggle functionality for smaller screens
-    if ($(window).width() <= 768) {
-        // If the window is mobile-sized, disable the open/close functionality
-        $(".sidebar").removeClass("close");
-    }
 
-    // Add your sidebar toggle functionality here for larger screens if needed
-    $(window).resize(function() {
-        if ($(window).width() <= 768) {
-            $(".sidebar").removeClass("close");
-        }
-    });
-});
-
-</script>
 <script src="static/script.js"></script>
 
 </body>

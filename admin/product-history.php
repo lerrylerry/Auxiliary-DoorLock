@@ -17,7 +17,7 @@ $listhistemd = mysqli_query($db, $sqlhistems);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auxiliary | Add Item History</title>
+    <title>Auxiliary | Products History</title>
     <link rel="stylesheet" href="../css/styles.css">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
@@ -121,7 +121,7 @@ $listhistemd = mysqli_query($db, $sqlhistems);
             <th>Quantity</th>
             <th>Category</th>
             <th>Date Added</th>
-            <th>Added By</th>
+            <!-- <th>Added By</th> -->
         </tr>
     </thead>
     <tbody>
@@ -133,7 +133,7 @@ $listhistemd = mysqli_query($db, $sqlhistems);
             <td><?php echo $data['quantity'] ?></td>
             <td><?php echo $data['category'] ?></td>
             <td><?php echo date("F j, Y", strtotime($data['dateAdded'])) ?></td>
-            <td><?php echo $data['addedBy'] ?></td>
+            <!-- <td><?php echo $data['addedBy'] ?></td> -->
         </tr>
         <?php } ?>
     </tbody>
@@ -154,23 +154,6 @@ $listhistemd = mysqli_query($db, $sqlhistems);
     $(document).ready(function () {
         $('#addHistoryTable').DataTable();
     });
-</script>
-<script>
-  $(document).ready(function() {
-    // Check window size and disable toggle functionality for smaller screens
-    if ($(window).width() <= 768) {
-        // If the window is mobile-sized, disable the open/close functionality
-        $(".sidebar").removeClass("close");
-    }
-
-    // Add your sidebar toggle functionality here for larger screens if needed
-    $(window).resize(function() {
-        if ($(window).width() <= 768) {
-            $(".sidebar").removeClass("close");
-        }
-    });
-});
-
 </script>
 
 <script src="static/script.js"></script>

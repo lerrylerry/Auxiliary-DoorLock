@@ -164,9 +164,56 @@ $listmr = mysqli_query($db, $sqlgetmr);
         .page-link {
             color: #9e1b32;
         }
-        .modal-header {
-            border-bottom: 2px solid #dee2e6;
+/* Ensure modal labels are left-aligned */
+.modal-body .form-label .namezzz {
+            text-align: left !important;
+            font-weight: bold;
         }
+
+        /* Ensure form controls take the full width */
+        .modal-body .form-control, 
+        .modal-body .form-select {
+            width: 100%;
+        }
+
+        /* Adjust modal dialog and content styling */
+        .modal-dialog-centered {
+            display: flex;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .modal-content {
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        /* Modal header styling */
+        .modal-header {
+            border-bottom: 2px solid #9e1b32;
+            background-color: #f8f9fa;
+        }
+
+        /* Title styling in the modal header */
+        .modal-title {
+            color: #9e1b32;
+            font-weight: bold;
+        }
+
+        /* Button styling */
+        .modal-footer .btn {
+            padding: 8px 20px;
+            font-weight: 600;
+        }
+
+        /* Modal footer flex to align buttons */
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        
 
         .modal-footer {
             border-top: 2px solid #dee2e6;
@@ -420,23 +467,6 @@ $listmr = mysqli_query($db, $sqlgetmr);
         $(document).ready(function() {
             $('#requestTable').DataTable();
         });
-        </script>
-        <script>
-        $(document).ready(function() {
-            // Check window size and disable toggle functionality for smaller screens
-            if ($(window).width() <= 768) {
-                // If the window is mobile-sized, disable the open/close functionality
-                $(".sidebar").removeClass("close");
-            }
-
-            // Add your sidebar toggle functionality here for larger screens if needed
-            $(window).resize(function() {
-                if ($(window).width() <= 768) {
-                    $(".sidebar").removeClass("close");
-                }
-            });
-        });
-
         </script>
 
         <!-- Latest compiled JavaScript -->

@@ -62,9 +62,9 @@
             </div>
             <ul class="sub-menu">
                 <li><a class="link_name">History</a></li>
-                <li><a href="historyAdmin.php">Borrow/Return History</a></li>
-                <li><a href="historyRepair.php">Repair History</a></li>
-                <li><a href="historyItem.php">Items History</a></li>
+                <li><a href="request-items.php">Borrow/Return History</a></li>
+                <li><a href="request-repair.php">Repair History</a></li>
+                <li><a href="product-history.php">Items History</a></li>
             </ul>
         </li>
         <li>
