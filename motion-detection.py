@@ -4,35 +4,24 @@ import mysql.connector
 import os
 from datetime import datetime
 
-import datetime
-
-# Log the execution of the script
-with open("/home/u553122496/domains/tupcauxiliary.com/public_html/Auxiliary/cron_log.txt", "a") as log_file:
-    log_file.write(f"Script executed successfully at {datetime.datetime.now()}\n")
-
-
 no_display = not os.environ.get('DISPLAY')
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 video_dir = os.path.join(script_dir, "recorded_videos")
-thumbnail_dir = os.path.join(script_dir, "thumbnails")  # New folder for thumbnails
+# thumbnail_dir = os.path.join(script_dir, "thumbnails")  # New folder for thumbnails (optional)
 
 # Create directories if they do not exist
 if not os.path.exists(video_dir):
     os.makedirs(video_dir)
-if not os.path.exists(thumbnail_dir):
-    os.makedirs(thumbnail_dir)
+# if not os.path.exists(thumbnail_dir):
+#     os.makedirs(thumbnail_dir)
 
 # Connect to MySQL database
 db = mysql.connector.connect(
-    # host="localhost",
-    # user="root",
-    # passwd="",
-    # database="dbauxsys",
     host="localhost",
-    user="u553122496_root",
-    passwd="nedzlerry4B",
-    database="u553122496_dbauxsys",
+    user="root",
+    passwd="",
+    database="dbauxsys",
     connection_timeout=60
 )
 cursor = db.cursor()
@@ -44,7 +33,7 @@ CREATE TABLE IF NOT EXISTS videos (
     filename VARCHAR(255),
     timestamp DATETIME,
     video_data LONGBLOB,
-    thumbnail_path VARCHAR(255)  # Add a field to store the thumbnail path
+    thumbnail_data LONGBLOB  # Store thumbnail binary data instead of path
 )
 """)
 
@@ -72,15 +61,20 @@ _, prev_frame = camera.read()
 prev_gray = cv2.cvtColor(prev_frame, cv2.COLOR_BGR2GRAY)
 prev_gray = cv2.GaussianBlur(prev_gray, (21, 21), 0)
 
-# Function to generate thumbnail from the first frame
-def generate_thumbnail(video_path, thumbnail_path):
+# Function to generate thumbnail from the first frame and return as binary data
+def generate_thumbnail(video_path):
     cap = cv2.VideoCapture(video_path)
     ret, frame = cap.read()  # Read the first frame
     if ret:
         # Resize the frame to create a thumbnail
         thumbnail = cv2.resize(frame, (160, 90))
-        cv2.imwrite(thumbnail_path, thumbnail)  # Save the thumbnail image
+
+        # Convert the thumbnail to a binary format (JPEG)
+        _, buffer = cv2.imencode('.jpg', thumbnail)
+        thumbnail_data = buffer.tobytes()  # Get binary data
+        return thumbnail_data
     cap.release()
+    return None
 
 while True:
     # Capture frame-by-frame
@@ -136,18 +130,20 @@ while True:
             with open(video_path, 'rb') as f:
                 binary_data = f.read()
 
-            # Generate thumbnail from the first frame of the video
-            thumbnail_filename = f"Thumbnail_{timestamp}.jpg"
-            thumbnail_path = os.path.join(thumbnail_dir, thumbnail_filename)  # Save to the thumbnails folder
-            generate_thumbnail(video_path, thumbnail_path)
+            # Generate thumbnail binary data
+            thumbnail_data = generate_thumbnail(video_path)
 
             # Insert metadata and binary data into database
             cursor.execute("""
-            INSERT INTO videos (filename, timestamp, video_data, thumbnail_path) 
+            INSERT INTO videos (filename, timestamp, video_data, thumbnail_data) 
             VALUES (%s, %s, %s, %s)
-            """, (video_filename, start_time, binary_data, thumbnail_path))
+            """, (video_filename, start_time, binary_data, thumbnail_data))
 
             db.commit()
+
+            os.remove(video_path)
+            print("Video saved to database and temporary file deleted.")
+
 
         # Update the previous frame and grayscale image
         prev_gray = gray_frame.copy()
@@ -160,10 +156,7 @@ while True:
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-
-
 # Release everything if job is finished
 camera.release()
 cv2.destroyAllWindows()
 db.close()
-
