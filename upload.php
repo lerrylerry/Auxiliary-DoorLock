@@ -17,9 +17,18 @@ if (!is_dir($thumbnail_dir)) {
     mkdir($thumbnail_dir, 0777, true);
 }
 
+// Get the highest id from the database (last inserted video ID) and add 1
+$sql = "SELECT MAX(id) AS highest_id FROM videos";
+$result = mysqli_query($db, $sql);
 
-$sql = "SELECT MAX(id) AS highest_id FROM videos;"; // Adjust the WHERE clause to fit your logic (e.g., use the latest drnum)
-$video_id = mysqli_query($db, $sql);
+if ($result) {
+    $row = mysqli_fetch_assoc($result);
+    $video_id = $row['highest_id'];  // Get the highest id from the database
+    // Add 1 to the highest ID for the next video ID
+    $video_id = ($video_id !== null) ? $video_id + 1 : 1;  // If no records exist, start with 1
+} else {
+    die("Error fetching the highest video ID: " . mysqli_error($db));
+}
 
 // Check for uploaded video file
 if (isset($_FILES['video'])) {
@@ -41,14 +50,13 @@ if (isset($_FILES['video'])) {
         // Insert video filename, timestamp, and video binary data into the database
         $timestamp = date('Y-m-d H:i:s');  // Current timestamp in DATETIME format
         $video_data = mysqli_real_escape_string($db, $video_data);  // Escape binary data for safe insertion
-        $sql = "INSERT INTO videos (filename, timestamp, video_data) 
-                VALUES ('$video_filename', '$timestamp', '$video_data')";
+        $sql = "INSERT INTO videos (id, filename, timestamp, video_data) 
+                VALUES ('$video_id', '$video_filename', '$timestamp', '$video_data')";
 
         if (mysqli_query($db, $sql)) {
             echo "Video information saved to database.";
 
-            // After saving the video, get the last inserted video ID
-            $video_id = mysqli_insert_id($db);
+            // After saving the video, you can still update the video_id if needed
         } else {
             echo "Error saving video to database: " . mysqli_error($db);
         }
@@ -78,10 +86,10 @@ if (isset($_FILES['thumbnail'])) {
         $thumbnail_data = mysqli_real_escape_string($db, $thumbnail_data);
 
         // Update the video record with the thumbnail data
-        $sql = "UPDATE videos SET thumbnail_data = '$thumbnail_data' WHERE id = $sql";
+        $sql = "UPDATE videos SET thumbnail_data = '$thumbnail_data' WHERE id = $video_id";
 
         if (mysqli_query($db, $sql)) {
-            echo "Thumbnail information saved to database for video ID: " . $sql;
+            echo "Thumbnail information saved to database for video ID: " . $video_id;
         } else {
             echo "Error saving thumbnail to database: " . mysqli_error($db);
         }
