@@ -24,8 +24,8 @@ $result = mysqli_query($db, $sql);
 if ($result) {
     $row = mysqli_fetch_assoc($result);
     $video_id = $row['highest_id'];  // Get the highest id from the database
-    // Add 1 to the highest ID for the next video ID
-    $video_id = ($video_id !== null) ? $video_id : 1;  // If no records exist, start with 1
+    // If no records exist, set the video_id to 1
+    $video_id = ($video_id !== null) ? $video_id : 1;
 } else {
     die("Error fetching the highest video ID: " . mysqli_error($db));
 }
@@ -39,7 +39,8 @@ if (isset($_FILES['video'])) {
     if (move_uploaded_file($_FILES['video']['tmp_name'], $video_file)) {
         echo "Video uploaded successfully: " . $video_file;
 
-        // Read the video file as binary data
+        // Insert video filename, timestamp, and video binary data into the database
+        $timestamp = date('Y-m-d H:i:s');  // Current timestamp in DATETIME format
         $video_data = file_get_contents($video_file);
 
         // Check if video data is successfully read
@@ -47,21 +48,21 @@ if (isset($_FILES['video'])) {
             die("Error reading video file.");
         }
 
-        // Insert video filename, timestamp, and video binary data into the database
-        $timestamp = date('Y-m-d H:i:s');  // Current timestamp in DATETIME format
-        $video_data = mysqli_real_escape_string($db, $video_data);  // Escape binary data for safe insertion
-        $sql = "INSERT INTO videos (id, filename, timestamp, video_data) 
-                VALUES ('$video_id', '$video_filename', '$timestamp', '$video_data')";
+        // Escape video binary data for safe insertion into the database
+        $video_data = mysqli_real_escape_string($db, $video_data);
+
+        // Insert video record into the database
+        $sql = "INSERT INTO videos (filename, timestamp, video_data) 
+                VALUES ('$video_filename', '$timestamp', '$video_data')";
 
         if (mysqli_query($db, $sql)) {
             echo "Video information saved to database.";
-
-            // After saving the video, you can still update the video_id if needed
         } else {
             echo "Error saving video to database: " . mysqli_error($db);
         }
     } else {
         echo "Failed to upload video.";
+        exit; // Stop the script if the video upload fails
     }
 }
 
@@ -86,10 +87,10 @@ if (isset($_FILES['thumbnail'])) {
         $thumbnail_data = mysqli_real_escape_string($db, $thumbnail_data);
 
         // Update the video record with the thumbnail data
-        $sql = "UPDATE videos SET thumbnail_data = '$thumbnail_data' WHERE id = $video_id + 1";
+        $sql = "UPDATE videos SET thumbnail_data = '$thumbnail_data' WHERE id = $video_id";
 
         if (mysqli_query($db, $sql)) {
-            echo "Thumbnail information saved to database for video ID: " . $video_id + 1;
+            echo "Thumbnail information saved to database for video ID: " . $video_id;
         } else {
             echo "Error saving thumbnail to database: " . mysqli_error($db);
         }
