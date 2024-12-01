@@ -25,7 +25,7 @@ if ($result) {
     $row = mysqli_fetch_assoc($result);
     $video_id = $row['highest_id'];  // Get the highest id from the database
     // Add 1 to the highest ID for the next video ID
-    $video_id = ($video_id !== null) ? $video_id : 1;  // If no records exist, start with 1
+    $video_id = ($video_id !== null) ? $video_id + 1 : 1;  // If no records exist, start with 1
 } else {
     die("Error fetching the highest video ID: " . mysqli_error($db));
 }
