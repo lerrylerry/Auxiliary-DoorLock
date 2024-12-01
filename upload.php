@@ -3,7 +3,7 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-session_start(); // Start the session to store and retrieve video_id
+session_start();  // Start the session to store and retrieve video_id
 
 require('dbcred/db.php');  // Include the database credentials
 
@@ -65,6 +65,7 @@ if (isset($_FILES['video'])) {
 
 // Check for uploaded thumbnail file and ensure video ID is available in session
 if (isset($_FILES['thumbnail'])) {
+    // Check if video ID exists in session
     if ($_SESSION['video_id'] === null) {
         echo "Error: No video uploaded. Cannot upload thumbnail without a video ID.";
     } else {
