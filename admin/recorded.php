@@ -110,6 +110,7 @@ $listvideos = mysqli_query($db, $sqlgetvideos);
 </head>
 <body>
 <?php include('static/sidebar.php')?> 
+
 <section class="home-section" style="overflow-y: auto;">
 <div class="home-content">
 <i class='bx bx-menu'></i>
@@ -122,11 +123,8 @@ $listvideos = mysqli_query($db, $sqlgetvideos);
             // Loop through video records
             while ($video = mysqli_fetch_assoc($listvideos)) { 
                 // Define paths for video and thumbnail
-                $videoPath = '/Auxiliary/uploads/videos/' . $video['filename'];  // Correct relative path
-                $thumbnailPath = '/Auxiliary/uploads/thumbnails/' . pathinfo($video['filename'], PATHINFO_FILENAME) . '.jpg';  // Correct relative path for thumbnail
-                echo "<p>Video Path: $videoPath</p>";
-                echo "<p>Thumbnail Path: $thumbnailPath</p>";
-                echo "<p>Thumbnail Exists: " . (file_exists($_SERVER['DOCUMENT_ROOT'] . $thumbnailPath) ? 'Yes' : 'No') . "</p>";
+                $videoPath = '/Auxiliary-DoorLock/recorded_videos/' . $video['filename'];  // Use relative path to video
+                $thumbnailPath = '/Auxiliary-DoorLock/thumbnails/' . pathinfo($video['filename'], PATHINFO_FILENAME) . '.jpg';  // Use relative path to thumbnail
 
                 // Generate thumbnail if not exists
                 generateThumbnail($_SERVER['DOCUMENT_ROOT'] . $videoPath, $_SERVER['DOCUMENT_ROOT'] . $thumbnailPath); // Generate thumbnail with full path
