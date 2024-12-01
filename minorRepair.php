@@ -7,11 +7,6 @@ require 'vendor/autoload.php';
 // Start session
 session_start();
 
-// Check if already logged in
-if (isset($_SESSION['loginid'])) {
-    header("location: admin/homepage.php");
-    exit();
-}
 
 // Insert data into database if form is submitted
 if (isset($_POST['name'])) {
