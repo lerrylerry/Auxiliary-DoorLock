@@ -64,9 +64,9 @@ if (isset($_POST['approverepair'])) {
     $resmail = mysqli_fetch_assoc(mysqli_query($db, $sqlgetmr));
 
     $subject = "Your Minor Repair Request Status";
-    $body = "Dear $name,\n\nYour minor repair request has been $status.";
+    $body = "Dear " . $resmail['name'] . ",\n\nYour minor repair request has been " . $resmail['status'] . "!";
 
-    $body .= "Best regards,\nTUP Auxiliary System";
+    $body .= "<br>Best regards,\nTUP Auxiliary System";
 
     // Email sending for approval
     try {

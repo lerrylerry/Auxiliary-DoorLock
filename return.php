@@ -141,10 +141,6 @@ if (isset($_POST['finalizerequest'])) {
         $adminEmailContent .= "Item: " . $item['name'] . " | Quantity: " . $item['borrowqty'] . "\n";
     }
 
-    $adminEmailContent .= "\nTo review the return request, please visit the following link:\n";
-    $adminEmailContent .= "https://tupcauxiliary.com/Auxiliary/index.php\n\n";
-    $adminEmailContent .= "Thank you,\nTUP Auxiliary System";
-
     // Send email to admin
     try {
         $mail->clearAddresses();
