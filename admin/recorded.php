@@ -123,8 +123,8 @@ $listvideos = mysqli_query($db, $sqlgetvideos);
             // Loop through video records
             while ($video = mysqli_fetch_assoc($listvideos)) { 
                 // Define paths for video and thumbnail
-                $videoPath = '/Auxiliary-DoorLock/recorded_videos/' . $video['filename'];  // Use relative path to video
-                $thumbnailPath = '/Auxiliary-DoorLock/thumbnails/' . pathinfo($video['filename'], PATHINFO_FILENAME) . '.jpg';  // Use relative path to thumbnail
+                $videoPath = '/Auxiliary/uploads/videos/' . $video['filename'];  // Use relative path to video
+                $thumbnailPath = '/Auxiliary/uploads/thumbnails/' . pathinfo($video['filename'], PATHINFO_FILENAME) . '.jpg';  // Use relative path to thumbnail
 
                 // Generate thumbnail if not exists
                 generateThumbnail($_SERVER['DOCUMENT_ROOT'] . $videoPath, $_SERVER['DOCUMENT_ROOT'] . $thumbnailPath); // Generate thumbnail with full path
