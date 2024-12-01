@@ -72,11 +72,7 @@ if (isset($_POST['finalizerequest'])) {
 
     // Prepare user email content
     $emailContent = "Dear " . $listcu['name'] . ",\n\n";
-    $emailContent .= "Your borrow request has been processed. Below are the details of the items you have requested:\n\n";
-
-    while ($item = mysqli_fetch_assoc($itemsresult)) {
-        $emailContent .= "Item: " . $item['name'] . " | Quantity: " . $item['borrowqty'] . "\n";
-    }
+    $emailContent .= "Your borrow request has been now processed.";
 
     $emailContent .= "\nThank you for using our service.\n\nBest regards,\nTUP Auxiliary System";
 
@@ -121,20 +117,13 @@ if (isset($_POST['finalizerequest'])) {
 
     // Prepare the admin's email content
     $adminEmailContent = "Dear Admin,\n\n";
-    $adminEmailContent .= "You have received a new borrow request. Please review the request below:\n\n";
-    $adminEmailContent .= "User: " . $listcu['name'] . "\n";
-    $adminEmailContent .= "User Email: " . $listcu['email'] . "\n";
-    $adminEmailContent .= "Borrow Items:\n";
+    $adminEmailContent .= "You have received a new borrow request" . $listcu['name'];
 
     // Reset itemsresult query to get borrow items again
     $itemsresult = mysqli_query($db, $sqlgetitems);
 
-    while ($item = mysqli_fetch_assoc($itemsresult)) {
-        $adminEmailContent .= "Item: " . $item['name'] . " | Quantity: " . $item['borrowqty'] . "\n";
-    }
-
-    $adminEmailContent .= "\nTo review the borrow request, please visit the following link:\n";
-    $adminEmailContent .= "https://tupcauxiliary.com/Auxiliary/index.php\n\n";
+    $adminEmailContent .= "\nTo review the borrow the request, please visit the following link:\n";
+    $adminEmailContent .= "https://tupcauxiliary.com/Auxiliary/admin/borrowedItems.php\n\n";
     $adminEmailContent .= "Thank you,\nTUP Auxiliary System";
 
     // Send email to admin

@@ -1,87 +1,104 @@
 <?php
 require('dbcred/db.php');
-
-// Start session
-session_start();
-
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 require 'vendor/autoload.php';
 
-// Function to send email
-function sendEmail($to, $subject, $body) {
-    $mail = new PHPMailer(true);
-    try {
-        // Server settings
-        $mail = new PHPMailer(true);
+// Start session
+session_start();
 
-        // Server settings
-        $mail->SMTPDebug = 0;
-        $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';  // Use your SMTP server
-        $mail->SMTPAuth = true;
-        $mail->Username = 'projxacts12@gmail.com';  // Your email address
-        $mail->Password = 'vdbwgupzfybcixsk';  // Your app password (use App Password if 2FA is enabled)
-        $mail->SMTPSecure = 'tls';  // TLS encryption
-        $mail->Port = 587;  // SMTP port for TLS
-        // Recipients
-        $mail->setFrom('projxacts12@gmail.com', 'TUP Auxiliary System');
-        $mail->addAddress($email, $name);  // Add recipient email dynamically
-
-        // Content
-        $mail->isHTML(true);
-        $mail->Subject = $subject;
-        $mail->Body    = $body;
-
-        $mail->send();
-    } catch (Exception $e) {
-        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
-    }
+// Check if already logged in
+if (isset($_SESSION['loginid'])) {
+    header("location: admin/homepage.php");
+    exit();
 }
 
 // Insert data into database if form is submitted
 if (isset($_POST['name'])) {
-    // Insert into tbminorrepair
     $sqlinsert = "INSERT INTO `tbminorrepair`(`name`, `position`, `department`, `email`, `type`, `serial`, `brandmodel`, `propertyno`, `acqdate`, `acqcost`, `scope`, `endUser`) 
     VALUES ('" . $_POST['name'] . "','" . $_POST['position'] . "','" . $_POST['department'] . "','" . $_POST['email'] . "','" . $_POST['type'] . "','" . $_POST['serial'] . "','" . $_POST['model'] . "','" . $_POST['propertyno'] . "','" . $_POST['acqusitionDate'] . "','" . $_POST['acqusitionCost'] . "','" . $_POST['message'] . "','" . $_POST['name'] . "')";
 
     // Execute the query and check for success
     if (mysqli_query($db, $sqlinsert)) {
-        // Email to the requester
-        $subjectRequester = "Your Minor Repair Request has been Received";
-        $bodyRequester = "
-        <html>
-        <body>
-        <h2>Dear " . $_POST['name'] . ",</h2>
-        <p>We have received your minor repair request. We will notify you once your request has been processed.</p>
-        <p>Thank you!</p>
-        </body>
-        </html>
-        ";
-        sendEmail($_POST['email'], $subjectRequester, $bodyRequester);
+        // Send email to the requester
+        $requesterEmail = $_POST['email'];
+        sendEmailToRequester($requesterEmail);
 
-        // Email to the administrator
-        $sqlAdmin = "SELECT email FROM tbadmin WHERE id = 1";
-        $resultAdmin = mysqli_query($db, $sqlAdmin);
-        if ($admin = mysqli_fetch_assoc($resultAdmin)) {
-            $subjectAdmin = "New Minor Repair Request Received";
-            $bodyAdmin = "
-            <html>
-            <body>
-            <h2>A new minor repair request has been submitted.</h2>
-            <p><strong>Requester's Name:</strong> " . $_POST['name'] . "</p>
-            </body>
-            </html>
-            ";
-            sendEmail($admin['email'], $subjectAdmin, $bodyAdmin);
-        }
+        // Send email to the admin (tbadmin where id = 1)
+        sendEmailToAdmin();
 
-        // Redirect to success page if successful
+        // Redirect to 200.php if successful
         header("Location: success.php");
         exit();
     } else {
         // Handle error (optional)
         echo "Error: " . mysqli_error($db);
+    }
+}
+
+// Function to send email to the requester
+function sendEmailToRequester($requesterEmail) {
+    try {
+        $mail = new PHPMailer(true);
+        
+        // Server settings
+        $mail->SMTPDebug = false;  // Set to true for debugging purposes
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';  // Gmail SMTP server
+        $mail->SMTPAuth = true;
+        $mail->Username = 'projxacts12@gmail.com';  // Your Gmail email address
+        $mail->Password = 'vdbwgupzfybcixsk';  // Your Gmail app password
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;  // TLS encryption
+        $mail->Port = 587;  // Port for sending via Gmail SMTP
+
+        // Recipients
+        $mail->setFrom('projxacts12@gmail.com', 'TUP Auxiliary System');
+        $mail->addAddress($requesterEmail);  // Send email to the requester
+
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = 'Repair Request Confirmation';
+        $mail->Body    = "<p>Dear,</p>" . $_POST['name'] . "<p>Your request for a minor repair has been successfully submitted. We will process it as soon as possible.</p><p>Thank you,</p><p>Auxiliary System</p>";
+
+        $mail->send();
+    } catch (Exception $e) {
+        echo "Mailer Error: " . $mail->ErrorInfo;
+    }
+}
+
+// Function to send email to the admin (tbadmin where id = 1)
+function sendEmailToAdmin() {
+    global $db;
+
+    try {
+        // Fetch the admin email from tbadmin where id = 1
+        $result = mysqli_query($db, "SELECT email FROM tbadmin WHERE id = 1");
+        $adminEmail = mysqli_fetch_assoc($result)['email'];
+
+        $mail = new PHPMailer(true);
+
+        // Server settings
+        $mail->SMTPDebug = false;  // Set to true for debugging purposes
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';  // Gmail SMTP server
+        $mail->SMTPAuth = true;
+        $mail->Username = 'projxacts12@gmail.com';  // Your Gmail email address
+        $mail->Password = 'vdbwgupzfybcixsk';  // Your Gmail app password
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;  // TLS encryption
+        $mail->Port = 587;  // Port for sending via Gmail SMTP
+
+        // Recipients
+        $mail->setFrom('projxacts12@gmail.com', 'TUP Auxiliary System');
+        $mail->addAddress($adminEmail);  // Send email to admin
+
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = 'New Repair Request';
+        $mail->Body    = "<p>A new minor repair request has been submitted by" . $_POST['name'] . "</p><p><a href='https://tupcauxiliary.com/auxiliary'>Click here to view the request.</a></p>";
+
+        $mail->send();
+    } catch (Exception $e) {
+        echo "Mailer Error: " . $mail->ErrorInfo;
     }
 }
 ?>

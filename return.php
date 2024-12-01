@@ -79,17 +79,7 @@ if (isset($_POST['finalizerequest'])) {
 
     // Step 3: Prepare the email content
     $emailContent = "Dear " . $user['name'] . ",\n\n"; // Using $user here for name
-    $emailContent .= "Your return request has been successfully processed. Below are the details of the items you have returned:\n\n";
-
-    // Debugging output to check if the items are being retrieved correctly
-    if (mysqli_num_rows($itemsresult) > 0) {
-        while ($item = mysqli_fetch_assoc($itemsresult)) {
-            // Append item name and quantity to the email content
-            $emailContent .= "Item: " . $item['name'] . " | Quantity: " . $item['borrowqty'] . "\n";
-        }
-    } else {
-        $emailContent .= "No items were returned or there was an issue fetching the items.\n";
-    }
+    $emailContent .= "Your return request has been now processed";
 
     $emailContent .= "\nThank you for using our service.\n\nBest regards,\nTUP Auxiliary System";
 
@@ -138,10 +128,11 @@ if (isset($_POST['finalizerequest'])) {
 
     // Prepare the admin's email content
     $adminEmailContent = "Dear Admin,\n\n";
-    $adminEmailContent .= "You have received a new return request. Please review the request below:\n\n";
-    $adminEmailContent .= "User: " . $user['name'] . "\n"; // Using $user here for name
-    $adminEmailContent .= "User Email: " . $user['email'] . "\n"; // Using $user for email
-    $adminEmailContent .= "Return Items:\n";
+    $adminEmailContent .= "You have received a new return request to " . $user['name'];
+
+    $adminEmailContent .= "\nTo review the borrow the request, please visit the following link:\n";
+    $adminEmailContent .= "https://tupcauxiliary.com/Auxiliary/admin/return-items.php\n\n";
+    $adminEmailContent .= "Thank you,\nTUP Auxiliary System";
 
     // Reset itemsresult query to get return items again
     $itemsresult = mysqli_query($db, $sqlgetitems);

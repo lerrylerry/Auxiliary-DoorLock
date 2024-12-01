@@ -22,6 +22,7 @@ if (isset($_POST['delete'])) {
     echo "Invalid request";
 }
 
+
 // Close the database connection (optional)
 mysqli_close($db);
 ?>

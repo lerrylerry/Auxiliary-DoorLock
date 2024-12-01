@@ -15,6 +15,7 @@ $currentUser = $_SESSION['name']; // Adjust according to how the current user is
 // Fetch the drnum from tbdrnum where id = 1
 $query = "SELECT `name` FROM `tbdrnum` WHERE `id` = 1";
 $result = mysqli_query($db, $query);
+
 $drnum = ''; // Default to empty if no value is found
 
 if ($result && mysqli_num_rows($result) > 0) {
@@ -22,13 +23,8 @@ if ($result && mysqli_num_rows($result) > 0) {
     $drnum = $row['name']; // Get the drnum from the database
 }
 
-// If drnum is not empty, set the flag to lock the field
-$isLocked = !empty($drnum); // If drnum is not empty, lock the field
 
-
-
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if (isset($_POST['add-btn'])){
     // Get the drnum from POST (either from input field or from the database value)
     $drnum = $_POST['drnum'];
 
@@ -71,16 +67,16 @@ if ($result && mysqli_num_rows($result) > 0) {
 }
 
 //---------------------------------------------------------------------------------------ADD STOCKS//
-if (isset($_POST['insertid'])) {
-  $sqlinsert = "INSERT INTO `tbpendingadd`(`name`, `quantity`) 
-              VALUES ('" . $_POST['name'] . "','" . $_POST['quantity'] . "')";
+// if (isset($_POST['insertid'])) {
+//   $sqlinsert = "INSERT INTO `tbpendingadd`(`name`, `quantity`) 
+//               VALUES ('" . $_POST['name'] . "','" . $_POST['quantity'] . "')";
 
-  if (mysqli_query($db, $sqlinsert)) {
-      echo "<script>var insertSuccess = true;</script>";
-  } else {
-      echo "<script>var insertSuccess = false;</script>";
-  }
-}
+//   if (mysqli_query($db, $sqlinsert)) {
+//       echo "<script>var insertSuccess = true;</script>";
+//   } else {
+//       echo "<script>var insertSuccess = false;</script>";
+//   }
+// }
 
 //---------------------------------------------------------------------------------------UPDATE STOCKS//
 if (isset($_POST['updatepid'])) {
@@ -375,7 +371,7 @@ $(document).ready(function() {
             <!-- DRNo. Input Field -->
             <div class="col-4">
             <label class="mb-2">DRNo.:</label>
-            <input type="text" class="form-control" id="drnum" name="drnum" value="<?php echo htmlspecialchars($drnum); ?>" <?php echo ($isLocked) ? 'disabled' : ''; ?> required>
+            <input type="text" class="form-control" id="drnum" name="drnum" value="<?php echo htmlspecialchars($drnum); ?>" required>
             <input type="hidden" id="hiddenDrnum" name="drnum" value="<?php echo htmlspecialchars($drnum); ?>">
             </div>
               <!-- Added By Input Field -->
@@ -608,19 +604,7 @@ $(document).ready(function() {
       $('.add-btn').click();
     }
   });
-  
-
-
-
-
-
-
-
-
-
 });
-
-
 </script>
 
 <script>

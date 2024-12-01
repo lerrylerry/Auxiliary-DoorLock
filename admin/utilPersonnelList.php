@@ -181,17 +181,17 @@ $listup = mysqli_query($db, $sqlgetup);
     <?php while ($data = mysqli_fetch_assoc($listup)) { ?>
       <tr>
         <td>
-            <span class="name"><?php echo $data['name']; ?></span>
-          </td>
-          <td>
-            <span class="email"><?php echo $data['email']; ?></span>
-          </td>
-          <td>
+          <span class="name"><?php echo $data['name']; ?></span>
+        </td>
+        <td>
+          <span class="email"><?php echo $data['email']; ?></span>
+        </td>
+        <td>
             <span class="pincode"><?php echo $data['pincode']; ?></span>
             <button type="button" class="pinVisibility" style="border: none; background: transparent; padding: 0; margin-left: 10px;">
             <i class="bi bi-eye" style="font-size: 30px; display: inline-block;"></i>
             </button>
-          </td>
+        </td>
         <td>
           <!-- Edit Button -->
           <button type="button" class="btn btn-primary btn-sm editBtn bi bi-pencil-fill" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $data['id']?>"> Edit</button>
@@ -221,11 +221,11 @@ $listup = mysqli_query($db, $sqlgetup);
 
                                     <div class="input-group">
                                       <input type="password" class="form-control" id="addpincode" name="updatepin" min="0" maxlength="4" value="<?php echo $data['pincode']?>" required>
-                                      <div class="input-group-append">
+                                      <!-- <div class="input-group-append">
                                           <span class="input-group-text">
                                               <i class="bi bi-eye" id="togglePassword"></i>
                                           </span>
-                                      </div>
+                                      </div> -->
                                     </div>
                                 </div>
                         </div>

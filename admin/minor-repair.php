@@ -63,6 +63,11 @@ if (isset($_POST['approverepair'])) {
     $sqlgetmr = "SELECT * FROM `tbminorrepair` WHERE id ='" . $_POST['approverepair'] . "'";
     $resmail = mysqli_fetch_assoc(mysqli_query($db, $sqlgetmr));
 
+    $subject = "Your Minor Repair Request Status";
+    $body = "Dear $name,\n\nYour minor repair request has been $status.";
+
+    $body .= "Best regards,\nTUP Auxiliary System";
+
     // Email sending for approval
     try {
         $mail->SMTPDebug = false;
@@ -77,8 +82,8 @@ if (isset($_POST['approverepair'])) {
         $mail->setFrom('projxacts12@gmail.com', 'TUP Auxillary System');
         $mail->addAddress($resmail['email'], $resmail['name']);
         $mail->isHTML(true);
-        $mail->Subject = 'Minor Repair Request Approved';
-        $mail->Body = 'Your Minor Repair Request has been approved <br> ' . $_SERVER['SERVER_ADDR'] . '/repair%20-%20userReview.php?repairid=' . $_POST['approverepair'];
+        $mail->Subject = $subject;
+        $mail->Body = $body;
         $mail->send();
     } catch (Exception $e) {
         echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
