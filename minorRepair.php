@@ -4,16 +4,79 @@ require('dbcred/db.php');
 // Start session
 session_start();
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+require 'vendor/autoload.php';
 
+// Function to send email
+function sendEmail($to, $subject, $body) {
+    $mail = new PHPMailer(true);
+    try {
+        // Server settings
+        $mail = new PHPMailer(true);
+
+        // Server settings
+        $mail->SMTPDebug = 0;
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';  // Use your SMTP server
+        $mail->SMTPAuth = true;
+        $mail->Username = 'projxacts12@gmail.com';  // Your email address
+        $mail->Password = 'vdbwgupzfybcixsk';  // Your app password (use App Password if 2FA is enabled)
+        $mail->SMTPSecure = 'tls';  // TLS encryption
+        $mail->Port = 587;  // SMTP port for TLS
+        // Recipients
+        $mail->setFrom('projxacts12@gmail.com', 'TUP Auxiliary System');
+        $mail->addAddress($email, $name);  // Add recipient email dynamically
+
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body    = $body;
+
+        $mail->send();
+    } catch (Exception $e) {
+        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+    }
+}
 
 // Insert data into database if form is submitted
 if (isset($_POST['name'])) {
+    // Insert into tbminorrepair
     $sqlinsert = "INSERT INTO `tbminorrepair`(`name`, `position`, `department`, `email`, `type`, `serial`, `brandmodel`, `propertyno`, `acqdate`, `acqcost`, `scope`, `endUser`) 
     VALUES ('" . $_POST['name'] . "','" . $_POST['position'] . "','" . $_POST['department'] . "','" . $_POST['email'] . "','" . $_POST['type'] . "','" . $_POST['serial'] . "','" . $_POST['model'] . "','" . $_POST['propertyno'] . "','" . $_POST['acqusitionDate'] . "','" . $_POST['acqusitionCost'] . "','" . $_POST['message'] . "','" . $_POST['name'] . "')";
 
     // Execute the query and check for success
     if (mysqli_query($db, $sqlinsert)) {
-        // Redirect to 200.php if successful
+        // Email to the requester
+        $subjectRequester = "Your Minor Repair Request has been Received";
+        $bodyRequester = "
+        <html>
+        <body>
+        <h2>Dear " . $_POST['name'] . ",</h2>
+        <p>We have received your minor repair request. We will notify you once your request has been processed.</p>
+        <p>Thank you!</p>
+        </body>
+        </html>
+        ";
+        sendEmail($_POST['email'], $subjectRequester, $bodyRequester);
+
+        // Email to the administrator
+        $sqlAdmin = "SELECT email FROM tbadmin WHERE id = 1";
+        $resultAdmin = mysqli_query($db, $sqlAdmin);
+        if ($admin = mysqli_fetch_assoc($resultAdmin)) {
+            $subjectAdmin = "New Minor Repair Request Received";
+            $bodyAdmin = "
+            <html>
+            <body>
+            <h2>A new minor repair request has been submitted.</h2>
+            <p><strong>Requester's Name:</strong> " . $_POST['name'] . "</p>
+            </body>
+            </html>
+            ";
+            sendEmail($admin['email'], $subjectAdmin, $bodyAdmin);
+        }
+
+        // Redirect to success page if successful
         header("Location: success.php");
         exit();
     } else {
@@ -22,7 +85,6 @@ if (isset($_POST['name'])) {
     }
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">

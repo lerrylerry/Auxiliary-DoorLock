@@ -108,7 +108,7 @@ if (isset($_POST['rejectmr'])) {
         $mail->addAddress($resmail['email'], $resmail['name']);
         $mail->isHTML(true);
         $mail->Subject = 'Minor Repair Request Rejected';
-        $mail->Body = 'Your Minor Repair Request has been Rejected Due to ' . $_POST['reason'] . ' <br> ' . $_SERVER['SERVER_ADDR'] . '/repair%20-%20userReview.php?repairid=' . $_POST['rejectmr'];
+        $mail->Body = 'Your Minor Repair Request has been Rejected Due to ' . $_POST['reason'] . ' <br> ' ;
         $mail->send();
     } catch (Exception $e) {
         echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
