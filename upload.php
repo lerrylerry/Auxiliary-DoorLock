@@ -20,23 +20,8 @@ if (!is_dir($thumbnail_dir)) {
 // Initialize video ID
 $video_id = null;
 
-// Function to validate file types
-function is_valid_video($file) {
-    $valid_types = ['video/mp4', 'video/x-m4v', 'video/avi', 'video/mpeg'];
-    return in_array($file['type'], $valid_types);
-}
-
-function is_valid_image($file) {
-    $valid_types = ['image/jpeg', 'image/png', 'image/gif'];
-    return in_array($file['type'], $valid_types);
-}
-
 // Check for uploaded video file
 if (isset($_FILES['video'])) {
-    if (!is_valid_video($_FILES['video'])) {
-        die("Invalid video file type.");
-    }
-
     $video_filename = basename($_FILES['video']['name']);
     $video_file = $video_dir . $video_filename;
 
@@ -53,8 +38,8 @@ if (isset($_FILES['video'])) {
         }
 
         // Insert video filename, timestamp, and video binary data into the database
-        $timestamp = date('Y-m-d H:i:s');
-        $video_data = mysqli_real_escape_string($db, $video_data);
+        $timestamp = date('Y-m-d H:i:s');  // Current timestamp in DATETIME format
+        $video_data = mysqli_real_escape_string($db, $video_data);  // Escape binary data for safe insertion
         $sql = "INSERT INTO videos (filename, timestamp, video_data) 
                 VALUES ('$video_filename', '$timestamp', '$video_data')";
 
@@ -63,9 +48,6 @@ if (isset($_FILES['video'])) {
 
             // After saving the video, get the last inserted video ID
             $video_id = mysqli_insert_id($db);
-
-            // Print the video ID
-            echo "<br>Video ID: " . $video_id;
         } else {
             echo "Error saving video to database: " . mysqli_error($db);
         }
@@ -76,10 +58,6 @@ if (isset($_FILES['video'])) {
 
 // Check for uploaded thumbnail file and ensure video ID is available
 if (isset($_FILES['thumbnail']) && $video_id !== null) {
-    if (!is_valid_image($_FILES['thumbnail'])) {
-        die("Invalid thumbnail file type.");
-    }
-
     $thumbnail_filename = basename($_FILES['thumbnail']['name']);
     $thumbnail_file = $thumbnail_dir . $thumbnail_filename;
 
