@@ -1,6 +1,9 @@
 <?php
 require('dbcred/db.php');  // Include database credentials
 
+echo '<pre>';
+print_r($_FILES);
+echo '</pre>';
 // Set the upload directories
 $video_dir = "uploads/videos/";
 $thumbnail_dir = "uploads/thumbnails/";
