@@ -134,11 +134,18 @@ $listvideos = mysqli_query($db, $sqlgetvideos);
                 generateThumbnail($_SERVER['DOCUMENT_ROOT'] . $videoPath, $_SERVER['DOCUMENT_ROOT'] . $thumbnailPath); // Generate thumbnail with full path
             ?>
                 <div class="thumbnail-item">
-                    <!-- Change the link behavior to download the video -->
-                    <a href="<?php echo $videoPath; ?>" download>
+                    <!-- Download link -->
+                    <a href="<?php echo $videoPath; ?>" download="<?php echo basename($videoPath); ?>">
+                        <!-- Thumbnail image -->
                         <img src="<?php echo $thumbnailPath; ?>" alt="Video Thumbnail" class="thumbnail-large">
                     </a>
-                    <p class="id"><?php echo $video['id']; ?>. <span class="timestamp"><?php echo date("F j, Y g:i A", strtotime($video['timestamp'])); ?></span></p>
+                    <!-- Display video ID and timestamp -->
+                    <p class="id">
+                        <?php echo $video['id']; ?>. 
+                        <span class="timestamp">
+                            <?php echo date("F j, Y g:i A", strtotime($video['timestamp'])); ?>
+                        </span>
+                    </p>
                 </div>
             <?php } ?>
             </div>
