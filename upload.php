@@ -60,7 +60,7 @@ if (isset($_FILES['video'])) {
 }
 
 // Check for uploaded thumbnail file and ensure video ID is available
-if (isset($_FILES['thumbnail']) && $video_id !== null) {
+if (isset($_FILES['thumbnail'])) {
     $thumbnail_filename = basename($_FILES['thumbnail']['name']);
     $thumbnail_file = $thumbnail_dir . $thumbnail_filename;
 
