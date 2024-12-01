@@ -1,9 +1,7 @@
+
 <?php
 require('../dbcred/db.php');
 session_start();
-
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
 // Redirect if not logged in
 if (!isset($_SESSION['loginid'])) {
@@ -35,8 +33,8 @@ function generateThumbnail($videoPath, $thumbnailPath) {
     return true; // Thumbnail exists or was successfully created
 }
 
-// Fetch video records
-$sqlgetvideos = "SELECT id, filename, timestamp FROM `videos`;";
+// Fetch video records from the database
+$sqlgetvideos = "SELECT id, filename, timestamp, video_data, thumbnail_data FROM `videos`;";
 $listvideos = mysqli_query($db, $sqlgetvideos);
 ?>
 
@@ -125,27 +123,20 @@ $listvideos = mysqli_query($db, $sqlgetvideos);
             <?php 
             // Loop through video records
             while ($video = mysqli_fetch_assoc($listvideos)) { 
-                // Define paths for video and thumbnail
-                $videoPath = '/Auxiliary/uploads/videos/' . $video['filename'];  // Use relative path to video
-                $thumbnailPath = '/Auxiliary/uploads/thumbnails/' . pathinfo($video['filename'], PATHINFO_FILENAME) . '.jpg';  // Use relative path to thumbnail
-                echo "<p>Video Path: $videoPath</p>";
-                echo "<p>Thumbnail Path: $thumbnailPath</p>";
-                // Generate thumbnail if not exists
-                generateThumbnail($_SERVER['DOCUMENT_ROOT'] . $videoPath, $_SERVER['DOCUMENT_ROOT'] . $thumbnailPath); // Generate thumbnail with full path
+                // Get the video and thumbnail binary data
+                $videoData = $video['video_data'];
+                $thumbnailData = $video['thumbnail_data'];
+
+                // Encode binary data to base64 for display
+                $videoBase64 = base64_encode($videoData);
+                $thumbnailBase64 = base64_encode($thumbnailData);
             ?>
                 <div class="thumbnail-item">
-                    <!-- Download link -->
-                    <a href="<?php echo $videoPath; ?>" download="<?php echo basename($videoPath); ?>">
-                        <!-- Thumbnail image -->
-                        <img src="<?php echo $thumbnailPath; ?>" alt="Video Thumbnail" class="thumbnail-large">
+                    <!-- Change the link behavior to download the video -->
+                    <a href="data:video/mp4;base64,<?php echo $videoBase64; ?>" download="<?php echo $video['filename']; ?>">
+                        <img src="data:image/jpeg;base64,<?php echo $thumbnailBase64; ?>" alt="Video Thumbnail" class="thumbnail-large">
                     </a>
-                    <!-- Display video ID and timestamp -->
-                    <p class="id">
-                        <?php echo $video['id']; ?>. 
-                        <span class="timestamp">
-                            <?php echo date("F j, Y g:i A", strtotime($video['timestamp'])); ?>
-                        </span>
-                    </p>
+                    <p class="id"><?php echo $video['id']; ?>. <span class="timestamp"><?php echo date("F j, Y g:i A", strtotime($video['timestamp'])); ?></span></p>
                 </div>
             <?php } ?>
             </div>
