@@ -123,14 +123,14 @@ $listvideos = mysqli_query($db, $sqlgetvideos);
             // Loop through video records
             while ($video = mysqli_fetch_assoc($listvideos)) { 
                 // Define paths for video and thumbnail
-                $videoPath = 'https://tupcauxiliary.com/Auxiliary/uploads/videos/' . $video['filename'];
-                $thumbnailPath = 'https://tupcauxiliary.com/Auxiliary/uploads/thumbnails/' . pathinfo($video['filename'], PATHINFO_FILENAME) . '.jpg';
+                $videoPath = 'https://tupcauxiliary.com/Auxiliary/uploads/videos/' . $video['filename'];  // Use relative path to video
+                $thumbnailPath = 'https://tupcauxiliary.com/Auxiliary/uploads/thumbnails/' . pathinfo($video['filename'], PATHINFO_FILENAME) . '.jpg';  // Use relative path to thumbnail
 
                 // Generate thumbnail if not exists
-                generateThumbnail($_SERVER['DOCUMENT_ROOT'] . '/Auxiliary/uploads/videos/' . $video['filename'], $_SERVER['DOCUMENT_ROOT'] . '/Auxiliary/uploads/thumbnails/' . pathinfo($video['filename'], PATHINFO_FILENAME) . '.jpg');
+                generateThumbnail($_SERVER['DOCUMENT_ROOT'] . $videoPath, $_SERVER['DOCUMENT_ROOT'] . $thumbnailPath); // Generate thumbnail with full path
             ?>
                 <div class="thumbnail-item">
-                    <!-- Link to download the video -->
+                    <!-- Change the link behavior to download the video -->
                     <a href="<?php echo $videoPath; ?>" download>
                         <img src="<?php echo $thumbnailPath; ?>" alt="Video Thumbnail" class="thumbnail-large">
                     </a>
@@ -148,22 +148,5 @@ $listvideos = mysqli_query($db, $sqlgetvideos);
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="static/script.js"></script>
-<script>
-  $(document).ready(function() {
-    // Check window size and disable toggle functionality for smaller screens
-    if ($(window).width() <= 768) {
-        // If the window is mobile-sized, disable the open/close functionality
-        $(".sidebar").removeClass("close");
-    }
-
-    // Add your sidebar toggle functionality here for larger screens if needed
-    $(window).resize(function() {
-        if ($(window).width() <= 768) {
-            $(".sidebar").removeClass("close");
-        }
-    });
-});
-
-</script>
 </body>
 </html>
