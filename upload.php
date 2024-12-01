@@ -48,6 +48,9 @@ if (isset($_FILES['video'])) {
 
             // After saving the video, get the last inserted video ID
             $video_id = mysqli_insert_id($db);
+
+            // Print the video ID
+            echo "<br>Video ID: " . $video_id;
         } else {
             echo "Error saving video to database: " . mysqli_error($db);
         }
@@ -57,7 +60,7 @@ if (isset($_FILES['video'])) {
 }
 
 // Check for uploaded thumbnail file and ensure video ID is available
-if (isset($_FILES['thumbnail'])) {
+if (isset($_FILES['thumbnail']) && $video_id !== null) {
     $thumbnail_filename = basename($_FILES['thumbnail']['name']);
     $thumbnail_file = $thumbnail_dir . $thumbnail_filename;
 
@@ -76,13 +79,18 @@ if (isset($_FILES['thumbnail'])) {
         // Escape thumbnail binary data for safe insertion into SQL query
         $thumbnail_data = mysqli_real_escape_string($db, $thumbnail_data);
 
-        // Update the video record with the thumbnail data
-        $sql = "UPDATE videos SET thumbnail_data = '$thumbnail_data' WHERE id = $video_id";
-
-        if (mysqli_query($db, $sql)) {
-            echo "Thumbnail information saved to database for video ID: " . $video_id;
+        // Ensure the video_id and thumbnail data are valid
+        if (!empty($video_id) && !empty($thumbnail_data)) {
+            // Using prepared statement to prevent SQL injection
+            $stmt = $db->prepare("UPDATE videos SET thumbnail_data = ? WHERE id = ?");
+            $stmt->bind_param('si', $thumbnail_data, $video_id);  // 'si' means string, integer
+            if ($stmt->execute()) {
+                echo "Thumbnail information saved to database for video ID: " . $video_id;
+            } else {
+                echo "Error saving thumbnail to database: " . $stmt->error;
+            }
         } else {
-            echo "Error saving thumbnail to database: " . mysqli_error($db);
+            echo "Error: Missing video ID or thumbnail data.";
         }
     } else {
         echo "Failed to upload thumbnail.";
