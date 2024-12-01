@@ -3,9 +3,6 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-// Start a session to store the video_id
-session_start();
-
 require('dbcred/db.php');  // Include the database credentials
 
 // Set the upload directories
@@ -49,9 +46,6 @@ if (isset($_FILES['video'])) {
             // After saving the video, get the last inserted video ID
             $video_id = mysqli_insert_id($db);
 
-            // Store the video ID in the session
-            $_SESSION['video_id'] = $video_id;
-
             // Print the video ID
             echo "<br>Video ID: " . $video_id;
         } else {
@@ -62,11 +56,11 @@ if (isset($_FILES['video'])) {
     }
 }
 
-// Check for uploaded thumbnail file and ensure video ID is available in the session
-if (isset($_FILES['thumbnail']) && isset($_SESSION['video_id'])) {
-    $video_id = $_SESSION['video_id'];  // Retrieve video ID from session
-
-    $thumbnail_filename = basename($_FILES['thumbnail']['name']);
+// Check for uploaded thumbnail file and ensure video filename is available
+if (isset($_FILES['thumbnail']) && isset($video_filename)) {
+    // Replace 'Motion' with 'Thumbnail' in the video filename and change extension to .jpg
+    $thumbnail_filename = str_replace('Motion', 'Thumbnail', $video_filename);
+    $thumbnail_filename = pathinfo($thumbnail_filename, PATHINFO_FILENAME) . '.jpg'; // Ensure it ends with .jpg
     $thumbnail_file = $thumbnail_dir . $thumbnail_filename;
 
     // Move the uploaded thumbnail to the directory
@@ -84,11 +78,11 @@ if (isset($_FILES['thumbnail']) && isset($_SESSION['video_id'])) {
         // Escape thumbnail binary data for safe insertion into SQL query
         $thumbnail_data = mysqli_real_escape_string($db, $thumbnail_data);
 
-        // Update the video record with the thumbnail data
-        $sql = "UPDATE videos SET thumbnail_data = '$thumbnail_data' WHERE id = $video_id";
+        // Update the video record with the thumbnail data using the video filename
+        $sql = "UPDATE videos SET thumbnail_data = '$thumbnail_data' WHERE filename = '$video_filename'";
 
         if (mysqli_query($db, $sql)) {
-            echo "Thumbnail information saved to database for video ID: " . $video_id;
+            echo "Thumbnail information saved to database for video: " . $video_filename;
         } else {
             echo "Error saving thumbnail to database: " . mysqli_error($db);
         }
