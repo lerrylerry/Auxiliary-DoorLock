@@ -18,7 +18,7 @@ if (!is_dir($thumbnail_dir)) {
 }
 
 // Initialize video ID
-$video_id = null;
+$video_id = 16;
 
 // Check for uploaded video file
 if (isset($_FILES['video'])) {
