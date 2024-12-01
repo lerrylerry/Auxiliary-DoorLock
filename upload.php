@@ -22,8 +22,9 @@ if (isset($_FILES['video'])) {
         echo "Video uploaded successfully: " . $video_file;
 
         // Insert video filename and timestamp into the database
-        $timestamp = date('F j, Y g:i A');  // Current timestamp in DATETIME format
-        $sql = "INSERT INTO `videos` (`filename`, `timestamp`) VALUES ('$video_filename', '$timestamp')";
+        $timestamp = date('Y-m-d H:i:s');  // Current timestamp in DATETIME format
+        $sql = "INSERT INTO `videos` (`filename`, `timestamp`, `video_data`, `thumbnail_data`) 
+        VALUES ('$video_filename', '$timestamp', ?, ?)";
         
         if (mysqli_query($db, $sql)) {
             echo "Video information saved to database.";
