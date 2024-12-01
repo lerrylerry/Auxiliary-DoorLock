@@ -25,7 +25,7 @@ if ($result) {
     $row = mysqli_fetch_assoc($result);
     $video_id = $row['highest_id'];  // Get the highest id from the database
     // Add 1 to the highest ID for the next video ID
-    $video_id = ($video_id !== null) ? $video_id + 1 : 1;  // If no records exist, start with 1
+    $video_id = ($video_id !== null) ? $video_id : 1;  // If no records exist, start with 1
 } else {
     die("Error fetching the highest video ID: " . mysqli_error($db));
 }
@@ -86,10 +86,10 @@ if (isset($_FILES['thumbnail'])) {
         $thumbnail_data = mysqli_real_escape_string($db, $thumbnail_data);
 
         // Update the video record with the thumbnail data
-        $sql = "UPDATE videos SET thumbnail_data = '$thumbnail_data' WHERE id = $video_id";
+        $sql = "UPDATE videos SET thumbnail_data = '$thumbnail_data' WHERE id = $video_id + 1";
 
         if (mysqli_query($db, $sql)) {
-            echo "Thumbnail information saved to database for video ID: " . $video_id;
+            echo "Thumbnail information saved to database for video ID: " . $video_id + 1;
         } else {
             echo "Error saving thumbnail to database: " . mysqli_error($db);
         }
