@@ -17,6 +17,9 @@ if (!is_dir($thumbnail_dir)) {
     mkdir($thumbnail_dir, 0777, true);
 }
 
+// Debugging: Log message to verify script execution
+echo "Script started.\n";
+
 // Check for uploaded video file
 if (isset($_FILES['video'])) {
     $video_filename = basename($_FILES['video']['name']);
@@ -24,15 +27,17 @@ if (isset($_FILES['video'])) {
 
     // Move the uploaded video to the directory
     if (move_uploaded_file($_FILES['video']['tmp_name'], $video_file)) {
-        echo "Video uploaded successfully: " . $video_file;
+        echo "Video uploaded successfully: " . $video_file . "\n";
 
         // Read the video file as binary data
         $video_data = file_get_contents($video_file);
 
         // Check if video data is successfully read
         if ($video_data === false) {
-            die("Error reading video file.");
+            die("Error reading video file.\n");
         }
+
+        echo "Video data read successfully.\n";
 
         // Check for uploaded thumbnail file
         if (isset($_FILES['thumbnail'])) {
@@ -41,38 +46,48 @@ if (isset($_FILES['video'])) {
 
             // Move the uploaded thumbnail to the directory
             if (move_uploaded_file($_FILES['thumbnail']['tmp_name'], $thumbnail_file)) {
-                echo "Thumbnail uploaded successfully: " . $thumbnail_file;
+                echo "Thumbnail uploaded successfully: " . $thumbnail_file . "\n";
 
                 // Read the thumbnail file as binary data
                 $thumbnail_data = file_get_contents($thumbnail_file);
 
                 // Check if thumbnail data is successfully read
                 if ($thumbnail_data === false) {
-                    die("Error reading thumbnail file.");
+                    die("Error reading thumbnail file.\n");
                 }
 
-                // Insert both video and thumbnail binary data into the database
-                $timestamp = date('Y-m-d H:i:s');  // Current timestamp in DATETIME format
-                $video_data = mysqli_real_escape_string($db, $video_data);  // Escape binary data for safe insertion
-                $thumbnail_data = mysqli_real_escape_string($db, $thumbnail_data);  // Escape binary data for safe insertion
+                echo "Thumbnail data read successfully.\n";
 
-                // Insert the video and thumbnail data together in the same SQL query
+                // Escape binary data for safe insertion into database
+                $video_data = mysqli_real_escape_string($db, $video_data);
+                $thumbnail_data = mysqli_real_escape_string($db, $thumbnail_data);
+
+                echo "Data escaped for database.\n";
+
+                // Prepare SQL query to insert video and thumbnail
+                $timestamp = date('Y-m-d H:i:s');  // Current timestamp in DATETIME format
                 $sql = "INSERT INTO videos (filename, timestamp, video_data, thumbnail_data) 
                         VALUES ('$video_filename', '$timestamp', '$video_data', '$thumbnail_data')";
 
+                // Debugging: Log the SQL query to check for correctness
+                echo "SQL Query: " . $sql . "\n";
+
+                // Execute SQL query to insert data
                 if (mysqli_query($db, $sql)) {
-                    echo "Video and thumbnail information saved to database.";
+                    echo "Video and thumbnail information saved to database.\n";
                 } else {
-                    echo "Error saving video and thumbnail to database: " . mysqli_error($db);
+                    echo "Error saving video and thumbnail to database: " . mysqli_error($db) . "\n";
                 }
             } else {
-                echo "Failed to upload thumbnail.";
+                echo "Failed to upload thumbnail.\n";
             }
         } else {
-            echo "No thumbnail uploaded.";
+            echo "No thumbnail uploaded.\n";
         }
     } else {
-        echo "Failed to upload video.";
+        echo "Failed to upload video.\n";
     }
+} else {
+    echo "No video uploaded.\n";
 }
 ?>
