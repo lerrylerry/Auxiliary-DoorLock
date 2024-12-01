@@ -3,7 +3,7 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-require('../dbcred/db.php');  // Ensure your database credentials are correct
+require('/dbcred/db.php');  // Make sure to include the database credentials
 
 // Set the upload directories
 $video_dir = "uploads/videos/";
@@ -21,29 +21,20 @@ if (!is_dir($thumbnail_dir)) {
 if (isset($_FILES['video'])) {
     $video_filename = basename($_FILES['video']['name']);
     $video_file = $video_dir . $video_filename;
-
+    
     if (move_uploaded_file($_FILES['video']['tmp_name'], $video_file)) {
         echo "Video uploaded successfully: " . $video_file;
 
-        // Get video file data
-        $video_data = file_get_contents($video_file);  // Read video file contents
+        // Insert video filename and timestamp into the database
         $timestamp = date('Y-m-d H:i:s');  // Current timestamp in DATETIME format
-
-        // Prepare SQL query for video insert
-        $sql = "INSERT INTO `videos` (`filename`, `timestamp`, `video_data`, `thumbnail_data`) 
-                VALUES (?, ?, ?, ?)";
-        $stmt = mysqli_prepare($db, $sql);
-
-        // Bind parameters (s for strings, b for binary data)
-        mysqli_stmt_bind_param($stmt, 'ssbb', $video_filename, $timestamp, $video_data, $thumbnail_data);
-
-        if (mysqli_stmt_execute($stmt)) {
+        $sql = "INSERT INTO videos (filename, timestamp, video_data, thumbnail_data) 
+        VALUES ('$video_filename', '$timestamp', ?, ?)";
+        
+        if (mysqli_query($db, $sql)) {
             echo "Video information saved to database.";
         } else {
             echo "Error saving video to database: " . mysqli_error($db);
         }
-
-        mysqli_stmt_close($stmt);
     } else {
         echo "Failed to upload video.";
     }
@@ -53,12 +44,9 @@ if (isset($_FILES['video'])) {
 if (isset($_FILES['thumbnail'])) {
     $thumbnail_filename = basename($_FILES['thumbnail']['name']);
     $thumbnail_file = $thumbnail_dir . $thumbnail_filename;
-
+    
     if (move_uploaded_file($_FILES['thumbnail']['tmp_name'], $thumbnail_file)) {
         echo "Thumbnail uploaded successfully: " . $thumbnail_file;
-
-        // Get thumbnail file data
-        $thumbnail_data = file_get_contents($thumbnail_file);  // Read thumbnail file contents
     } else {
         echo "Failed to upload thumbnail.";
     }
