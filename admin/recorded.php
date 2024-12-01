@@ -123,14 +123,14 @@ $listvideos = mysqli_query($db, $sqlgetvideos);
             // Loop through video records
             while ($video = mysqli_fetch_assoc($listvideos)) { 
                 // Define paths for video and thumbnail
-                $videoPath = 'https://tupcauxiliary.com/Auxiliary/uploads/videos/' . $video['filename'];  // Use relative path to video
-                $thumbnailPath = 'https://tupcauxiliary.com/Auxiliary/uploads/thumbnails/' . pathinfo($video['filename'], PATHINFO_FILENAME) . '.jpg';  // Use relative path to thumbnail
+                $videoPath = 'https://tupcauxiliary.com/Auxiliary/uploads/videos/' . $video['filename'];
+                $thumbnailPath = 'https://tupcauxiliary.com/Auxiliary/uploads/thumbnails/' . pathinfo($video['filename'], PATHINFO_FILENAME) . '.jpg';
 
                 // Generate thumbnail if not exists
-                generateThumbnail($_SERVER['DOCUMENT_ROOT'] . $videoPath, $_SERVER['DOCUMENT_ROOT'] . $thumbnailPath); // Generate thumbnail with full path
+                generateThumbnail($_SERVER['DOCUMENT_ROOT'] . '/Auxiliary/uploads/videos/' . $video['filename'], $_SERVER['DOCUMENT_ROOT'] . '/Auxiliary/uploads/thumbnails/' . pathinfo($video['filename'], PATHINFO_FILENAME) . '.jpg');
             ?>
                 <div class="thumbnail-item">
-                    <!-- Change the link behavior to download the video -->
+                    <!-- Link to download the video -->
                     <a href="<?php echo $videoPath; ?>" download>
                         <img src="<?php echo $thumbnailPath; ?>" alt="Video Thumbnail" class="thumbnail-large">
                     </a>
