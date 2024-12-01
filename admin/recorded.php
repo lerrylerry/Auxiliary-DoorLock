@@ -127,7 +127,7 @@ $listvideos = mysqli_query($db, $sqlgetvideos);
                 echo "<p>Video Path: $videoPath</p>";
                 echo "<p>Thumbnail Path: $thumbnailPath</p>";
                 echo "<p>Thumbnail Exists: " . (file_exists($_SERVER['DOCUMENT_ROOT'] . $thumbnailPath) ? 'Yes' : 'No') . "</p>";
-                
+
                 // Generate thumbnail if not exists
                 generateThumbnail($_SERVER['DOCUMENT_ROOT'] . $videoPath, $_SERVER['DOCUMENT_ROOT'] . $thumbnailPath); // Generate thumbnail with full path
             ?>
@@ -150,5 +150,22 @@ $listvideos = mysqli_query($db, $sqlgetvideos);
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="static/script.js"></script>
+<script>
+  $(document).ready(function() {
+    // Check window size and disable toggle functionality for smaller screens
+    if ($(window).width() <= 768) {
+        // If the window is mobile-sized, disable the open/close functionality
+        $(".sidebar").removeClass("close");
+    }
+
+    // Add your sidebar toggle functionality here for larger screens if needed
+    $(window).resize(function() {
+        if ($(window).width() <= 768) {
+            $(".sidebar").removeClass("close");
+        }
+    });
+});
+
+</script>
 </body>
 </html>
