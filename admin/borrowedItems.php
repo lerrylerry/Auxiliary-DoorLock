@@ -98,18 +98,41 @@ if (isset($_POST['approveborrow'])) {
                 $sqlupdatestock = "UPDATE `tbproductlist` SET `quantity`=`quantity` - " . $itelis['borrowqty'] . " WHERE id='" . $itelis['itemid'] . "'";
                 mysqli_query($db, $sqlupdatestock);
 
-                // If the category is 'Returnables', insert into tbpendingreturn
+                // If the category is 'Returnables', handle the pending return logic
                 if ($rowCategory['category'] === 'Returnables') {
-                    $sqlinsertreturn = "
-                        INSERT INTO tbpendingreturn (userid, itemid, borrowqty, transid) 
-                        VALUES (
-                            '" . $_POST['userid'] . "', 
-                            '" . $itelis['itemid'] . "', 
-                            '" . $itelis['borrowqty'] . "', 
-                            '" . $itelis['transid'] . "'
-                        )
+                    // Check if the item with the same userid already exists in tbpendingreturn
+                    $sqlCheckExistence = "
+                        SELECT borrowqty FROM tbpendingreturn 
+                        WHERE userid = '" . $_POST['userid'] . "' 
+                        AND itemid = '" . $itelis['itemid'] . "'
                     ";
-                    mysqli_query($db, $sqlinsertreturn);
+                    $resultCheckExistence = mysqli_query($db, $sqlCheckExistence);
+
+                    if ($resultCheckExistence && mysqli_num_rows($resultCheckExistence) > 0) {
+                        // If the item already exists, update the borrowqty by adding the new quantity
+                        $existingRecord = mysqli_fetch_assoc($resultCheckExistence);
+                        $newBorrowQty = $existingRecord['borrowqty'] + $itelis['borrowqty'];
+
+                        $sqlUpdateQty = "
+                            UPDATE tbpendingreturn 
+                            SET borrowqty = '" . $newBorrowQty . "' 
+                            WHERE userid = '" . $_POST['userid'] . "' 
+                            AND itemid = '" . $itelis['itemid'] . "'
+                        ";
+                        mysqli_query($db, $sqlUpdateQty);
+                    } else {
+                        // If the item doesn't exist, insert a new record
+                        $sqlinsertreturn = "
+                            INSERT INTO tbpendingreturn (userid, itemid, borrowqty, transid) 
+                            VALUES (
+                                '" . $_POST['userid'] . "', 
+                                '" . $itelis['itemid'] . "', 
+                                '" . $itelis['borrowqty'] . "', 
+                                '" . $itelis['transid'] . "'
+                            )
+                        ";
+                        mysqli_query($db, $sqlinsertreturn);
+                    }
                 }
 
                 // Append item details to the email content
