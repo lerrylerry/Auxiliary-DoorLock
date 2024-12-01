@@ -3,6 +3,8 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
+session_start();  // Start the session to store/retrieve the video ID
+
 require('dbcred/db.php');  // Include the database credentials
 
 // Set the upload directories
@@ -39,55 +41,78 @@ if (isset($_FILES['video'])) {
 
         echo "Video data read successfully.\n";
 
-        // Check for uploaded thumbnail file
-        if (isset($_FILES['thumbnail'])) {
-            $thumbnail_filename = basename($_FILES['thumbnail']['name']);
-            $thumbnail_file = $thumbnail_dir . $thumbnail_filename;
+        // Escape binary data for safe insertion into database
+        $video_data = mysqli_real_escape_string($db, $video_data);
 
-            // Move the uploaded thumbnail to the directory
-            if (move_uploaded_file($_FILES['thumbnail']['tmp_name'], $thumbnail_file)) {
-                echo "Thumbnail uploaded successfully: " . $thumbnail_file . "\n";
+        // Prepare SQL query to insert video
+        $timestamp = date('Y-m-d H:i:s');  // Current timestamp in DATETIME format
+        $sql = "INSERT INTO videos (filename, timestamp, video_data) 
+                VALUES ('$video_filename', '$timestamp', '$video_data')";
 
-                // Read the thumbnail file as binary data
-                $thumbnail_data = file_get_contents($thumbnail_file);
+        // Debugging: Log the SQL query to check for correctness
+        echo "SQL Query: " . $sql . "\n";
 
-                // Check if thumbnail data is successfully read
-                if ($thumbnail_data === false) {
-                    die("Error reading thumbnail file.\n");
-                }
+        // Execute SQL query to insert video
+        if (mysqli_query($db, $sql)) {
+            $video_id = mysqli_insert_id($db); // Get the last inserted video ID
+            echo "Video information saved to database.\n";
 
-                echo "Thumbnail data read successfully.\n";
+            // Store video ID in session for later use (thumbnail upload)
+            $_SESSION['video_id'] = $video_id;
 
-                // Escape binary data for safe insertion into database
-                $video_data = mysqli_real_escape_string($db, $video_data);
-                $thumbnail_data = mysqli_real_escape_string($db, $thumbnail_data);
-
-                echo "Data escaped for database.\n";
-
-                // Prepare SQL query to insert video and thumbnail
-                $timestamp = date('Y-m-d H:i:s');  // Current timestamp in DATETIME format
-                $sql = "INSERT INTO videos (filename, timestamp, video_data, thumbnail_data) 
-                        VALUES ('$video_filename', '$timestamp', '$video_data', '$thumbnail_data')";
-
-                // Debugging: Log the SQL query to check for correctness
-                echo "SQL Query: " . $sql . "\n";
-
-                // Execute SQL query to insert data
-                if (mysqli_query($db, $sql)) {
-                    echo "Video and thumbnail information saved to database.\n";
-                } else {
-                    echo "Error saving video and thumbnail to database: " . mysqli_error($db) . "\n";
-                }
-            } else {
-                echo "Failed to upload thumbnail.\n";
-            }
         } else {
-            echo "No thumbnail uploaded.\n";
+            echo "Error saving video to database: " . mysqli_error($db) . "\n";
         }
     } else {
         echo "Failed to upload video.\n";
     }
+}
+
+// Check if the video ID is available in session
+if (isset($_SESSION['video_id'])) {
+    $video_id = $_SESSION['video_id'];  // Retrieve the video ID from the session
+
+    // Check for uploaded thumbnail file
+    if (isset($_FILES['thumbnail'])) {
+        $thumbnail_filename = basename($_FILES['thumbnail']['name']);
+        $thumbnail_file = $thumbnail_dir . $thumbnail_filename;
+
+        // Move the uploaded thumbnail to the directory
+        if (move_uploaded_file($_FILES['thumbnail']['tmp_name'], $thumbnail_file)) {
+            echo "Thumbnail uploaded successfully: " . $thumbnail_file . "\n";
+
+            // Read the thumbnail file as binary data
+            $thumbnail_data = file_get_contents($thumbnail_file);
+
+            // Check if thumbnail data is successfully read
+            if ($thumbnail_data === false) {
+                die("Error reading thumbnail file.\n");
+            }
+
+            echo "Thumbnail data read successfully.\n";
+
+            // Escape binary data for safe insertion into database
+            $thumbnail_data = mysqli_real_escape_string($db, $thumbnail_data);
+
+            // Prepare SQL query to update video with thumbnail
+            $sql = "UPDATE videos SET thumbnail_data = '$thumbnail_data' WHERE id = $video_id";
+
+            // Debugging: Log the SQL query to check for correctness
+            echo "SQL Query: " . $sql . "\n";
+
+            // Execute SQL query to update video with thumbnail
+            if (mysqli_query($db, $sql)) {
+                echo "Thumbnail information saved to database for video ID: " . $video_id . "\n";
+            } else {
+                echo "Error saving thumbnail to database: " . mysqli_error($db) . "\n";
+            }
+        } else {
+            echo "Failed to upload thumbnail.\n";
+        }
+    } else {
+        echo "No thumbnail uploaded.\n";
+    }
 } else {
-    echo "No video uploaded.\n";
+    echo "No video ID found in session. Please upload a video first.\n";
 }
 ?>
