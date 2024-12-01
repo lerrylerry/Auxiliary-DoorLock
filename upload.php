@@ -48,6 +48,9 @@ if (isset($_FILES['video'])) {
 
             // After saving the video, get the last inserted video ID
             $video_id = mysqli_insert_id($db);
+
+            // Print the video ID
+            echo "<br>Video ID: " . $video_id;
         } else {
             echo "Error saving video to database: " . mysqli_error($db);
         }
