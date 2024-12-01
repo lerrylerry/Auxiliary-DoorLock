@@ -1,10 +1,4 @@
 <?php
-// Enable error reporting for debugging
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
-require('dbcred/db.php');  // Include the database credentials
-
 // Set the upload directories
 $video_dir = "uploads/videos/";
 $thumbnail_dir = "uploads/thumbnails/";
@@ -17,11 +11,14 @@ if (!is_dir($thumbnail_dir)) {
     mkdir($thumbnail_dir, 0777, true);
 }
 
+// Include the database credentials
+require('../dbcred/db.php');  // Make sure to include the database credentials
+
 // Check for uploaded video file
 if (isset($_FILES['video'])) {
     $video_filename = basename($_FILES['video']['name']);
     $video_file = $video_dir . $video_filename;
-
+    
     // Move the uploaded video to the directory
     if (move_uploaded_file($_FILES['video']['tmp_name'], $video_file)) {
         echo "Video uploaded successfully: " . $video_file;
@@ -37,16 +34,14 @@ if (isset($_FILES['video'])) {
         // Insert video filename, timestamp, and video binary data into the database
         $timestamp = date('Y-m-d H:i:s');  // Current timestamp in DATETIME format
         $video_data = mysqli_real_escape_string($db, $video_data);  // Escape binary data for safe insertion
-        $sql = "INSERT INTO videos (filename, timestamp, video_data) 
-                VALUES ('$video_filename', '$timestamp', '$video_data')";
+        $sql = "INSERT INTO videos (filename, timestamp, video_data, thumbnail_data) 
+                VALUES ('$video_filename', '$timestamp', '$video_data', '')";
 
         if (mysqli_query($db, $sql)) {
             echo "Video information saved to database.";
 
             // After saving the video, get the last inserted video ID
             $video_id = mysqli_insert_id($db);
-
-            // Print the video ID
             echo "<br>Video ID: " . $video_id;
         } else {
             echo "Error saving video to database: " . mysqli_error($db);
@@ -56,13 +51,11 @@ if (isset($_FILES['video'])) {
     }
 }
 
-// Check for uploaded thumbnail file and ensure video filename is available
-if (isset($_FILES['thumbnail']) && isset($video_filename)) {
-    // Replace 'Motion' with 'Thumbnail' in the video filename and change extension to .jpg
-    $thumbnail_filename = str_replace('Motion', 'Thumbnail', $video_filename);
-    $thumbnail_filename = pathinfo($thumbnail_filename, PATHINFO_FILENAME) . '.jpg'; // Ensure it ends with .jpg
+// Check for uploaded thumbnail file
+if (isset($_FILES['thumbnail'])) {
+    $thumbnail_filename = basename($_FILES['thumbnail']['name']);
     $thumbnail_file = $thumbnail_dir . $thumbnail_filename;
-
+    
     // Move the uploaded thumbnail to the directory
     if (move_uploaded_file($_FILES['thumbnail']['tmp_name'], $thumbnail_file)) {
         echo "Thumbnail uploaded successfully: " . $thumbnail_file;
@@ -78,7 +71,8 @@ if (isset($_FILES['thumbnail']) && isset($video_filename)) {
         // Escape thumbnail binary data for safe insertion into SQL query
         $thumbnail_data = mysqli_real_escape_string($db, $thumbnail_data);
 
-        // Update the video record with the thumbnail data using the video filename
+        // Update the video record with the thumbnail data
+        // Use the video filename to identify the correct video record
         $sql = "UPDATE videos SET thumbnail_data = '$thumbnail_data' WHERE filename = '$video_filename'";
 
         if (mysqli_query($db, $sql)) {
