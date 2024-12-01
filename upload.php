@@ -27,8 +27,8 @@ if (isset($_FILES['video'])) {
 
         // Insert video filename and timestamp into the database
         $timestamp = date('Y-m-d H:i:s');  // Current timestamp in DATETIME format
-        $sql = "INSERT INTO videos (filename, timestamp, video_data, thumbnail_data) 
-        VALUES ('$video_filename', '$timestamp', ?, ?)";
+        $sql = "INSERT INTO videos (filename, timestamp) 
+        VALUES ('$video_filename', '$timestamp')";
         
         if (mysqli_query($db, $sql)) {
             echo "Video information saved to database.";
