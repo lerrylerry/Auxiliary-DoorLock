@@ -17,7 +17,7 @@ if (!is_dir($thumbnail_dir)) {
 }
 
 // Check for uploaded video file
-if (isset($_FILES['video'])) {
+if (isset($_FILES['video']) && $_FILES['video']['error'] === UPLOAD_ERR_OK) {
     $video_filename = basename($_FILES['video']['name']);
     $video_file = $video_dir . $video_filename;
     $video_data = file_get_contents($_FILES['video']['tmp_name']); // Read binary data
@@ -26,7 +26,7 @@ if (isset($_FILES['video'])) {
         echo "Video uploaded successfully: " . $video_file;
 
         // Check for uploaded thumbnail file
-        if (isset($_FILES['thumbnail'])) {
+        if (isset($_FILES['thumbnail']) && $_FILES['thumbnail']['error'] === UPLOAD_ERR_OK) {
             $thumbnail_filename = basename($_FILES['thumbnail']['name']);
             $thumbnail_file = $thumbnail_dir . $thumbnail_filename;
             $thumbnail_data = file_get_contents($_FILES['thumbnail']['tmp_name']); // Read binary data
@@ -34,11 +34,11 @@ if (isset($_FILES['video'])) {
             if (move_uploaded_file($_FILES['thumbnail']['tmp_name'], $thumbnail_file)) {
                 echo "Thumbnail uploaded successfully: " . $thumbnail_file;
 
-                // Insert video and thumbnail data into the database
-                $timestamp = date('Y-m-d H:i:s');  // Current timestamp in DATETIME format
-                $stmt = $db->prepare("INSERT INTO videos (filename, timestamp, video_data, thumbnail_data) 
-                                      VALUES (?, ?, ?, ?)");
+                // Insert video and thumbnail into the database
+                $timestamp = date('Y-m-d H:i:s');
+                $stmt = $db->prepare("INSERT INTO videos (filename, timestamp, video_data, thumbnail_data) VALUES (?, ?, ?, ?)");
                 $stmt->bind_param("sbbs", $video_filename, $timestamp, $video_data, $thumbnail_data);
+
 
                 if ($stmt->execute()) {
                     echo "Video and thumbnail saved to database.";
