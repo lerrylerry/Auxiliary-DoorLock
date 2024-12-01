@@ -86,10 +86,10 @@ if (isset($_FILES['thumbnail'])) {
         $thumbnail_data = mysqli_real_escape_string($db, $thumbnail_data);
 
         // Update the video record with the thumbnail data
-        $sql = "UPDATE videos SET thumbnail_data = '$thumbnail_data' WHERE id = $video_id ";
+        $sql = "UPDATE videos SET thumbnail_data = '$thumbnail_data' WHERE id = $video_id + 1";
 
         if (mysqli_query($db, $sql)) {
-            echo "Thumbnail information saved to database for video ID: " . $video_id ;
+            echo "Thumbnail information saved to database for video ID: " . $video_id + 1;
         } else {
             echo "Error saving thumbnail to database: " . mysqli_error($db);
         }
