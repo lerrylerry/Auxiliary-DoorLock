@@ -125,7 +125,8 @@ $listvideos = mysqli_query($db, $sqlgetvideos);
                 // Define paths for video and thumbnail
                 $videoPath = '/Auxiliary/uploads/videos/' . $video['filename'];  // Use relative path to video
                 $thumbnailPath = '/Auxiliary/uploads/thumbnails/' . pathinfo($video['filename'], PATHINFO_FILENAME) . '.jpg';  // Use relative path to thumbnail
-
+                echo "<p>Video Path: $videoPath</p>";
+                echo "<p>Thumbnail Path: $thumbnailPath</p>";
                 // Generate thumbnail if not exists
                 generateThumbnail($_SERVER['DOCUMENT_ROOT'] . $videoPath, $_SERVER['DOCUMENT_ROOT'] . $thumbnailPath); // Generate thumbnail with full path
             ?>
