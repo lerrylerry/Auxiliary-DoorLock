@@ -3,7 +3,7 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-require('/dbcred/db.php');  // Make sure to include the database credentials
+require('dbcred/db.php');  // Make sure to include the database credentials
 
 // Set the upload directories
 $video_dir = "uploads/videos/";
