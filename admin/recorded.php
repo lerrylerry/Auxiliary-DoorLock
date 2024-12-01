@@ -2,6 +2,9 @@
 require('../dbcred/db.php');
 session_start();
 
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 // Redirect if not logged in
 if (!isset($_SESSION['loginid'])) {
     header("location: ../login.php");
