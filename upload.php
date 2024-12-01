@@ -17,9 +17,11 @@ if (!is_dir($thumbnail_dir)) {
     mkdir($thumbnail_dir, 0777, true);
 }
 
+$video_filename = ''; // Initialize the variable to avoid undefined warnings
+
 // Check for uploaded video file
 if (isset($_FILES['video'])) {
-    $video_filename = basename($_FILES['video']['name']);
+    $video_filename = basename($_FILES['video']['name']);  // Save the filename for later use
     $video_file = $video_dir . $video_filename;
 
     // Move the uploaded video to the directory
@@ -69,12 +71,18 @@ if (isset($_FILES['thumbnail'])) {
 
         // Insert thumbnail binary data into the database (link to video record)
         $thumbnail_data = mysqli_real_escape_string($db, $thumbnail_data);  // Escape binary data for safe insertion
-        $sql = "UPDATE videos SET thumbnail_data = '$thumbnail_data' WHERE filename = '$video_filename'";
 
-        if (mysqli_query($db, $sql)) {
-            echo "Thumbnail information saved to database.";
+        // Ensure that the video was successfully uploaded before updating the thumbnail
+        if (!empty($video_filename)) {
+            $sql = "UPDATE videos SET thumbnail_data = '$thumbnail_data' WHERE filename = '$video_filename'";
+
+            if (mysqli_query($db, $sql)) {
+                echo "Thumbnail information saved to database.";
+            } else {
+                echo "Error saving thumbnail to database: " . mysqli_error($db);
+            }
         } else {
-            echo "Error saving thumbnail to database: " . mysqli_error($db);
+            echo "Error: No video uploaded to associate with this thumbnail.";
         }
     } else {
         echo "Failed to upload thumbnail.";
