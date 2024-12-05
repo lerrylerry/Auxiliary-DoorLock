@@ -44,7 +44,6 @@ $listvideos = mysqli_query($db, $sqlgetvideos);
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Auxiliary | Recorded Motion</title>
-  <link rel="stylesheet" href="../css/styles.css">
   <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css" rel="stylesheet">
@@ -52,62 +51,8 @@ $listvideos = mysqli_query($db, $sqlgetvideos);
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Video.js CSS -->
   <link href="https://vjs.zencdn.net/7.14.3/video-js.css" rel="stylesheet" />
-  <style>
-    /* Grid Layout: 4 thumbnails per row */
-    .thumbnail-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);  /* 4 items per row */
-        gap: 20px;  /* Space between thumbnails */
-        margin-top: 20px;
-    }
-
-    .thumbnail-item {
-        position: relative;
-        text-align: center;
-        background-color: #f7f7f7;  /* Add a background for better visibility */
-        padding: 10px;
-        border-radius: 5px;  /* Rounded corners */
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Add some shadow for better look */
-        overflow: hidden;
-        height: 300px;  /* Fixed height for the thumbnail item */
-    }
-
-    .thumbnail-item img {
-        width: 100%;
-        height: auto;
-        object-fit: cover;  /* Ensures the image covers the area without distortion */
-    }
-
-    .thumbnail-item .id, .thumbnail-item .timestamp {
-        font-size: 16px;  /* Same font size for both ID and Timestamp */
-        font-weight: bold;  /* Make text bold */
-        color: black;  /* Set the font color to black */
-        margin-top: 10px;
-    }
-
-    .thumbnail-item .timestamp {
-        font-family: 'Arial', sans-serif; /* Use Arial font for timestamp */
-    }
-
-    /* Responsive design for smaller screens */
-    @media (max-width: 1200px) {
-        .thumbnail-grid {
-            grid-template-columns: repeat(3, 1fr);  /* 3 items per row for medium screens */
-        }
-    }
-
-    @media (max-width: 768px) {
-        .thumbnail-grid {
-            grid-template-columns: repeat(2, 1fr);  /* 2 items per row for small screens */
-        }
-    }
-
-    @media (max-width: 576px) {
-        .thumbnail-grid {
-            grid-template-columns: 1fr;  /* 1 item per row for extra small screens */
-        }
-    }
-  </style>
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/admin-section.css">
 </head>
 <body>
 <?php include('static/sidebar.php')?> 

@@ -1,0 +1,158 @@
+.table {
+    margin-top: 15px;
+}
+
+.table th, .table td {
+    text-align: center;
+    padding: 12px;
+}
+
+.table th {
+    background-color: #9e1b32;
+    color: white;
+}
+
+.table td {
+    background-color: #f9f9f9;
+}
+
+.active>.page-link, .page-link.active {
+    background-color: #9e1b32;
+    border-color: #9e1b32;
+}
+
+.page-link {
+    color: #9e1b32;
+}
+
+/* Ensure modal labels are left-aligned */
+.modal-body .form-label .namezzz {
+    text-align: left !important;
+    font-weight: bold;
+}
+
+/* Ensure form controls take the full width */
+.modal-body .form-control, 
+.modal-body .form-select {
+    width: 100%;
+}
+
+/* Adjust modal dialog and content styling */
+.modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.modal-content {
+    padding: 20px;
+    border-radius: 8px;
+}
+
+/* Modal header styling */
+.modal-header {
+    border-bottom: 2px solid #9e1b32;
+    background-color: #f8f9fa;
+}
+
+/* Title styling in the modal header */
+.modal-title {
+    color: #9e1b32;
+    font-weight: bold;
+}
+
+/* Button styling */
+.modal-footer .btn {
+    padding: 8px 20px;
+    font-weight: 600;
+}
+
+/* Modal footer flex to align buttons */
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+table.dataTable {
+    margin-right: 10px !important;
+}
+
+.card {
+    border-radius: 10px;
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0;
+}
+
+.card-body {
+    background-color: #f8f9fa;
+}
+
+.text-muted {
+    font-size: 0.95rem;
+}
+
+.fw-bold {
+    font-weight: bold;
+}
+
+/* Grid Layout: 4 thumbnails per row */
+.thumbnail-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);  /* 4 items per row */
+    gap: 20px;  /* Space between thumbnails */
+    margin-top: 20px;
+}
+
+.thumbnail-item {
+    position: relative;
+    text-align: center;
+    background-color: #f7f7f7;  /* Add a background for better visibility */
+    padding: 10px;
+    border-radius: 5px;  /* Rounded corners */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Add some shadow for better look */
+    overflow: hidden;
+    height: 300px;  /* Fixed height for the thumbnail item */
+}
+
+.thumbnail-item img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;  /* Ensures the image covers the area without distortion */
+}
+
+.thumbnail-item .id, .thumbnail-item .timestamp {
+    font-size: 16px;  /* Same font size for both ID and Timestamp */
+    font-weight: bold;  /* Make text bold */
+    color: black;  /* Set the font color to black */
+    margin-top: 10px;
+}
+
+.thumbnail-item .timestamp {
+    font-family: 'Arial', sans-serif; /* Use Arial font for timestamp */
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 1200px) {
+    .thumbnail-grid {
+        grid-template-columns: repeat(3, 1fr);  /* 3 items per row for medium screens */
+    }
+}
+
+@media (max-width: 768px) {
+    .thumbnail-grid {
+        grid-template-columns: repeat(2, 1fr);  /* 2 items per row for small screens */
+    }
+}
+
+@media (max-width: 576px) {
+    .thumbnail-grid {
+        grid-template-columns: 1fr;  /* 1 item per row for extra small screens */
+    }
+}
+
+.fa-eye {
+    cursor: pointer;
+}

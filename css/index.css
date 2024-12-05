@@ -1,0 +1,300 @@
+/* General Body and Layout */
+body {
+    background-color: #ed8383; /* Light Red Fallback */
+    background-image: url('../images/LOCKER.jpg'); /* Replace with your image path */
+    background-size: cover;
+    background-position: center;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    color: #fff;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    position: relative; /* Ensure the overlay is above the background image */
+}
+
+body::before {
+    content: ''; /* Empty content for the overlay */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
+    z-index: -1; /* Place it behind the content */
+}
+
+/* Navbar */
+.navbar {
+    background-color: #9e1b32; /* Cardinal Red */
+}
+
+.navbar .container-fluid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar .navbar-toggler {
+    border: 1px solid #fff;
+    background-color: #9e1b32;
+}
+
+/* Navbar Dropdown Menu */
+.navdiv .dropdown .btn {
+    color: white;
+    background-color: #9e1b32;
+    border: 1px solid #fff;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.navdiv .dropdown .btn:hover {
+    background-color: #7a1623;
+    color: white;
+}
+
+.navdiv .dropdown .btn:focus {
+    background-color: #7a1623;
+    color: white;
+    box-shadow: none;
+}
+
+.dropdown-menu {
+    background-color: #9e1b32;
+    border: 1px solid #7a1623;
+}
+
+.dropdown-item {
+    color: white;
+    background-color: #9e1b32;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #7a1623;
+    color: white;
+}
+
+/* Navbar Logo */
+.navLogo {
+    display: flex;
+    align-items: center;
+}
+
+.navLogo img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 3px solid #555;
+}
+
+.navLogo p {
+    color: white;
+    padding-left: 10px;
+    font-size: 1.2rem;
+}
+
+.navbar .navbar-nav .nav-item {
+    margin: 0 10px;
+}
+
+.navbar .navbar-nav .nav-link {
+    color: white;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+}
+
+.navbar .navbar-nav .nav-link:hover {
+    color: #d8d8d8;
+}
+
+/* Container Styles */
+.content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 80px 20px; /* Increase padding for better spacing */
+    text-align: center;
+    flex-grow: 1;
+    margin: 0 20px;
+    background: rgba(0, 0, 0, 0.7); /* Darker semi-transparent background for better contrast */
+    border-radius: 15px; /* Rounded corners for a more modern look */
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5); /* Soft shadow around the content box */
+}
+
+.container {
+    max-width: 1200px;
+    width: 100%;
+    padding: 20px;
+}
+
+/* Heading Styles */
+h2 {
+    font-size: 3rem; /* Increase font size for more emphasis */
+    color: #fff;
+    text-shadow: 2px 2px 15px rgba(0, 0, 0, 0.7), 0 0 25px #ff0000, 0 0 5px #ff0000; /* More dramatic shadow */
+    margin-bottom: 20px;
+    letter-spacing: 2px; /* Add letter-spacing for a more elegant look */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern sans-serif font */
+    font-weight: bold;
+}
+
+/* Subheading Styles (Tech Uni Text) */
+.school {
+    font-size: 1.4rem; /* Slightly larger font for readability */
+    color: #fff;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.6); /* Soft shadow to make it pop */
+    margin-top: 0;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Responsive text for small screens */
+@media (max-width: 576px) {
+    h2 {
+        font-size: 2.2rem; /* Smaller h2 size on small screens */
+    }
+
+    p {
+        font-size: 1.1rem; /* Slightly smaller p size on small screens */
+    }
+
+    .content {
+        margin: 0 10px;
+        padding: 60px 10px; /* Less padding on small screens */
+    }
+}
+
+/* Card and Form Styles */
+.card {
+    background-color: rgba(255, 255, 255, 0.9); /* Light form card to stand out */
+    border-radius: 8px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); /* Darker shadow for contrast */
+    padding: 30px;
+    margin-top: 50px;
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 30px;
+    box-sizing: border-box;
+}
+
+.card-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #9e1b32;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Input Styles */
+input, textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+input:focus, textarea:focus {
+    border-color: #9e1b32;
+    box-shadow: 0 0 10px rgba(158, 27, 50, 0.5);
+    outline: none;
+}
+
+/* Label Styles */
+label {
+    color: #333;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* Submit Button */
+.submitBtn button {
+    width: 100%;
+    padding: 12px;
+    background-color: #9e1b32;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submitBtn button:hover {
+    background-color: #7a1623;
+}
+
+/* Forgot Password Link */
+.sulink {
+    text-align: center;
+    margin-top: 10px;
+    color: #333;
+}
+
+.sulink a {
+    color: #9e1b32;
+    text-decoration: none;
+}
+
+.sulink a:hover {
+    text-decoration: underline;
+}
+
+/* Remember Me Checkbox */
+.rmbr {
+    display: inline-block;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    margin-right: 5px;
+}
+
+#rmbr {
+    vertical-align: middle;
+}
+
+/* Error Message Styles */
+.error {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 5px;
+    text-align: center;
+}
+
+/* Background Logo */
+#bg-logo {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    opacity: 0.1;
+    z-index: -1;
+    width: 120px;
+}
+
+/* Footer Styles */
+footer {
+    background-color: #2d2d2d;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    margin-top: auto; /* Push footer to the bottom of the page */
+}
+
+footer p {
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+footer a {
+    color: #ed8383;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
