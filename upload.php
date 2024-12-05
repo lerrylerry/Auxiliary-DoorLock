@@ -57,6 +57,13 @@ if (isset($_FILES['video'])) {
 
         if (mysqli_query($db, $sql)) {
             echo "Video information saved to database.";
+
+            // Delete the video file after saving to the database
+            if (unlink($video_file)) {
+                echo "Video file deleted from server.";
+            } else {
+                echo "Failed to delete video file from server.";
+            }
         } else {
             echo "Error saving video to database: " . mysqli_error($db);
         }
@@ -91,6 +98,13 @@ if (isset($_FILES['thumbnail'])) {
 
         if (mysqli_query($db, $sql)) {
             echo "Thumbnail information saved to database for video ID: " . $video_id;
+
+            // Delete the thumbnail file after saving to the database
+            if (unlink($thumbnail_file)) {
+                echo "Thumbnail file deleted from server.";
+            } else {
+                echo "Failed to delete thumbnail file from server.";
+            }
         } else {
             echo "Error saving thumbnail to database: " . mysqli_error($db);
         }
