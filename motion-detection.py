@@ -85,7 +85,7 @@ def generate_thumbnail(video_path, thumbnail_path):
 
 # Function to upload video to the web server
 def upload_file(file_path, file_type):
-    url = "https://tupcauxiliary.com/upload.php"  # Adjusted URL for upload.php
+    url = "https://tupcauxiliary.com/Auxiliary/upload.php"  # Adjusted URL for upload.php
 
     # Check if the file exists before attempting to upload
     if not os.path.exists(file_path):

@@ -89,7 +89,7 @@ function sendEmailToAdmin() {
         // Content
         $mail->isHTML(true);
         $mail->Subject = 'New Repair Request';
-        $mail->Body    = "<p>A new minor repair request has been submitted by" . $_POST['name'] . "</p><p><a href='https://tupcauxiliary.com'>Click here to view the request.</a></p>";
+        $mail->Body    = "<p>A new minor repair request has been submitted by" . $_POST['name'] . "</p><p><a href='https://tupcauxiliary.com/Auxiliary'>Click here to view the request.</a></p>";
 
         $mail->send();
     } catch (Exception $e) {
