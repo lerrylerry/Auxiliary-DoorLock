@@ -88,18 +88,11 @@
     </ul>
 </div>
 
-<!-- Include jQuery (make sure to include jQuery in your project) -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <script>
-$(document).ready(function() {
-    // When an item with the class `.iocn-link` is clicked (which are the parent links with submenus)
-    $('.iocn-link').click(function() {
-        // Toggle the class 'showMenu' on the parent 'li' to display/hide the submenu
-        $(this).parent('li').toggleClass('showMenu');
-        
-        // Optional: To animate the dropdown toggle effect, you can add slideToggle
-        $(this).next('.sub-menu').slideToggle(300); // 300ms animation time
-    });
+    $(document).ready(function() {
+  $('.sidebar .nav-links li').click(function() {
+    $(this).toggleClass('showMenu');
+  });
 });
+
 </script>

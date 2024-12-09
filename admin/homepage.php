@@ -160,5 +160,14 @@ $listp = mysqli_query($db, $sqlgetp);
 
 
   <script src="static/script.js"></script>
+  <script>
+$(document).ready(function() {
+  // When the hamburger icon is clicked, toggle the sidebar visibility
+  $('.hamburger-icon').click(function() {
+    $('.sidebar').toggleClass('open');
+  });
+});
+
+  </script>
 </body>
 </html>
