@@ -81,7 +81,7 @@ $listvideos = mysqli_query($db, $sqlgetvideos);
                     <a href="data:video/mp4;base64,<?php echo $videoBase64; ?>" download="<?php echo $video['filename']; ?>">
                         <img src="data:image/jpeg;base64,<?php echo $thumbnailBase64; ?>" alt="Video Thumbnail" class="thumbnail-large">
                     </a>
-                    <p class="id"><?php echo $video['id']; ?>. <span class="timestamp"><?php echo date("F j, Y g:i A", strtotime($video['timestamp'])); ?></span></p>
+                    <p class="id"><?php echo $video['id']; ?>. <span class="timestamp"><?php echo date("F j, Y g:i A", strtotime($video['timestamp'] . ' +8 hours')); ?></span></p>
                 </div>
             <?php } ?>
             </div>
@@ -90,11 +90,7 @@ $listvideos = mysqli_query($db, $sqlgetvideos);
         <?php } ?>
     </div>
 </section>
-<td>
-                    <?php 
-                    echo date("F j, Y g:i A", strtotime($data['datetime'] . ' +8 hours')); 
-                    ?>
-                    </td>
+
 <!-- Bootstrap JS (jQuery is required) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
