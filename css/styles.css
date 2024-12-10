@@ -315,21 +315,18 @@ body {
   display: none;
 }
 
-/* Mobile View */
-@media screen and (max-width: 768px) {
+/* Mobile View (Mid-range screens like 768px) */
+@media screen and (max-width: 1024px) {
   .sidebar {
-    width: 0;  /* Sidebar is hidden by default */
-    visibility: hidden;  /* Sidebar hidden */
-  }
-
-  .sidebar.open {
-    width: 255px;  /* Show sidebar when open */
+    width: 255px;  /* Sidebar remains open at medium screen sizes */
     visibility: visible;
+    background: #580606;
   }
 
   .sidebar.close {
-    width: 80px;  /* Sidebar is narrow when closed */
+    width: 80px;
     visibility: visible;
+    background: #580606;
   }
 
   .home-section {
@@ -338,7 +335,7 @@ body {
   }
 
   .hamburger-icon {
-    display: block;  /* Show hamburger icon on mobile */
+    display: block;
     font-size: 30px;
     color: #11101d;
     cursor: pointer;
@@ -347,83 +344,110 @@ body {
     left: 20px;
   }
 
-  .sidebar .nav-links,
-  .sidebar .log-details {
-    visibility: visible;
-    opacity: 1;
-  }
-
-  .sidebar .nav-links li .sub-menu {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
   .sidebar .nav-links li a .link_name {
-    color: #11101d;
-  }
-
-  .sidebar .nav-links li i {
-    color: #11101d;
+    color: #fff;
   }
 
   .sidebar .nav-links li:hover a .link_name {
-    color: #ff6347; /* Highlight color on hover */
+    color: #ff6347;  /* Highlight on hover */
   }
 
-  /* Initially, submenus are hidden */
-  .sidebar .nav-links li .sub-menu {
-    display: none;
+  .sidebar .nav-links li i {
+    color: #fff;
   }
 
-  /* Show submenus when parent has 'showMenu' class */
-  .sidebar .nav-links li.showMenu .sub-menu {
-    display: block;
+  .sidebar .nav-links li i:hover {
+    color: #ff6347;  /* Change icon color on hover */
   }
-  
-  /* Keep the chevron icon rotated when the submenu is visible */
-  .sidebar .nav-links li.showMenu .arrow {
-    transform: rotate(-180deg);
+
+  .sidebar .nav-links li .sub-menu a {
+    color: #fff;
+  }
+
+  .sidebar .nav-links li .sub-menu a:hover {
+    color: #ff6347;  /* Highlight sub-menu links on hover */
   }
 }
 
-/* Small Screen (below 400px) Fix */
-@media screen and (max-width: 400px) {
+/* Small Mobile View (screens up to 768px) */
+@media screen and (max-width: 768px) {
   .sidebar {
-    width: 240px;  /* Adjust sidebar width for very small screens */
+    width: 255px;  /* Show sidebar when open */
+    visibility: visible;
+    background: #580606;
   }
 
-  .sidebar.open {
-    width: 240px;  /* Sidebar fully visible */
+  .sidebar.close {
+    width: 80px;
+    visibility: visible;
+    background: #580606;
   }
 
   .home-section {
     left: 0;
     width: 100%;
   }
+
+  .hamburger-icon {
+    display: block;
+    font-size: 30px;
+    color: #11101d;
+    cursor: pointer;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+  }
+
+  .sidebar .nav-links li a .link_name {
+    color: #fff;
+  }
+
+  .sidebar .nav-links li:hover a .link_name {
+    color: #ff6347;  /* Highlight on hover */
+  }
+
+  .sidebar .nav-links li i {
+    color: #fff;
+  }
+
+  .sidebar .nav-links li i:hover {
+    color: #ff6347;  /* Change icon color on hover */
+  }
+
+  .sidebar .nav-links li .sub-menu a {
+    color: #fff;
+  }
+
+  .sidebar .nav-links li .sub-menu a:hover {
+    color: #ff6347;  /* Highlight sub-menu links on hover */
+  }
 }
 
-/* Pin Visibility */
-.pinVisibility {
-  transition: transform 0.4s ease-in;
-}
+/* Extra Small Mobile View (up to 400px) */
+@media screen and (max-width: 400px) {
+  .sidebar {
+    width: 240px;
+  }
 
-.pinVisibility:hover {
-  transform: scale(1.08);
-}
+  .home-section {
+    left: 0;
+    width: 100%;
+  }
 
-.btn-danger {
-  --bs-btn-bg: #9e1b32 !important;
-  --bs-btn-border-color: #9e1b32 !important;
-}
+  /* .sidebar.close {
+    width: 60px;
+  } */
 
-/* Bootstrap Icon Adjustments */
-.sidebar .nav-links li i {
-  font-family: "Bootstrap Icons", sans-serif;
-  font-size: 24px;
-  color: #fff;
-  transition: color 0.3s ease;
-}
+  .hamburger-icon {
+    font-size: 25px;
+    left: 15px;  /* Position the hamburger icon for very small screens */
+  }
 
-.sidebar .nav-links li:hover i {
-  color: #1d1b31;  /* Change icon color on hover */
+  .sidebar .nav-links li a .link_name {
+    font-size: 14px; /* Adjust text size on extra small screens */
+  }
+
+  .sidebar .nav-links li i {
+    font-size: 18px; /* Adjust icon size */
+  }
 }
