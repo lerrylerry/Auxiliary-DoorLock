@@ -450,6 +450,7 @@ $(document).ready(function() {
 
 
 <script src="static/script.js"></script>
+<script src="static/swipe.js"></script>
 <script>
     $(document).ready(function() {
     $('#confirmBtn').on('click', function() {

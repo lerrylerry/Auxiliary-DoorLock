@@ -261,8 +261,8 @@ body {
 }
 
 .sidebar.close ~ .home-section {
-  left: 78px;
-  width: calc(100% - 78px);
+  left: 0;
+  width: 100%; /* Full width when sidebar is closed */
 }
 
 .home-content {
@@ -436,9 +436,13 @@ body {
     transform: translateX(-100%); /* Slide sidebar off-screen when closed */
   }
 
+  .sidebar.close .logo-details img {
+    display: none;
+  }
+
   .home-section {
     left: 0;
-    width: 100%;
+    width: 100%;  /* Ensure home section takes full width */
   }
 
   .hamburger-icon {

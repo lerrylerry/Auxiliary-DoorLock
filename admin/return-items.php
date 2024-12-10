@@ -494,6 +494,6 @@ $(document).ready(function () {
 </script>
 
 <script src="static/script.js"></script>
-
+<script src="static/swipe.js"></script>
 </body>
 </html>

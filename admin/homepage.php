@@ -160,6 +160,7 @@ $listp = mysqli_query($db, $sqlgetp);
 
 
   <script src="static/script.js"></script>
+  <script src="static/swipe.js"></script>
   <script>
 $(document).ready(function() {
   // When the hamburger icon is clicked, toggle the sidebar visibility
