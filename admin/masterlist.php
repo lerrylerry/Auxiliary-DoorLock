@@ -155,12 +155,12 @@ $listp = mysqli_query($db, $sqlgetp);
                         <button type="submit" class="btn btn-primary">Save changes</button>
                         </form>
                     </div>
-                </div>
+   f             </div>
             </div>
         </div>
 
         <!-- Delete Button -->
-        <button type="button" class="btn btn-danger btn-sm deleteBtn bi bi-trash-fill" data-bs-toggle="modal" data-bs-target="#deleteModal<?php echo $data['id']?>"></button>
+        <!-- <button type="button" class="btn btn-danger btn-sm deleteBtn bi bi-trash-fill" data-bs-toggle="modal" data-bs-target="#deleteModal<?php echo $data['id']?>"></button> -->
         <div class="modal fade" id="deleteModal<?php echo $data['id']?>" tabindex="-1" aria-labelledby="deleteModalLabel1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
