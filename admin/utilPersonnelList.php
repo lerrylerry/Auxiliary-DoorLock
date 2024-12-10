@@ -233,25 +233,6 @@ $listup = mysqli_query($db, $sqlgetup);
   <button type="button" class="btn btn-danger mb-3 mt-3 bottom-button" data-bs-toggle="modal" data-bs-target="#addPersonnelModal">Add Personnel</button>
 </div>
 
-<!-- Bootstrap JS (jQuery is required) -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
-
-<!-- Bootstrap Bundle (Popper.js is required) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-$(document).ready(function() {
-    // Initialize DataTable
-    $('#personnelTable').DataTable({
-        "lengthMenu": [[25, 50, 100], [25, 50, 100]], // Limit to only 25, 50, or 100 entries per page
-    });
-});
-</script>
-
-
 <!-- Add Product Modal -->
 <div class="modal fade" id="addPersonnelModal" tabindex="-1" aria-labelledby="addPersonnelLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -295,22 +276,26 @@ $(document).ready(function() {
 </div>
 </section>
 
-<script src="static/script.js"></script>
-<script src="static/swipe.js"></script>
-<!-- <script>
-  $(document).ready(function() {
-    $('#addpersonnelName').on('input', function() {
-        $(this).val($(this).val().toUpperCase());
+<!-- Bootstrap JS (jQuery is required) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+
+<!-- Bootstrap Bundle (Popper.js is required) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    // Initialize DataTable
+    $('#personnelTable').DataTable({
+        "lengthMenu": [[25, 50, 100], [25, 50, 100]], // Limit to only 25, 50, or 100 entries per page
     });
 });
 </script>
-<script>
-$(document).ready(function() {
-    $('#personnelName1').on('input', function() {
-        $(this).val($(this).val().toUpperCase());
-    });
-});
-</script> -->
+
+<script src="static/script.js"></script>
+<script src="static/swipe.js"></script>
 
 </body>
 </html>
