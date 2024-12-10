@@ -253,7 +253,7 @@ $listmr = mysqli_query($db, $sqlgetmr);
 
 
                     <td class="w-25"><?php echo $data['status']?></td>
-                    <td class="w-25"><?php echo date("F j, Y g:i A", strtotime($data['datetime'])); ?></td>
+                    <td class="w-25"><?php echo date("F j, Y g:i A", strtotime($data['datetime'] . ' +8 hours')); ?></td>
                     <td class="w-25">
                     <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#approveModal"><i class="bi bi-check-circle-fill"></i></button>
 

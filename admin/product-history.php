@@ -57,7 +57,11 @@ $listhistemd = mysqli_query($db, $sqlhistems);
             <td><?php echo $data['units'] ?></td>
             <td><?php echo $data['quantity'] ?></td>
             <td><?php echo $data['category'] ?></td>
-            <td><?php echo date("F j, Y", strtotime($data['dateAdded'])) ?></td>
+            <td>
+            <?php 
+            echo date("F j, Y g:i A", strtotime($data['dateAdded'] . ' +8 hours')); 
+            ?>
+            </td>
             <!-- <td><?php echo $data['addedBy'] ?></td> -->
         </tr>
         <?php } ?>

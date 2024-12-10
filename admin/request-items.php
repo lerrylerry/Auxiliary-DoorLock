@@ -150,7 +150,7 @@ $listreturn= mysqli_query($db, $sqlgetreturn);
                 </td>
                 <td>Return</td>
                 <td><?php echo $datar['status'] ?></td>
-                <td><?php echo date("F j, Y", strtotime($datar['datetime'])) ?></td>
+                <td><?php echo date("F j, Y g:i A", strtotime($datar['datetime'] . ' +8 hours')); ?></td>
             </tr>
         <?php } ?>
 
