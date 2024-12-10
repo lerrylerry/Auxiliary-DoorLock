@@ -155,7 +155,7 @@ $listp = mysqli_query($db, $sqlgetp);
                         <button type="submit" class="btn btn-primary">Save changes</button>
                         </form>
                     </div>
-   f             </div>
+                </div>
             </div>
         </div>
 

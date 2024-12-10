@@ -86,5 +86,6 @@ $pdf->SetXY(115, 135); // X position for Time
 $pdf->Cell(90, 8, $time, 0, 1);
 
 // Output the new PDF to download
-$pdf->Output('D', 'edited.pdf');
+$pdf->Output('D', $name . '-repair.pdf');
+
 ?>
