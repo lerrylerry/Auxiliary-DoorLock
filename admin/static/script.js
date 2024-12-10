@@ -94,9 +94,9 @@ $('#pincode1').on('input', function() {
   var pincode = pincodeInput.val().replace(/\D/g, ''); // Remove non-numeric characters
   pincodeInput.val(pincode); // Update input value
 
-  var isValid = /^[1-9]{4}$/.test(pincode);
+  var isValid = /^[0-9]{4}$/.test(pincode);
   if (!isValid) {
-      pincodeInput[0].setCustomValidity("Please enter a 4-digit number from 1 to 9.");
+      pincodeInput[0].setCustomValidity("Please enter a 4-digit number from 0 to 9.");
   } else {
       pincodeInput[0].setCustomValidity("");
   }
@@ -120,9 +120,9 @@ $('#addpincode').on('input', function() {
   var pincode = pincodeInput.val().replace(/\D/g, ''); // Remove non-numeric characters
   pincodeInput.val(pincode); // Update input value
 
-  var isValid = /^[1-9]{4}$/.test(pincode);
+  var isValid = /^[0-9]{4}$/.test(pincode);
   if (!isValid) {
-      pincodeInput[0].setCustomValidity("Please enter a 4-digit number from 1 to 9.");
+      pincodeInput[0].setCustomValidity("Please enter a 4-digit number from 0 to 9.");
   } else {
       pincodeInput[0].setCustomValidity("");
   }
@@ -133,9 +133,9 @@ $('.newpin').on('input', function() {
   var pincode = pincodeInput.val().replace(/\D/g, ''); // Remove non-numeric characters
   pincodeInput.val(pincode); // Update input value
 
-  var isValid = /^[1-9]{4}$/.test(pincode);
+  var isValid = /^[0-9]{4}$/.test(pincode);
   if (!isValid) {
-      pincodeInput[0].setCustomValidity("Please enter a 4-digit number from 1 to 9.");
+      pincodeInput[0].setCustomValidity("Please enter a 4-digit number from 0 to 9.");
   } else {
       pincodeInput[0].setCustomValidity("");
   }
@@ -146,13 +146,15 @@ $('.plus').on('input', function() {
   var pincode = pincodeInput.val().replace(/\D/g, ''); // Remove non-numeric characters
   pincodeInput.val(pincode); // Update input value
 
-  var isValid = /^[1-9]{4}$/.test(pincode);
+  var isValid = /^[0-9]{4}$/.test(pincode);
   if (!isValid) {
-      pincodeInput[0].setCustomValidity("Please enter a 4-digit number from 1 to 9.");
+      pincodeInput[0].setCustomValidity("Please enter a 4-digit number from 0 to 9.");
   } else {
       pincodeInput[0].setCustomValidity("");
   }
 });
+
+
 
 
 

@@ -39,8 +39,29 @@ if (isset($_POST['name'])) {
 
 
 if (isset($_POST['updateupid'])) {
-    $sqlupdateup = "UPDATE `tbup` SET `name`='".$_POST['updatename']."' ,`email` ='".$_POST['updatemail']."' ,`pincode` ='".$_POST['updatepin']."' WHERE id='" . $_POST['updateupid'] . "'";
-    mysqli_query($db, $sqlupdateup);
+  // Sanitize the inputs
+  $updateid = $_POST['updateupid'];
+  $updatename = mysqli_real_escape_string($db, $_POST['updatename']);
+  $updatemail = mysqli_real_escape_string($db, $_POST['updatemail']);
+  $updatepin = mysqli_real_escape_string($db, $_POST['updatepin']);
+
+  // Check if the name, email, or pincode already exists (excluding the current record)
+  $checkQuery = "SELECT COUNT(*) AS count FROM `tbup` WHERE (`name` = '$updatename' OR `email` = '$updatemail' OR `pincode` = '$updatepin') AND id != '$updateid'";
+  $result = mysqli_query($db, $checkQuery);
+  $row = mysqli_fetch_assoc($result);
+
+  if ($row['count'] > 0) {
+      // A duplicate record exists
+      echo "<script>alert('Record with the same name, email or pincode already exists!');</script>";
+  } else {
+      // No duplication found, proceed with the update
+      $sqlupdateup = "UPDATE `tbup` SET `name`='$updatename', `email`='$updatemail', `pincode`='$updatepin' WHERE id='$updateid'";
+      if (mysqli_query($db, $sqlupdateup)) {
+          echo "<script>alert('Personnel updated successfully!');</script>";
+      } else {
+          echo "<script>alert('Error updating record!');</script>";
+      }
+  }
 }
 
 if (isset($_POST['activateid'])) {
@@ -275,6 +296,7 @@ $(document).ready(function() {
 </section>
 
 <script src="static/script.js"></script>
+<script src="static/swipe.js"></script>
 <!-- <script>
   $(document).ready(function() {
     $('#addpersonnelName').on('input', function() {

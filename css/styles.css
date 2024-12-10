@@ -427,16 +427,19 @@ body {
 @media screen and (max-width: 400px) {
   .sidebar {
     width: 240px;
+    transition: transform 0.3s ease; /* Smooth transition for sliding effect */
+    transform: translateX(0); /* Sidebar is initially open */
+  }
+
+  .sidebar.close {
+    width: 60px;
+    transform: translateX(-100%); /* Slide sidebar off-screen when closed */
   }
 
   .home-section {
     left: 0;
     width: 100%;
   }
-
-  /* .sidebar.close {
-    width: 60px;
-  } */
 
   .hamburger-icon {
     font-size: 25px;
@@ -451,3 +454,4 @@ body {
     font-size: 18px; /* Adjust icon size */
   }
 }
+
