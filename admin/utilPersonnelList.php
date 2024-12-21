@@ -9,34 +9,43 @@ if (!isset($_SESSION['loginid'])) {
     header("location: ../login.php");
 }
 
+$error = "";
+
 // if (isset($_POST['name'])) {
 //     $sqlinsert = "INSERT INTO `tbup`(`name`, `pincode`,`status`) VALUES ('" . $_POST['name'] . "','" . $_POST['pincode'] . "','inactive')";
 //     mysqli_query($db, $sqlinsert);
 // }
 
 if (isset($_POST['name'])) {
-  // Sanitize inputs to prevent SQL injection
-  $name = mysqli_real_escape_string($db, $_POST['name']);
-  $email = mysqli_real_escape_string($db, $_POST['email']);
-  $pincode = mysqli_real_escape_string($db, $_POST['pincode']);
-  
-  // Check if the name or pincode already exists
-  $checkQuery = "SELECT COUNT(*) AS count FROM `tbup` WHERE `name` = '$name' OR `email` = '$email' OR `pincode` = '$pincode'";
-  $result = mysqli_query($db, $checkQuery);
-  $row = mysqli_fetch_assoc($result);
-  $recordExists = $row['count'] > 0;
+    // Sanitize inputs to prevent SQL injection
+    $name = mysqli_real_escape_string($db, $_POST['name']);
+    $email = mysqli_real_escape_string($db, $_POST['email']);
+    $pincode = mysqli_real_escape_string($db, $_POST['pincode']);
 
-  if (!$recordExists) {
-      // Name and pincode combination doesn't exist, so insert it
-      $sqlinsert = "INSERT INTO `tbup`(`name`, `email`, `pincode`, `status`) VALUES ('$name', '$email', '$pincode', 'active')";
-      mysqli_query($db, $sqlinsert);
-  } else {
-      // Name or pincode already exists, handle this case accordingly
-      echo "<script>alert('Record with the same name, email or pincode already exists!!');</script>";
-      // Or you can redirect the user or perform other actions
-  }
+    // Check if the pincode is the default (7777)
+    if ($pincode == '7777') {
+        $error = "The pincode cannot be 7777, it is the default pincode!";
+    } else {
+        // Check if the name, email, or pincode already exists
+        $checkQuery = "SELECT COUNT(*) AS count FROM `tbup` WHERE `name` = '$name' OR `email` = '$email' OR `pincode` = '$pincode'";
+        $result = mysqli_query($db, $checkQuery);
+        $row = mysqli_fetch_assoc($result);
+        $recordExists = $row['count'] > 0;
+
+        if (!$recordExists) {
+            // Name, email, and pincode combination doesn't exist, so insert the record
+            $sqlinsert = "INSERT INTO `tbup`(`name`, `email`, `pincode`, `status`) VALUES ('$name', '$email', '$pincode', 'active')";
+            if (mysqli_query($db, $sqlinsert)) {
+              $success = "Record created successfully!";
+            } else {
+                $error = "Error creating record!";
+            }
+        } else {
+            // Name, email, or pincode already exists
+            $error = "Record with the same name, email, or pincode already exists!";
+        }
+    }
 }
-
 
 if (isset($_POST['updateupid'])) {
   // Sanitize the inputs
@@ -45,38 +54,77 @@ if (isset($_POST['updateupid'])) {
   $updatemail = mysqli_real_escape_string($db, $_POST['updatemail']);
   $updatepin = mysqli_real_escape_string($db, $_POST['updatepin']);
 
-  // Check if the name, email, or pincode already exists (excluding the current record)
-  $checkQuery = "SELECT COUNT(*) AS count FROM `tbup` WHERE (`name` = '$updatename' OR `email` = '$updatemail' OR `pincode` = '$updatepin') AND id != '$updateid'";
-  $result = mysqli_query($db, $checkQuery);
-  $row = mysqli_fetch_assoc($result);
-
-  if ($row['count'] > 0) {
-      // A duplicate record exists
-      echo "<script>alert('Record with the same name, email or pincode already exists!');</script>";
+  // Check if the pincode is the default pin (7777)
+  if ($updatepin == '7777') {
+      $error = "The pincode cannot be 7777, it is the default pincode!";
   } else {
-      // No duplication found, proceed with the update
-      $sqlupdateup = "UPDATE `tbup` SET `name`='$updatename', `email`='$updatemail', `pincode`='$updatepin' WHERE id='$updateid'";
-      if (mysqli_query($db, $sqlupdateup)) {
-          echo "<script>alert('Personnel updated successfully!');</script>";
+      // Check if the name, email, or pincode already exists (excluding the current record)
+      $checkQuery = "SELECT COUNT(*) AS count FROM `tbup` WHERE (`name` = '$updatename' OR `email` = '$updatemail' OR `pincode` = '$updatepin') AND id != '$updateid'";
+      $result = mysqli_query($db, $checkQuery);
+      $row = mysqli_fetch_assoc($result);
+
+      if ($row['count'] > 0) {
+          // A duplicate record exists
+          $error = "Record with the same name, email or pincode already exists!";
       } else {
-          echo "<script>alert('Error updating record!');</script>";
+          // No duplication found, proceed with the update
+          $sqlupdateup = "UPDATE `tbup` SET `name`='$updatename', `email`='$updatemail', `pincode`='$updatepin' WHERE id='$updateid'";
+          if (mysqli_query($db, $sqlupdateup)) {
+            $success = "Personnel updated successfully!";
+          } else {
+              $error = "Error updating record!";
+          }
       }
   }
 }
 
 if (isset($_POST['activateid'])) {
-    $sqlupdateup = "UPDATE `tbup` SET `status`='active' WHERE id='" . $_POST['activateid'] . "'";
-    mysqli_query($db, $sqlupdateup);
-}
-if (isset($_POST['deactivateid'])) {
-    $sqlupdateup = "UPDATE `tbup` SET `status`='inactive' WHERE id='" . $_POST['deactivateid'] . "'";
-    mysqli_query($db, $sqlupdateup);
+  // Function to generate a random 4-digit pincode
+  function generateRandomPin() {
+      return str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);  // Generates a 4-digit pin, e.g., 0421
+  }
+
+  // Initialize the pincode and check if it exists
+  $uniquePinFound = false;
+  $newPincode = '';
+  
+  while (!$uniquePinFound) {
+      // Generate a random pincode
+      $newPincode = generateRandomPin();
+      
+      // Check if the generated pincode already exists in the database
+      $checkPinQuery = "SELECT COUNT(*) AS count FROM `tbup` WHERE `pincode` = '$newPincode'";
+      $result = mysqli_query($db, $checkPinQuery);
+      $row = mysqli_fetch_assoc($result);
+      
+      // If the pincode doesn't exist in the table, we have a unique pincode
+      if ($row['count'] == 0) {
+          $uniquePinFound = true;  // Exit the loop
+      }
+  }
+
+  // Now that we have a unique pincode, proceed with the update
+  $activateid = mysqli_real_escape_string($db, $_POST['activateid']);
+  $sqlupdateup = "UPDATE `tbup` SET `status`='active', `pincode`='$newPincode' WHERE id='$activateid'";
+  
+  // Execute the query
+  if (mysqli_query($db, $sqlupdateup)) {
+      // echo "<script>alert('Record activated successfully with pincode: $newPincode');</script>";
+  } else {
+      echo "<script>alert('Error activating record!');</script>";
+  }
 }
 
-if (isset($_POST['deleteid'])) {
-    $sqldeletep= "DELETE FROM `tbup` WHERE id='" . $_POST['deleteid'] . "'";
-    mysqli_query($db, $sqldeletep);
+
+if (isset($_POST['deactivateid'])) {
+  $sqlupdateup = "UPDATE `tbup` SET `status`='inactive', `pincode`= '7777' WHERE id='" . $_POST['deactivateid'] . "'";
+  mysqli_query($db, $sqlupdateup);
 }
+
+// if (isset($_POST['deleteid'])) {
+//     $sqldeletep= "DELETE FROM `tbup` WHERE id='" . $_POST['deleteid'] . "'";
+//     mysqli_query($db, $sqldeletep);
+// }
 
 $sqlgetup = "SELECT id,name,email,pincode, status FROM `tbup`;";
 $listup = mysqli_query($db, $sqlgetup);
@@ -114,7 +162,7 @@ $listup = mysqli_query($db, $sqlgetup);
       <tr>
         <th>Name</th>
         <th>Email</th>
-        <th>Pincode</th>
+        <!-- <th>Pincode</th> -->
         <th>Action</th>
       </tr>
       <br>
@@ -128,12 +176,12 @@ $listup = mysqli_query($db, $sqlgetup);
         <td>
           <span class="email"><?php echo $data['email']; ?></span>
         </td>
-        <td>
+        <!-- <td>
             <span class="pincode"><?php echo $data['pincode']; ?></span>
             <button type="button" class="pinVisibility" style="border: none; background: transparent; padding: 0; margin-left: 10px;">
             <i class="bi bi-eye" style="font-size: 30px; display: inline-block;"></i>
             </button>
-        </td>
+        </td> -->
         <td>
           <!-- Edit Button -->
           <button type="button" class="btn btn-primary btn-sm editBtn bi bi-pencil-fill" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $data['id']?>"> Edit</button>
@@ -146,28 +194,31 @@ $listup = mysqli_query($db, $sqlgetup);
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
+                        <?php if ($error): ?>
+                          <div class="error alert alert-danger text-center" role="alert"><?php echo $error; ?></div>
+                      <?php endif; ?>
                             <!-- Edit Form -->
                             <form action="" method="POST">
                                 <input type="hidden" class="form-control" name ="updateupid" value="<?php echo $data['id']?>">
                                 <div class="mb-3">
-                                    <label for="personnelName1" class="form-label">Personnel</label>
+                                    <label for="personnelName1" class="form-label">Personnel:</label>
                                     <input type="text" class="form-control" id="personnelName1" name="updatename" value="<?php echo $data['name']?>" required>
                                 </div>
                                 <div class="mb-3">
-                                  <label for="email" class="form-label">Email</label>
+                                  <label for="email" class="form-label">Email:</label>
                                   <input type="email" name="updatemail" class="form-control" id="addpersonnelemail" value="<?php echo $data['email']?>" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="pincode1" class="form-label">Pincode</label>
+                                    <label for="pincode1" class="form-label">Pincode:</label>
                                     <!-- <input type="password" class="form-control" id="pincode1" name="updatepin" min="0" maxlength="4" value="<?php echo $data['pincode']?>" required> -->
 
                                     <div class="input-group">
-                                      <input type="password" class="form-control" id="addpincode" name="updatepin" min="0" maxlength="4" value="<?php echo $data['pincode']?>" required>
-                                      <!-- <div class="input-group-append">
-                                          <span class="input-group-text">
-                                              <i class="bi bi-eye" id="togglePassword"></i>
-                                          </span>
-                                      </div> -->
+                                    <input type="password" class="form-control addpincode" name="updatepin" min="0" maxlength="4" value="<?php echo $data['pincode']?>" required>
+                                      <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-eye togglePassword"></i>
+                                        </span>
+                                      </div>
                                     </div>
                                 </div>
                         </div>
@@ -180,9 +231,9 @@ $listup = mysqli_query($db, $sqlgetup);
                 </div>
             </div>
           <!-- Delete Button -->
-          <button type="button" class="btn btn-danger btn-sm deleteBtn bi bi-trash-fill" data-bs-toggle="modal" data-bs-target="#deleteModal<?php echo $data['id']?>"> Delete</button>
+          <!-- <button type="button" class="btn btn-danger btn-sm deleteBtn bi bi-trash-fill" data-bs-toggle="modal" data-bs-target="#deleteModal<?php echo $data['id']?>"> Delete</button> -->
             <!-- Delete Modals -->
-            <div class="modal fade" id="deleteModal<?php echo $data['id']?>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <!-- <div class="modal fade" id="deleteModal<?php echo $data['id']?>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -201,29 +252,78 @@ $listup = mysqli_query($db, $sqlgetup);
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
           <!-- Status Button -->
           <?php if($data['status'] =="inactive"){ ?>
-            <div class="status d-inline-block" >
-              <form method="post" action="">
-                <button id="toggleButton" class="btn btn-secondary btn-sm btn-icon" onclick="toggleState()">
-                  <i id="toggleIcon" class="bi bi-play-fill"><span id="toggleText">Inactive</span></i> <!-- Initial icon with text -->
-                    <input type="hidden" class="form-control" id="pincode1" name="activateid" value="<?php echo $data['id']?>">
-                </button>
-              </form>
+            <button id="toggleButton" class="btn btn-secondary btn-sm btn-icon" data-bs-toggle="modal" data-bs-target="#activeModal">
+              <i id="toggleIcon" class="bi bi-play-fill"><span id="toggleText">Inactive</span></i>
+            </button>
+
+            <!-- Active Modal -->
+            <div class="modal fade" id="activeModal" tabindex="-1" aria-labelledby="activeModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="activeModalLabel">Confirm Action for <span class="text-danger"><?php echo $data['name']?>?</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    Are you sure you want to change the status to <button id="toggleButton" class="btn btn-success btn-sm btn-icon" disabled>
+                        <i id="toggleIcon" class="bi bi-pause-fill"><span id="toggleText">Active</span></i>
+                    </button> ?
+                    <hr>
+                    <p class="mt-3 text-muted">
+                      <strong>Note:</strong> The activation will automatically generate a random pin that can be used by the utility personnel.
+                    </p>
+                    <!-- <p><span>&bull;</span> This action will change the status.</p>
+                    <p><span>&bull;</span> Ensure that this change is correct.</p> -->
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form method="post" action="">
+                      <button id="toggleButton" class="btn btn-primary btn-sm btn-icon" onclick="toggleState(event)">Confirm
+                        <input type="hidden" class="form-control" id="pincode1" name="activateid" value="<?php echo $data['id']?>">
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
             </div>
-            
-            <?php }else if($data['status'] =="active"){?>
-            
-            <div class="status d-inline-block" >
-              <form method="post" action="">
-                <button id="toggleButton" class="btn btn-success btn-sm btn-icon" onclick="toggleState()">
-                    <i id="toggleIcon" class="bi bi-pause-fill"><span id="toggleText">Active</span></i> <!-- Initial icon with text -->
-                    <input type="hidden" class="form-control" id="pincode1" name="deactivateid" value="<?php echo $data['id']?>">
-                </button>
-              </form>
+
+          <?php }else if($data['status'] =="active"){?>
+            <button id="toggleButton" class="btn btn-success btn-sm btn-icon" data-bs-toggle="modal" data-bs-target="#inactiveModal">
+                <i id="toggleIcon" class="bi bi-pause-fill"><span id="toggleText">Active</span></i>
+            </button>
+
+            <!-- Inactive Modal -->
+            <div class="modal fade" id="inactiveModal" tabindex="-1" aria-labelledby="inactiveModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="inactiveModalLabel">Confirm Action for <span class="text-danger"><?php echo $data['name']?>?</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    Are you sure you want to change the status to <button id="toggleButton" class="btn btn-secondary btn-sm btn-icon" disabled>
+                        <i id="toggleIcon" class="bi bi-play-fill"><span id="toggleText">Inactive</span></i>
+                    </button> ?
+                    <hr>
+                    <p class="mt-3 text-secondary">
+                      <strong>Note:</strong> The deactivation of the utility personnel will set the pincode to default and the previous pincode use will be usable again by other personnel.
+                    </p>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form method="post" action="">
+                      <button id="toggleButton" class="btn btn-primary btn-sm btn-icon" onclick="toggleState()">Confirm
+                          <input type="hidden" class="form-control" id="pincode1" name="deactivateid" value="<?php echo $data['id']?>">
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
             </div>
-            
+              
             <?php  } ?>
         </td>
       </tr>
@@ -242,26 +342,27 @@ $listup = mysqli_query($db, $sqlgetup);
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
+        <?php if ($error): ?>
+            <div class="error alert alert-danger text-center" role="alert"><?php echo $error; ?></div>
+        <?php endif; ?>
         <!-- Add Product Form -->
         <form id="addProductForm" method="post" action ="">
           <div class="mb-3">
-            <label for="productName" class="form-label">Name</label>
+            <label for="productName" class="form-label">Personnel:</label>
             <input type="text" name="name" class="form-control" id="addpersonnelName" placeholder="ex: Juan dela Cruz" required>
           </div>
           <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
+            <label for="email" class="form-label">Email:</label>
             <input type="email" name="email" class="form-control" id="addpersonnelemail" placeholder="ex: juandelacruz@gmail.com" required>
           </div>
           <div class="mb-3">
-            <!-- 
-            <input type="password" name="pincode" class="form-control" id="addpincode" placeholder="Enter 4 numbers"> -->
-            <label for="quantity" class="form-label">Pincode</label>
+            <label for="quantity" class="form-label">Pincode:</label>
             <div class="input-group">
               <input type="password" class="form-control newpin" id="pincode1" name="pincode" min="0" maxlength="4" placeholder="Create 4 digit pincode" required >
               <div class="input-group-append">
-                  <span class="input-group-text">
-                      <i class="bi bi-eye" id="togglePassword2"></i>
-                  </span>
+                <span class="input-group-text">
+                    <i class="bi bi-eye" id="togglePassword2"></i>
+                </span>
               </div>
             </div>
           </div>
@@ -274,6 +375,7 @@ $listup = mysqli_query($db, $sqlgetup);
     </div>
   </div>
 </div>
+
 </section>
 
 <!-- Bootstrap JS (jQuery is required) -->

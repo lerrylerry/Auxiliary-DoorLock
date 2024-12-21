@@ -59,8 +59,9 @@ if (isset($_POST['finalizerequest'])) {
     mysqli_query($db, $sqlupdatetransid);
 
     // Fetch user details (name and email) for sending the email
-    $sqlgetcu = "SELECT id, name, email FROM `tbup` WHERE id = '" . $_POST['finalizerequest'] . "';";
+    $sqlgetcu = "SELECT id, name, email FROM `tbup` WHERE id = '" . $_POST['finalizerequest'] . "' AND pincode != '7777';";
     $listcu = mysqli_fetch_assoc(mysqli_query($db, $sqlgetcu));
+
 
     // Fetch the list of items the user has borrowed
     $sqlgetitems = "SELECT tbproductlist.name, tbpendingborrow.borrowqty 

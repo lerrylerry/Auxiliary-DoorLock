@@ -25,18 +25,6 @@
     color: #9e1b32;
 }
 
-/* Ensure modal labels are left-aligned */
-.modal-body .form-label .namezzz {
-    text-align: left !important;
-    font-weight: bold;
-}
-
-/* Ensure form controls take the full width */
-.modal-body .form-control, 
-.modal-body .form-select {
-    width: 100%;
-}
-
 /* Adjust modal dialog and content styling */
 .modal-dialog-centered {
     display: flex;
@@ -155,4 +143,12 @@ table.dataTable {
 
 .fa-eye {
     cursor: pointer;
+}
+
+/* Align the label text to the left in the modal */
+.modal-body .form-label {
+    text-align: left; /* Align text to the left */
+    display: block; /* Make label a block-level element */
+    width: 100%; /* Ensure label takes up full width */
+    margin-bottom: 8px; /* Adds spacing between label and input */
 }

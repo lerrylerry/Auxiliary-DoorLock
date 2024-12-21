@@ -102,8 +102,9 @@ $('#pincode1').on('input', function() {
   }
 });
 
-$('#togglePassword').click(function() {
-  var passwordInput = $('#addpincode');
+// Use class selectors to apply the function to all rows
+$('.togglePassword').click(function() {
+  var passwordInput = $(this).closest('.input-group').find('.addpincode'); // Find the input within the same group
   var icon = $(this);
 
   if (passwordInput.attr('type') === 'password') {
@@ -114,6 +115,7 @@ $('#togglePassword').click(function() {
       icon.removeClass('bi-eye-slash').addClass('bi-eye');
   }
 });
+
 
 $('#addpincode').on('input', function() {
   var pincodeInput = $(this);

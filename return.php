@@ -170,7 +170,7 @@ if (isset($_POST['delete'])) {
 $sqlgetitems = "SELECT tbproductlist.*,tbpendingreturn.* FROM tbpendingreturn LEFT JOIN tbproductlist ON tbpendingreturn.itemid = tbproductlist.id WHERE userid = '" . $_GET['userid'] . "' AND returningqty != 0;";
 $listresult = mysqli_query($db, $sqlgetitems);
 
-$sqlgetcu = "SELECT id,name,pincode,status FROM `tbup` WHERE id ='" . $_GET['userid'] . "';";
+$sqlgetcu = "SELECT id,name,pincode,status FROM `tbup` WHERE id ='" . $_GET['userid'] . "' AND pincode != '7777';";
 $listcu = mysqli_fetch_assoc(mysqli_query($db, $sqlgetcu));
 
 // return------------------------------------------------------------------------------------------------------
