@@ -3,24 +3,36 @@
 require('dbcred/db.php');
 
 if (isset($_GET['pincode'])) {
-    $sqlgetpin = "SELECT name,status from tbup WHERE pincode = '" . $_GET['pincode'] . "' AND dooraccess ='Approved'";
-    $sqlnullpin = "UPDATE `tbup` SET `dooraccess` = NULL WHERE pincode = '" .  $_GET['pincode'] . "'";
+    // Prepare SQL to get the pincode details from tbup
+    $sqlgetpin = "SELECT name, status FROM tbup WHERE pincode = '" . $_GET['pincode'] . "' AND dooraccess = 'Approved'";
+    $sqlnullpin = "UPDATE tbup SET dooraccess = NULL WHERE pincode = '" . $_GET['pincode'] . "'";
+
+    // Query the tbup table
     $result = mysqli_query($db, $sqlgetpin);
     $nullpin = mysqli_query($db, $sqlnullpin);
     $data = mysqli_fetch_array($result);
 
-    if (!empty($data)) {
-        echo "startname;" . $data [0] . ";endname;startstatus;" . $data [1] . ";endstatus;";
+    // If no result is found with the given pincode in tbup
+    if (empty($data)) {
+        // Query the tbparser table to get the dynamic 'master' value for id = 1
+        $sqlMaster = "SELECT master FROM tbparser WHERE id = 1";
+        $resultMaster = mysqli_query($db, $sqlMaster);
 
-    } else {
-	if (($_GET['pincode']) === "0000") {
-	    echo "startname;Master;endname;startstatus;active;endstatus;";
-	} else {
+        // If a result is found for the 'master' value in tbparser
+        if ($resultMaster && mysqli_num_rows($resultMaster) > 0) {
+            $row = mysqli_fetch_assoc($resultMaster);
+            $masterName = $row['master']; // Get the 'master' value from tbparser
+
+            // Output the dynamic values
+            echo "startname;{$masterName};endname;startstatus;active;endstatus;";
+        } else {
+            // In case there's no 'master' in tbparser, return a no result message
             echo "nothing;noresult";
- 	 }
-	}
+        }
+    } else {
+        // If data is found for the given pincode, return the name and status from tbup
+        echo "startname;" . $data[0] . ";endname;startstatus;" . $data[1] . ";endstatus;";
+    }
 }
-
-
 
 ?>

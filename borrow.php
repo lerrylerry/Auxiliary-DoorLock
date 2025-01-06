@@ -43,106 +43,142 @@ if (isset($_POST['additem'])) {
 
 // Handle finalizing the borrow request
 if (isset($_POST['finalizerequest'])) {
-    // Insert the borrow request into tbborrow table
-    $sqlsubmitrequest = "INSERT INTO `tbborrow`(`userid`, `status`) 
-                         VALUES ('" . $_POST['finalizerequest'] . "','Pending')";
-    mysqli_query($db, $sqlsubmitrequest);
+    // Get the user ID from the POST data
+    $userId = $_POST['finalizerequest'];
 
-    // Get the transaction ID of the borrow request
-    $transid = mysqli_insert_id($db);
+    // Check if there are any pending borrow items for the user in tbpendingborrow
+    $sqlCheckPending = "SELECT COUNT(*) AS count FROM `tbpendingborrow` WHERE `userid` = '$userId' AND `transid` = '0'";
+    $resultCheckPending = mysqli_query($db, $sqlCheckPending);
+    $row = mysqli_fetch_assoc($resultCheckPending);
 
-    // Update pending borrow items with the transaction ID
-    $sqlupdatetransid = "UPDATE `tbpendingborrow` 
-                         SET `transid` = '$transid' 
-                         WHERE userid = '" . $_POST['finalizerequest'] . "' 
-                         AND transid = '0'";
-    mysqli_query($db, $sqlupdatetransid);
-
-    // Fetch user details (name and email) for sending the email
-    $sqlgetcu = "SELECT id, name, email FROM `tbup` WHERE id = '" . $_POST['finalizerequest'] . "' AND pincode != '7777';";
-    $listcu = mysqli_fetch_assoc(mysqli_query($db, $sqlgetcu));
-
-
-    // Fetch the list of items the user has borrowed
-    $sqlgetitems = "SELECT tbproductlist.name, tbpendingborrow.borrowqty 
-                    FROM tbpendingborrow 
-                    LEFT JOIN tbproductlist ON tbpendingborrow.itemid = tbproductlist.id 
-                    WHERE tbpendingborrow.userid = '" . $_POST['finalizerequest'] . "' 
-                    AND tbpendingborrow.transid = '$transid'";
-    $itemsresult = mysqli_query($db, $sqlgetitems);
-
-    // Prepare user email content
-    $emailContent = "Dear " . $listcu['name'] . ",\n\n";
-    $emailContent .= "Your borrow request has been now processed.";
-
-    $emailContent .= "\nThank you for using our service.\n\nBest regards,\nTUP Auxiliary System";
-
-    // Send email to the user
-    try {
-        $mail = new PHPMailer(true);
-        // Server settings
-        $mail->SMTPDebug = 0;
-        $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';
-        $mail->SMTPAuth = true;
-        $mail->Username = 'projxacts12@gmail.com';
-        $mail->Password = 'vdbwgupzfybcixsk'; // Use an App password for security
-        $mail->SMTPSecure = 'tls';
-        $mail->Port = 587;
-
-        // Recipients
-        $mail->setFrom('projxacts12@gmail.com', 'TUP Auxiliary System');
-        $mail->addAddress($listcu['email'], $listcu['name']);
-
-        // Email content
-        $mail->isHTML(false);
-        $mail->Subject = 'Borrow Request Confirmation';
-        $mail->Body = $emailContent;
-
-        // Send email
-        $mail->send();
-
-        // Set success message for the user
-        $message = "Your borrow request has been successfully submitted!";
-        $modalType = "success"; // Set modal type to success
-    } catch (Exception $e) {
-        $message = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+    // If there are no pending borrow items, do nothing and exit
+    if ($row['count'] == 0) {
+        $message = "No pending borrow items found for this user.";
         $modalType = "error"; // Set modal type to error
+        header("Location: borrowANDreturn.php");
+        exit();
     }
 
-    // Fetch admin's email (assuming the admin's id is 1)
-    $sqlgetAdminEmail = "SELECT email FROM tbadmin WHERE id = 1";
-    $adminResult = mysqli_query($db, $sqlgetAdminEmail);
-    $adminEmailData = mysqli_fetch_assoc($adminResult);
-    $adminEmail = $adminEmailData['email'];
+    // Insert the borrow request into tbborrow table
+    $sqlsubmitrequest = "INSERT INTO `tbborrow`(`userid`, `status`) 
+                         VALUES ('$userId', 'Pending')";
+    $insertResult = mysqli_query($db, $sqlsubmitrequest);
 
-    // Prepare the admin's email content
-    $adminEmailContent = "Dear Admin,\n\n";
-    $adminEmailContent .= "You have received a new borrow request " . $listcu['name'];
+    // Check if the borrow request was successfully inserted
+    if ($insertResult) {
+        // Get the transaction ID of the borrow request
+        $transid = mysqli_insert_id($db);
 
-    // Reset itemsresult query to get borrow items again
-    $itemsresult = mysqli_query($db, $sqlgetitems);
+        // Update pending borrow items with the transaction ID
+        $sqlupdatetransid = "UPDATE `tbpendingborrow` 
+                             SET `transid` = '$transid' 
+                             WHERE `userid` = '$userId' 
+                             AND `transid` = '0'";
+        $updateResult = mysqli_query($db, $sqlupdatetransid);
 
-    $adminEmailContent .= "\nTo review the borrow the request, please visit the following link:\n";
-    $adminEmailContent .= "<p><a href='https://tupcauxiliary.com/Auxiliary/admin/borrowedItems.php'>Click here to view the request.</a></p>";
-    $adminEmailContent .= "Thank you,\nTUP Auxiliary System";
+        // Check if the transaction ID was successfully updated in tbpendingborrow
+        if ($updateResult && mysqli_affected_rows($db) > 0) {
+            // Fetch user details (name and email) for sending the email
+            $sqlgetcu = "SELECT id, name, email FROM `tbup` WHERE id = '$userId' AND pincode != '7777';";
+            $listcu = mysqli_fetch_assoc(mysqli_query($db, $sqlgetcu));
 
-    // Send email to admin
-    try {
-        $mail->clearAddresses();
-        $mail->addAddress($adminEmail, 'Admin');
-        $mail->Subject = 'New Borrow Request Submitted';
-        $mail->Body = $adminEmailContent;
+            // Fetch the list of items the user has borrowed
+            $sqlgetitems = "SELECT tbproductlist.name, tbpendingborrow.borrowqty 
+                            FROM tbpendingborrow 
+                            LEFT JOIN tbproductlist ON tbpendingborrow.itemid = tbproductlist.id 
+                            WHERE tbpendingborrow.userid = '$userId' 
+                            AND tbpendingborrow.transid = '$transid'";
+            $itemsresult = mysqli_query($db, $sqlgetitems);
 
-        // Send email
-        $mail->send();
-    } catch (Exception $e) {
-        $message = "Message could not be sent to admin. Mailer Error: {$mail->ErrorInfo}";
+            // Check if the user actually borrowed items
+            if (mysqli_num_rows($itemsresult) > 0) {
+                // Prepare user email content
+                $emailContent = "Dear " . $listcu['name'] . ",\n\n";
+                $emailContent .= "Your borrow request has been processed successfully.";
+
+                $emailContent .= "\nThank you for using our service.\n\nBest regards,\nTUP Auxiliary System";
+
+                // Send email to the user
+                try {
+                    $mail = new PHPMailer(true);
+                    // Server settings
+                    $mail->SMTPDebug = 0;
+                    $mail->isSMTP();
+                    $mail->Host = 'smtp.gmail.com';
+                    $mail->SMTPAuth = true;
+                    $mail->Username = 'projxacts12@gmail.com';
+                    $mail->Password = 'vdbwgupzfybcixsk'; // Use an App password for security
+                    $mail->SMTPSecure = 'tls';
+                    $mail->Port = 587;
+
+                    // Recipients
+                    $mail->setFrom('projxacts12@gmail.com', 'TUP Auxiliary System');
+                    $mail->addAddress($listcu['email'], $listcu['name']);
+
+                    // Email content
+                    $mail->isHTML(false);
+                    $mail->Subject = 'Borrow Request Confirmation';
+                    $mail->Body = $emailContent;
+
+                    // Send email
+                    $mail->send();
+
+                    // Set success message for the user
+                    $message = "Your borrow request has been successfully submitted!";
+                    $modalType = "success"; // Set modal type to success
+                } catch (Exception $e) {
+                    $message = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+                    $modalType = "error"; // Set modal type to error
+                }
+
+                // Fetch admin's email (assuming the admin's id is 1)
+                $sqlgetAdminEmail = "SELECT email FROM tbadmin WHERE id = 1";
+                $adminResult = mysqli_query($db, $sqlgetAdminEmail);
+                $adminEmailData = mysqli_fetch_assoc($adminResult);
+                $adminEmail = $adminEmailData['email'];
+
+                // Prepare the admin's email content
+                $adminEmailContent = "Dear Admin,\n\n";
+                $adminEmailContent .= "You have received a new borrow request from " . $listcu['name'];
+
+                // Reset itemsresult query to get borrow items again
+                $itemsresult = mysqli_query($db, $sqlgetitems);
+
+                $adminEmailContent .= "\nTo review the borrow request, please visit the following link:\n";
+                $adminEmailContent .= "<p><a href='https://tupcauxiliary.com/Auxiliary/admin/borrowedItems.php'>Click here to view the request.</a></p>";
+                $adminEmailContent .= "Thank you,\nTUP Auxiliary System";
+
+                // Send email to admin
+                try {
+                    $mail->clearAddresses();
+                    $mail->addAddress($adminEmail, 'Admin');
+                    $mail->Subject = 'New Borrow Request Submitted';
+                    $mail->Body = $adminEmailContent;
+
+                    // Send email
+                    $mail->send();
+                } catch (Exception $e) {
+                    $message = "Message could not be sent to admin. Mailer Error: {$mail->ErrorInfo}";
+                    $modalType = "error"; // Set modal type to error
+                }
+            } else {
+                // Handle the case where no items were borrowed
+                $message = "No items were borrowed. The transaction was not processed.";
+                $modalType = "error"; // Set modal type to error
+            }
+        } else {
+            // Handle failed transaction update (if needed)
+            $message = "There was an error processing your borrow request.";
+            $modalType = "error"; // Set modal type to error
+        }
+    } else {
+        // Handle failed insert (if needed)
+        $message = "There was an error inserting your borrow request.";
         $modalType = "error"; // Set modal type to error
     }
 
     // Redirect after showing the modal
-    header("Location: borrowANDreturn.php");
+    header("Location: borrow-success.php");
     exit();
 }
 
@@ -159,6 +195,9 @@ $sqlgetitems = "SELECT tbproductlist.*, tbpendingborrow.*
                 WHERE userid = '" . $_GET['userid'] . "' 
                 AND transid = '0';";
 $listresult = mysqli_query($db, $sqlgetitems);
+
+// Check if there are any results
+$hasPendingItems = mysqli_num_rows($listresult) > 0 ? 'true' : 'false'; // 'true' if there are results, 'false' otherwise
 
 // Fetch user details
 $sqlgetcu = "SELECT id, name, pincode, status, email FROM `tbup` WHERE id ='" . $_GET['userid'] . "';";
@@ -247,9 +286,9 @@ $listp = mysqli_query($db, $sqlgetp);
                             <td><?php echo $data['quantity'] ?><span class="text-danger"> (-<?php echo $data['borrowqty'] ?>) </span></td>
                             <td><?php echo $data['unit'] ?></td>
                             <td>
-                                <form action="" method="POST">
+                                <form action="" method="POST" id="deleteit">
                                     <input type="hidden" value="<?php echo $data['id']; ?>" name="delete">
-                                    <button type="submit" class="btn btn-danger mb-1">Delete</button>
+                                    <button type="submit" class="btn btn-danger mb-1" id="deleted">Delete</button>
                                 </form>
                             </td>
                         </tr>
@@ -268,7 +307,7 @@ $listp = mysqli_query($db, $sqlgetp);
                         <option value="">- Select -</option>
                         <?php while ($data = mysqli_fetch_assoc($listp)) { ?>
                             <option value="<?php echo $data['id'] ?>" data-quantity="<?php echo $data['quantity'] ?>">
-                                <?php echo $data['name'] ?> | <?php echo $data['unit'] ?>: <?php echo $data['quantity'] ?>
+                                <?php echo $data['name'] ?> | <?php echo $data['unit'] ?>
                             </option>
                         <?php } ?>
                     </select>
@@ -291,11 +330,13 @@ $listp = mysqli_query($db, $sqlgetp);
 
         <!-- Submit Button -->
         <div class="submitBtn mx-auto mt-4">
-            <form method="post" action="">
+            <form method="post" action="" id="borrowForm">
                 <input type="hidden" class="form-control" value="<?php echo $_GET['userid']; ?>" name="finalizerequest" required>
-                <button type="submit" class="borrow-submit w-100">Submit</button>
+                <button type="submit" class="borrow-submit w-100" id="submitBtn">Submit</button>
             </form>
         </div>
+
+
     </div>
 </div>
 
@@ -362,6 +403,53 @@ $(document).ready(function() {
     <?php } ?>
 });
 </script>
+
+<script>
+$(document).ready(function() {
+    $("#borrowForm").on("submit", function() {
+        // Disable the submit button functionality
+        $("#submitBtn").prop("disabled", true);
+
+        // Add a class to change the appearance
+        $("#submitBtn").addClass("disabled-button");
+
+        // Optionally, change the button text
+        $("#submitBtn").text("Processing..."); 
+
+        // Disable the submit button functionality
+        $("#deleted").prop("disabled", true);
+
+        // Add a class to change the appearance
+        $("#deleted").addClass("disabled-button");
+
+        // Disable the submit button functionality
+        $("#add").prop("disabled", true);
+
+        // Add a class to change the appearance
+        $("#add").addClass("disabled-button");
+    });
+});
+</script>
+
+<script>
+    $(document).ready(function() {
+        // Get the PHP result and convert it to boolean
+        var hasPendingItems = <?php echo $hasPendingItems == 'true' ? 'true' : 'false'; ?>;
+        
+        // Enable or disable the button based on hasPendingItems value
+        $('#submitBtn').prop('disabled', !hasPendingItems);
+    });
+</script>
+
+
+<style>
+/* This is the class that will visually disable the button */
+.disabled-button {
+    background-color: #cccccc; /* Change to a lighter color */
+    color: #666666; /* Light text color */
+    cursor: not-allowed; /* Change the cursor to indicate disabled */
+}
+</style>
 
 </body>
 </html>

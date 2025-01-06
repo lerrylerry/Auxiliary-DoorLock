@@ -69,7 +69,14 @@ $(document).ready(function(){
     if (pincodeInput.length > 4) {
         $(this).val(pincodeInput.slice(0, 4));
     }
-});
+  });
+
+  $("#masterpincode").on("input", function() {
+    let pincodeInput = $(this).val();
+    if (pincodeInput.length > 4) {
+        $(this).val(pincodeInput.slice(0, 4));
+    }
+  });
 
 
 $('#togglePassword2').on("click",function() {
@@ -102,6 +109,19 @@ $('#pincode1').on('input', function() {
   }
 });
 
+$('#pincode2').on('input', function() {
+  var pincodeInput = $(this);
+  var pincode = pincodeInput.val().replace(/\D/g, ''); // Remove non-numeric characters
+  pincodeInput.val(pincode); // Update input value
+
+  var isValid = /^[0-9]{4}$/.test(pincode);
+  if (!isValid) {
+      pincodeInput[0].setCustomValidity("Please enter a 4-digit number from 0 to 9.");
+  } else {
+      pincodeInput[0].setCustomValidity("");
+  }
+});
+
 // Use class selectors to apply the function to all rows
 $('.togglePassword').click(function() {
   var passwordInput = $(this).closest('.input-group').find('.addpincode'); // Find the input within the same group
@@ -112,6 +132,22 @@ $('.togglePassword').click(function() {
       icon.removeClass('bi-eye').addClass('bi-eye-slash');
   } else {
       passwordInput.attr('type', 'password');
+      icon.removeClass('bi-eye-slash').addClass('bi-eye');
+  }
+});
+$('#togglePassword3').on("click",function() {
+  var passwordInput2 = $(".masterpincode");
+  var icon = $(this);
+
+  if (passwordInput2.attr('type') === 'password') {
+      console.log("hapihapi")
+      passwordInput2.attr('type', 'text');
+      console.log("sad")
+      icon.removeClass('bi-eye').addClass('bi-eye-slash');
+  } else {
+      console.log("hai")
+      passwordInput2.attr('type', 'password');
+      console.log("sadsad")
       icon.removeClass('bi-eye-slash').addClass('bi-eye');
   }
 });

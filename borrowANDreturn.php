@@ -20,7 +20,7 @@ if (isset($_POST['loginupid'])) {
             header("location: borrow.php?userid=".$verify['id']);
             exit();
         } else {
-            $error = "Incorrect pincode.";
+            $error = "Incorrect pincode";
         }
     }
 }

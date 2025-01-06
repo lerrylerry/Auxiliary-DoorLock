@@ -156,7 +156,7 @@ if (isset($_POST['finalizerequest'])) {
     }
 
     // Redirect after showing the modal
-    header("Location: borrowANDreturn.php");
+    header("Location: return-success.php");
     exit();
 }
 
@@ -169,6 +169,9 @@ if (isset($_POST['delete'])) {
 
 $sqlgetitems = "SELECT tbproductlist.*,tbpendingreturn.* FROM tbpendingreturn LEFT JOIN tbproductlist ON tbpendingreturn.itemid = tbproductlist.id WHERE userid = '" . $_GET['userid'] . "' AND returningqty != 0;";
 $listresult = mysqli_query($db, $sqlgetitems);
+
+// Check if there are any results
+$hasPendingItems = mysqli_num_rows($listresult) > 0 ? 'true' : 'false'; // 'true' if there are results, 'false' otherwise
 
 $sqlgetcu = "SELECT id,name,pincode,status FROM `tbup` WHERE id ='" . $_GET['userid'] . "' AND pincode != '7777';";
 $listcu = mysqli_fetch_assoc(mysqli_query($db, $sqlgetcu));
@@ -201,7 +204,7 @@ $listp = mysqli_query($db, $sqlgetp);
 
     <link rel="stylesheet" href="css/borrow&return.css">
 
-    <title>Auxiliary | Borrow/Request</title>
+    <title>Auxiliary | Return/Request</title>
 </head>
 <body>
 <!-- Navbar -->
@@ -266,7 +269,7 @@ $listp = mysqli_query($db, $sqlgetp);
                             <td>
                                 <form action="" method="POST">
                                     <input type="hidden" value="<?php echo $data['id']; ?>" name="delete">
-                                    <button type="submit" class="btn btn-danger mb-1">Delete</button>
+                                    <button type="submit" class="btn btn-danger mb-1" id="deleted">Delete</button>
                                 </form>
                             </td>
                         </tr>
@@ -278,31 +281,33 @@ $listp = mysqli_query($db, $sqlgetp);
         <!-- Add Item Section -->
         <form method="post" action="" class="mt-4">
             <div class="row mb-3">
-                <div class="col-4">
+                <div class="col-md-6">
                     <label for="unitDropdown" class="borrow-label small-label">Items:</label>
                     <select id="unitDropdown" name="additem" class="form-select" required>
                         <option value="">- Select -</option>
                         <?php while ($data = mysqli_fetch_assoc($listp)) { ?>
-                            <option value="<?php echo $data['id'] ?>" data-quantity="<?php echo $data['quantity'] ?>"><?php echo $data['name'] ?> | <?php echo $data['unit'] ?>: <?php echo $data['borrowqty'] ?></option>
+                            <option value="<?php echo $data['id'] ?>" data-quantity="<?php echo $data['quantity'] ?>"><?php echo $data['name'] ?> | <?php echo $data['unit'] ?></option>
                         <?php } ?>
                     </select>
                 </div>
-                <div class="col-4">
+                <div class="col-md-6">
                     <label for="quantity" class="borrow-label small-label">Quantity:</label>
                     <input class="form-control" type="number" id="quantity" name="qty" placeholder="Enter quantity" required>
                 </div>
-                <div class="col-4">
-                    <br>
-                    <button type="submit" id="add" class="btn btn-danger">Add</button>
+            </div>
+            <!-- Add Button below Quantity -->
+            <div class="row">
+                <div class="col-md-6 offset-md-6 d-flex justify-content-end">
+                    <button type="submit" id="add" class="btn btn-primary w-50">Add</button>
                 </div>
             </div>
         </form>
 
         <!-- Submit Button -->
         <div class="submitBtn mx-auto mt-4">
-            <form method="post" action="">
+            <form method="post" action="" id="returnForm">
                 <input type="hidden" class="form-control" value="<?php echo $_GET['userid']; ?>" name="finalizerequest" required>
-                <button type="submit" class="borrow-submit w-100">Submit</button>
+                <button type="submit" class="borrow-submit w-100" id="submitBtn">Submit</button>
             </form>
         </div>
     </div>
@@ -357,6 +362,7 @@ $listp = mysqli_query($db, $sqlgetp);
     });
 });
 </script>
+
 <script>
 $(document).ready(function() {
     // Check if there's a message to show
@@ -369,5 +375,51 @@ $(document).ready(function() {
     <?php } ?>
 });
 </script>
+
+<script>
+$(document).ready(function() {
+    $("#returnForm").on("submit", function() {
+        // Disable the submit button functionality
+        $("#submitBtn").prop("disabled", true);
+
+        // Add a class to change the appearance
+        $("#submitBtn").addClass("disabled-button");
+
+        // Optionally, change the button text
+        $("#submitBtn").text("Processing..."); 
+
+        // Disable the submit button functionality
+        $("#deleted").prop("disabled", true);
+
+        // Add a class to change the appearance
+        $("#deleted").addClass("disabled-button");
+
+        // Disable the submit button functionality
+        $("#add").prop("disabled", true);
+
+        // Add a class to change the appearance
+        $("#add").addClass("disabled-button");
+    });
+});
+</script>
+
+<script>
+    $(document).ready(function() {
+        // Get the PHP result and convert it to boolean
+        var hasPendingItems = <?php echo $hasPendingItems == 'true' ? 'true' : 'false'; ?>;
+        
+        // Enable or disable the button based on hasPendingItems value
+        $('#submitBtn').prop('disabled', !hasPendingItems);
+    });
+</script>
+
+<style>
+/* This is the class that will visually disable the button */
+.disabled-button {
+    background-color: #cccccc; /* Change to a lighter color */
+    color: #666666; /* Light text color */
+    cursor: not-allowed; /* Change the cursor to indicate disabled */
+}
+</style>
 </body>
 </html>

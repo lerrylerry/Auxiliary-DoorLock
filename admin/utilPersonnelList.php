@@ -9,42 +9,85 @@ if (!isset($_SESSION['loginid'])) {
     header("location: ../login.php");
 }
 
-$error = "";
+$statusMessage = "";
+$modalTitle = "";
 
-// if (isset($_POST['name'])) {
-//     $sqlinsert = "INSERT INTO `tbup`(`name`, `pincode`,`status`) VALUES ('" . $_POST['name'] . "','" . $_POST['pincode'] . "','inactive')";
-//     mysqli_query($db, $sqlinsert);
-// }
+if (isset($_POST['addnewpersonnel'])) {
+  // Sanitize inputs to prevent SQL injection
+  $name = mysqli_real_escape_string($db, $_POST['name']);
+  $email = mysqli_real_escape_string($db, $_POST['email']);
+  $pincode = mysqli_real_escape_string($db, $_POST['pincode']);
 
-if (isset($_POST['name'])) {
-    // Sanitize inputs to prevent SQL injection
-    $name = mysqli_real_escape_string($db, $_POST['name']);
-    $email = mysqli_real_escape_string($db, $_POST['email']);
-    $pincode = mysqli_real_escape_string($db, $_POST['pincode']);
+  // Check if the pincode is the default (7777)
+  if ($pincode == '7777') {
+      $statusMessage = "The pincode cannot be 7777, it is the default pincode!";
+      $modalTitle = "Error";
+  } else {
+      // Check if the pincode already exists in tbparser (master pincode)
+      $checkMasterPincodeQuery = "SELECT COUNT(*) AS count FROM `tbparser` WHERE `pincode` = '$pincode'";
+      $masterPincodeResult = mysqli_query($db, $checkMasterPincodeQuery);
+      $masterPincodeRow = mysqli_fetch_assoc($masterPincodeResult);
+      if ($masterPincodeRow['count'] > 0) {
+          // If the pincode already exists in tbparser, show error
+          $statusMessage = "The pincode is already used as the master pincode and cannot be reused!";
+          $modalTitle = "Error";
+      } else {
+          // Check if the name, email, or pincode already exists in tbup
+          $checkQuery = "SELECT COUNT(*) AS count FROM `tbup` WHERE `name` = '$name' OR `email` = '$email' OR `pincode` = '$pincode'";
+          $result = mysqli_query($db, $checkQuery);
+          $row = mysqli_fetch_assoc($result);
+          $recordExists = $row['count'] > 0;
 
-    // Check if the pincode is the default (7777)
-    if ($pincode == '7777') {
-        $error = "The pincode cannot be 7777, it is the default pincode!";
-    } else {
-        // Check if the name, email, or pincode already exists
-        $checkQuery = "SELECT COUNT(*) AS count FROM `tbup` WHERE `name` = '$name' OR `email` = '$email' OR `pincode` = '$pincode'";
-        $result = mysqli_query($db, $checkQuery);
-        $row = mysqli_fetch_assoc($result);
-        $recordExists = $row['count'] > 0;
+          if (!$recordExists) {
+              // Name, email, and pincode combination doesn't exist, so insert the record
+              $sqlinsert = "INSERT INTO `tbup`(`name`, `email`, `pincode`, `status`) VALUES ('$name', '$email', '$pincode', 'active')";
+              if (mysqli_query($db, $sqlinsert)) {
+                  $statusMessage = "Record created successfully!";
+                  $modalTitle = "Success";
+              } else {
+                  $statusMessage = "Error creating record!";
+                  $modalTitle = "Error";
+              }
+          } else {
+              // Name, email, or pincode already exists in tbup
+              $statusMessage = "Record with the same name, email, or pincode already exists!";
+              $modalTitle = "Error";
+          }
+      }
+  }
+}
 
-        if (!$recordExists) {
-            // Name, email, and pincode combination doesn't exist, so insert the record
-            $sqlinsert = "INSERT INTO `tbup`(`name`, `email`, `pincode`, `status`) VALUES ('$name', '$email', '$pincode', 'active')";
-            if (mysqli_query($db, $sqlinsert)) {
-              $success = "Record created successfully!";
-            } else {
-                $error = "Error creating record!";
-            }
-        } else {
-            // Name, email, or pincode already exists
-            $error = "Record with the same name, email, or pincode already exists!";
-        }
-    }
+if (isset($_POST['editmasterpin'])) {
+  // Sanitize inputs to prevent SQL injection
+  $pincode = mysqli_real_escape_string($db, $_POST['pincodes']);
+
+  // Check if the pincode is the default (7777)
+  if ($pincode == '7777') {
+      $statusMessage = "The master pincode cannot be 7777, it is the default pincode for utility personnel!";
+      $modalTitle = "Error";
+  } else {
+      // Check if the pincode already exists
+      $checkQuery = "SELECT COUNT(*) AS count FROM `tbup` WHERE `pincode` = '$pincode'";
+      $result = mysqli_query($db, $checkQuery);
+      $row = mysqli_fetch_assoc($result);
+      $recordExists = $row['count'] > 0;
+
+      if (!$recordExists) {
+          // Pincode doesn't exist, so update the master pincode
+          $sqlupdate = "UPDATE `tbparser` SET `pincode` = '$pincode' WHERE `id` = 1";
+          if (mysqli_query($db, $sqlupdate)) {
+            $statusMessage = "Master Pincode has been changed!";
+            $modalTitle = "Success";
+          } else {
+              $statusMessage = "Error updating master pincode!";
+              $modalTitle = "Error";
+          }
+      } else {
+          // Pincode already exists in the `tbup` table
+          $statusMessage = "The pincode is already in use by utility personnel!";
+          $modalTitle = "Error";
+      }
+  }
 }
 
 if (isset($_POST['updateupid'])) {
@@ -56,23 +99,37 @@ if (isset($_POST['updateupid'])) {
 
   // Check if the pincode is the default pin (7777)
   if ($updatepin == '7777') {
-      $error = "The pincode cannot be 7777, it is the default pincode!";
+      $statusMessage = "The pincode cannot be 7777, it is the default pincode!";
+      $modalTitle = "Error";
   } else {
-      // Check if the name, email, or pincode already exists (excluding the current record)
-      $checkQuery = "SELECT COUNT(*) AS count FROM `tbup` WHERE (`name` = '$updatename' OR `email` = '$updatemail' OR `pincode` = '$updatepin') AND id != '$updateid'";
-      $result = mysqli_query($db, $checkQuery);
-      $row = mysqli_fetch_assoc($result);
-
-      if ($row['count'] > 0) {
-          // A duplicate record exists
-          $error = "Record with the same name, email or pincode already exists!";
+      // Check if the pincode already exists in tbparser (master pincode)
+      $checkMasterPincodeQuery = "SELECT COUNT(*) AS count FROM `tbparser` WHERE `pincode` = '$updatepin'";
+      $masterPincodeResult = mysqli_query($db, $checkMasterPincodeQuery);
+      $masterPincodeRow = mysqli_fetch_assoc($masterPincodeResult);
+      if ($masterPincodeRow['count'] > 0) {
+          // If the pincode is already used as the master pincode, show error
+          $statusMessage = "The pincode is already used as the master pincode and cannot be reused!";
+          $modalTitle = "Error";
       } else {
-          // No duplication found, proceed with the update
-          $sqlupdateup = "UPDATE `tbup` SET `name`='$updatename', `email`='$updatemail', `pincode`='$updatepin' WHERE id='$updateid'";
-          if (mysqli_query($db, $sqlupdateup)) {
-            $success = "Personnel updated successfully!";
+          // Check if the name, email, or pincode already exists (excluding the current record)
+          $checkQuery = "SELECT COUNT(*) AS count FROM `tbup` WHERE (`name` = '$updatename' OR `email` = '$updatemail' OR `pincode` = '$updatepin') AND id != '$updateid'";
+          $result = mysqli_query($db, $checkQuery);
+          $row = mysqli_fetch_assoc($result);
+
+          if ($row['count'] > 0) {
+              // A duplicate record exists
+              $statusMessage = "Record with the same name, email, or pincode already exists!";
+              $modalTitle = "Error";
           } else {
-              $error = "Error updating record!";
+              // No duplication found, proceed with the update
+              $sqlupdateup = "UPDATE `tbup` SET `name`='$updatename', `email`='$updatemail', `pincode`='$updatepin' WHERE id='$updateid'";
+              if (mysqli_query($db, $sqlupdateup)) {
+                  $statusMessage = "Personnel updated successfully!";
+                  $modalTitle = "Success";
+              } else {
+                  $statusMessage = "Error updating record!";
+                  $modalTitle = "Error";
+              }
           }
       }
   }
@@ -129,6 +186,12 @@ if (isset($_POST['deactivateid'])) {
 $sqlgetup = "SELECT id,name,email,pincode, status FROM `tbup`;";
 $listup = mysqli_query($db, $sqlgetup);
 
+$sqlgetmp = "SELECT pincode FROM `tbparser` WHERE id = 1";
+$listmp = mysqli_query($db, $sqlgetmp);
+$mp = mysqli_fetch_assoc($listmp); // Get the result row
+
+// Check if there's a valid result
+$pincode = isset($mp['pincode']) ? $mp['pincode'] : ''; // Default to empty if no pincode is found
 
 ?>
 
@@ -194,9 +257,6 @@ $listup = mysqli_query($db, $sqlgetup);
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                        <?php if ($error): ?>
-                          <div class="error alert alert-danger text-center" role="alert"><?php echo $error; ?></div>
-                      <?php endif; ?>
                             <!-- Edit Form -->
                             <form action="" method="POST">
                                 <input type="hidden" class="form-control" name ="updateupid" value="<?php echo $data['id']?>">
@@ -331,6 +391,7 @@ $listup = mysqli_query($db, $sqlgetup);
     </tbody>
   </table>
   <button type="button" class="btn btn-danger mb-3 mt-3 bottom-button" data-bs-toggle="modal" data-bs-target="#addPersonnelModal">Add Personnel</button>
+  <button type="button" class="btn btn-danger mb-3 mt-3 bottom-button" data-bs-toggle="modal" data-bs-target="#masterPinModal">Master Pin Setup</button>
 </div>
 
 <!-- Add Product Modal -->
@@ -342,9 +403,6 @@ $listup = mysqli_query($db, $sqlgetup);
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <?php if ($error): ?>
-            <div class="error alert alert-danger text-center" role="alert"><?php echo $error; ?></div>
-        <?php endif; ?>
         <!-- Add Product Form -->
         <form id="addProductForm" method="post" action ="">
           <div class="mb-3">
@@ -369,12 +427,64 @@ $listup = mysqli_query($db, $sqlgetup);
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary" id="addPersonnelBtn">Create Personnel</button>
+        <button type="submit" class="btn btn-primary" id="addPersonnelBtn" name="addnewpersonnel">Create Personnel</button>
           </form>
       </div>
     </div>
   </div>
 </div>
+
+<!-- Master Pincode Modal -->
+<div class="modal fade" id="masterPinModal" tabindex="-1" aria-labelledby="masterPinLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="masterPinLabel">Edit Master Pincode</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Add Product Form -->
+        <form id="masterPinForm" method="post" action="">
+          <div class="mb-3">
+            <label for="quantity" class="form-label">Master Pincode:</label>
+            <div class="input-group">
+              <!-- Set the value of the pincode dynamically from the database -->
+              <input type="password" class="form-control masterpincode" id="pincode2" name="pincodes" min="0" maxlength="4" placeholder="4-Digit Master Pin" value="<?php echo htmlspecialchars($pincode); ?>" required>
+              <div class="input-group-append">
+                <span class="input-group-text">
+                    <i class="bi bi-eye" id="togglePassword3"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" id="masterPinBtn" name="editmasterpin">Save Changes</button>
+          </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Success/Error Modal -->
+<div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header justify-content-center">
+        <h5 class="modal-title" id="statusModalLabel"></h5>
+      </div>
+      <div class="modal-body text-center">
+        <!-- Success/Error Message Here -->
+        <div id="statusMessage"></div>
+      </div>
+      <div class="modal-footer justify-content-end">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 </section>
 
@@ -394,6 +504,33 @@ $(document).ready(function() {
         "lengthMenu": [[25, 50, 100], [25, 50, 100]], // Limit to only 25, 50, or 100 entries per page
     });
 });
+</script>
+
+<script>
+  // Show status modal after form submission
+  window.onload = function() {
+    // PHP success/error message and title from the backend
+    let statusMessage = "<?php echo $statusMessage; ?>";
+    let modalTitle = "<?php echo $modalTitle; ?>";
+    
+    // If there is a status message, show the second modal with the message
+    if (statusMessage) {
+        // Update the message and title in the modal
+        document.getElementById("statusMessage").innerHTML = statusMessage;
+        document.getElementById("statusModalLabel").innerHTML = modalTitle;
+
+        // Change the modal title color based on success or error
+        if(modalTitle === "Success") {
+            document.getElementById("statusModalLabel").style.color = "green"; // Success color
+        } else {
+            document.getElementById("statusModalLabel").style.color = "red"; // Error color
+        }
+        
+        // Show the modal
+        var statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
+        statusModal.show();
+    }
+  }
 </script>
 
 <script src="static/script.js"></script>
