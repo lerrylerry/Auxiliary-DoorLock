@@ -449,7 +449,7 @@ $pincode = isset($mp['pincode']) ? $mp['pincode'] : ''; // Default to empty if n
             <label for="quantity" class="form-label">Master Pincode:</label>
             <div class="input-group">
               <!-- Set the value of the pincode dynamically from the database -->
-              <input type="password" class="form-control masterpincode" id="pincode2" name="pincodes" min="0" maxlength="4" placeholder="4-Digit Master Pin" value="<?php echo htmlspecialchars($pincode); ?>" required>
+              <input type="password" class="form-control masterpincode" id="pincode2" name="pincode" min="0" maxlength="4" placeholder="4-Digit Master Pin" value="<?php echo htmlspecialchars($pincode); ?>" required>
               <div class="input-group-append">
                 <span class="input-group-text">
                     <i class="bi bi-eye" id="togglePassword3"></i>
