@@ -15,7 +15,7 @@ if (isset($_GET['pincode'])) {
     // If no result is found with the given pincode in tbup
     if (empty($data)) {
         // Query the tbparser table to get the dynamic 'master' value for id = 1
-        $sqlMaster = "SELECT master FROM tbparser WHERE id = 1";
+        $sqlMaster = "SELECT pincode FROM tbparser WHERE id = 1";
         $resultMaster = mysqli_query($db, $sqlMaster);
 
         // If a result is found for the 'master' value in tbparser

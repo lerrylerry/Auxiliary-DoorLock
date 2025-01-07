@@ -51,7 +51,7 @@
 <div class="content">
     <div class="container">
         <h2>Welcome to the Auxiliary System</h2>
-        <p class="school">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES (CAVITE-CAMPUS)</p>
+        <p class="school">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES - CAVITE</p>
     </div>
 </div>
 
