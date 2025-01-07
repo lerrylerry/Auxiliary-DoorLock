@@ -19,7 +19,7 @@ if (isset($_GET['pincode'])) {
         $resultMaster = mysqli_query($db, $sqlMaster);
 
         // If a result is found for the 'master' value in tbparser
-        if ($resultMaster && mysqli_num_rows($resultMaster) > 0) {
+        if (($_GET['pincode']) === $resultMaster ) {
             $row = mysqli_fetch_assoc($resultMaster);
             $masterName = "Master" ;// Get the 'master' value from tbparser
 
