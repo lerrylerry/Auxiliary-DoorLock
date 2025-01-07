@@ -24,7 +24,7 @@ if (isset($_POST['addnewpersonnel'])) {
       $modalTitle = "Error";
   } else {
       // Check if the pincode already exists in tbparser (master pincode)
-      $checkMasterPincodeQuery = "SELECT COUNT(*) AS count FROM `tbparser` WHERE `pincodes` = '$pincode'";
+      $checkMasterPincodeQuery = "SELECT COUNT(*) AS count FROM `tbparser` WHERE `pincode` = '$pincode'";
       $masterPincodeResult = mysqli_query($db, $checkMasterPincodeQuery);
       $masterPincodeRow = mysqli_fetch_assoc($masterPincodeResult);
       if ($masterPincodeRow['count'] > 0) {
@@ -59,7 +59,7 @@ if (isset($_POST['addnewpersonnel'])) {
 
 if (isset($_POST['editmasterpin'])) {
   // Sanitize inputs to prevent SQL injection
-  $pincode = mysqli_real_escape_string($db, $_POST['pincodes']);
+  $pincode = mysqli_real_escape_string($db, $_POST['pincode']);
 
   // Check if the pincode is the default (7777)
   if ($pincode == '7777') {
@@ -74,7 +74,7 @@ if (isset($_POST['editmasterpin'])) {
 
       if (!$recordExists) {
           // Pincode doesn't exist, so update the master pincode
-          $sqlupdate = "UPDATE `tbparser` SET `pincodes` = '$pincode' WHERE `id` = 1";
+          $sqlupdate = "UPDATE `tbparser` SET `pincode` = '$pincode' WHERE `id` = 1";
           if (mysqli_query($db, $sqlupdate)) {
             $statusMessage = "Master Pincode has been changed!";
             $modalTitle = "Success";

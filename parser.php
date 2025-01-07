@@ -6,7 +6,7 @@ if (isset($_GET['pincode'])) {
     // Prepare SQL to get the pincode details from tbup
     $sqlgetpin = "SELECT name, status FROM tbup WHERE pincode = '" . $_GET['pincode'] . "' AND dooraccess = 'Approved'";
     $sqlnullpin = "UPDATE tbup SET dooraccess = NULL WHERE pincode = '" . $_GET['pincode'] . "'";
-    $sqlMaster = "SELECT pincodes FROM tbparser WHERE id = 1";
+    $sqlMaster = "SELECT pincode FROM tbparser WHERE id = 1";
     
     // Query the tbup table
     $resultMaster = mysqli_query($db, $sqlMaster);
