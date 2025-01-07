@@ -21,7 +21,7 @@ if (isset($_GET['pincode'])) {
         // If a result is found for the 'master' value in tbparser
         if ($resultMaster && mysqli_num_rows($resultMaster) > 0) {
             $row = mysqli_fetch_assoc($resultMaster);
-            $masterName = $row['master']; // Get the 'master' value from tbparser
+            $masterName = "Master" ;// Get the 'master' value from tbparser
 
             // Output the dynamic values
             echo "startname;{$masterName};endname;startstatus;active;endstatus;";
