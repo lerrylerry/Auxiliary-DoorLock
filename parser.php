@@ -15,11 +15,11 @@ if (isset($_GET['pincode'])) {
     $data = mysqli_fetch_array($result);
     $data2 = mysqli_fetch_array($resultMaster);
 
-    if (!empty($data2)) {
+    if (!empty($data)) {
         echo "startname;" . $data [0] . ";endname;startstatus;" . $data [1] . ";endstatus;";
 
     } else {
-	    if (($_GET['pincode']) === "7676") {
+	    if (($_GET['pincode']) === "0000") {
 	    echo "startname;Master;endname;startstatus;active;endstatus;";
 	} else {
             echo "nothing;noresult";
