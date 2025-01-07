@@ -19,7 +19,7 @@ if (isset($_GET['pincode'])) {
         echo "startname;" . $data [0] . ";endname;startstatus;" . $data [1] . ";endstatus;";
 
     } else {
-	    if (($_GET['pincode']) === "0000") {
+	    if (($_GET['pincode']) === "6767") {
 	    echo "startname;Master;endname;startstatus;active;endstatus;";
 	} else {
             echo "nothing;noresult";
