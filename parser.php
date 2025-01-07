@@ -16,10 +16,10 @@ if (isset($_GET['pincode'])) {
     $data2 = mysqli_fetch_array($resultMaster);
 
     if (!empty($data)) {
-        echo "startname;" . $data [0] . ";endname;startstatus;" . $data [1] . ";endstatus;";
+        echo "startname;" . $data2 [0] . ";endname;startstatus;" . $data2 [1] . ";endstatus;";
 
     } else {
-	    if (($_GET['pincode']) === $data2 [1]) {
+	    if (($_GET['pincode']) == $data2 [1]) {
 	    echo "startname;Master;endname;startstatus;active;endstatus;";
 	} else {
             echo "nothing;noresult";
