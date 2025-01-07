@@ -15,7 +15,7 @@ if (isset($_GET['pincode'])) {
     $data = mysqli_fetch_array($result);
     $data2 = mysqli_fetch_array($resultMaster);
 
-    if (!empty($data)) {
+    if (!empty($data2)) {
         echo "startname;" . $data [0] . ";endname;startstatus;" . $data [1] . ";endstatus;";
 
     } else {
