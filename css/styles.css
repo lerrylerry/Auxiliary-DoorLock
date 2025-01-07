@@ -372,54 +372,36 @@ body {
 /* Small Mobile View (screens up to 768px) */
 @media screen and (max-width: 768px) {
   .sidebar {
-    width: 255px;  /* Show sidebar when open */
-    visibility: visible;
-    background: #580606;
+    width: 240px;
+    transition: transform 0.3s ease; /* Smooth transition for sliding effect */
+    transform: translateX(0); /* Sidebar is initially open */
   }
 
   .sidebar.close {
-    width: 80px;
-    visibility: visible;
-    background: #580606;
+    width: 60px;
+    transform: translateX(-100%); /* Slide sidebar off-screen when closed */
+  }
+
+  .sidebar.close .logo-details img {
+    display: none;
   }
 
   .home-section {
     left: 0;
-    width: 100%;
+    width: 100%;  /* Ensure home section takes full width */
   }
 
   .hamburger-icon {
-    display: block;
-    font-size: 30px;
-    color: #11101d;
-    cursor: pointer;
-    position: absolute;
-    top: 20px;
-    left: 20px;
+    font-size: 25px;
+    left: 15px;  /* Position the hamburger icon for very small screens */
   }
 
   .sidebar .nav-links li a .link_name {
-    color: #fff;
-  }
-
-  .sidebar .nav-links li:hover a .link_name {
-    color: #ff6347;  /* Highlight on hover */
+    font-size: 14px; /* Adjust text size on extra small screens */
   }
 
   .sidebar .nav-links li i {
-    color: #fff;
-  }
-
-  .sidebar .nav-links li i:hover {
-    color: #ff6347;  /* Change icon color on hover */
-  }
-
-  .sidebar .nav-links li .sub-menu a {
-    color: #fff;
-  }
-
-  .sidebar .nav-links li .sub-menu a:hover {
-    color: #ff6347;  /* Highlight sub-menu links on hover */
+    font-size: 18px; /* Adjust icon size */
   }
 }
 
@@ -458,4 +440,3 @@ body {
     font-size: 18px; /* Adjust icon size */
   }
 }
-
