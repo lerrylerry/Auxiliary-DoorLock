@@ -18,7 +18,7 @@ function sendEmailNotification($email, $name, $status, $itemDetails, $optionalMe
       $body .= "Message from Admin: $optionalMessage\n\n"; // Add the optional message if present
     }
 
-    $body .= "\n\nBest regards,\nTUP Auxiliary System";
+    $body .= "Best regards,\nTUP Auxiliary System";
 
     try {
         $mail = new PHPMailer(true);
