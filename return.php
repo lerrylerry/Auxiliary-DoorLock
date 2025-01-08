@@ -131,7 +131,7 @@ if (isset($_POST['finalizerequest'])) {
     $adminEmailContent .= "You have received a new return request to " . $user['name'];
 
     $adminEmailContent .= "\nTo review the borrow the request, please visit the following link:\n";
-    $adminEmailContent .= "<p><a href='https://tupcauxiliary.com/Auxiliary/admin/return-items.php'>Click here to view the request.</a></p>";
+    $adminEmailContent .= "<p><a href='https://tupcauxiliary.com/Auxiliary/admin/return-items.php'>Click here</a> to view the request.</p>";
     $adminEmailContent .= "Thank you,\nTUP Auxiliary System";
 
     // Reset itemsresult query to get return items again

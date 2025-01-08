@@ -145,7 +145,7 @@ if (isset($_POST['finalizerequest'])) {
                 $itemsresult = mysqli_query($db, $sqlgetitems);
 
                 $adminEmailContent .= "\nTo review the borrow request, please visit the following link:\n";
-                $adminEmailContent .= "<p><a href='https://tupcauxiliary.com/Auxiliary/admin/borrowedItems.php'>Click here to view the request.</a></p>";
+                $adminEmailContent .= "<p><a href='https://tupcauxiliary.com/Auxiliary/admin/borrowedItems.php'>Click here</a> to view the request.</p>";
                 $adminEmailContent .= "Thank you,\nTUP Auxiliary System";
 
                 // Send email to admin
