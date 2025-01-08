@@ -139,14 +139,14 @@ if (isset($_POST['finalizerequest'])) {
 
                 // Prepare the admin's email content
                 $adminEmailContent = "Dear Admin,\n\n";
-                $adminEmailContent .= "You have received a new borrow request from " . $listcu['name'];
+                $adminEmailContent .= "You have received a new borrow request from: " . $listcu['name'];
 
                 // Reset itemsresult query to get borrow items again
                 $itemsresult = mysqli_query($db, $sqlgetitems);
 
                 $adminEmailContent .= "\nTo review the borrow request, please visit the following link:\n";
                 $adminEmailContent .= "https://tupcauxiliary.com/Auxiliary/admin/borrowedItems.php";
-                $adminEmailContent .= "Thank you,\nTUP Auxiliary System";
+                $adminEmailContent .= "\nThank you,\nTUP Auxiliary System";
 
                 // Send email to admin
                 try {

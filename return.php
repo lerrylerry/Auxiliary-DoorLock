@@ -128,11 +128,11 @@ if (isset($_POST['finalizerequest'])) {
 
     // Prepare the admin's email content
     $adminEmailContent = "Dear Admin,\n\n";
-    $adminEmailContent .= "You have received a new return request to " . $user['name'];
+    $adminEmailContent .= "You have received a new return request to: " . $user['name'];
 
     $adminEmailContent .= "\nTo review the borrow the request, please visit the following link:\n";
     $adminEmailContent .= "https://tupcauxiliary.com/Auxiliary/admin/return-items.php.</p>";
-    $adminEmailContent .= "Thank you,\nTUP Auxiliary System";
+    $adminEmailContent .= "\nThank you,\nTUP Auxiliary System";
 
     // Reset itemsresult query to get return items again
     $itemsresult = mysqli_query($db, $sqlgetitems);
