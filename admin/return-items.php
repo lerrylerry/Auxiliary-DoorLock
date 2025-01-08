@@ -12,7 +12,7 @@ require '../vendor/autoload.php';
 // Function to send email notification
 function sendEmailNotification($email, $name, $status, $itemDetails, $optionalMessage = '') {
     $subject = "Your Return Request Status";
-    $body = "Dear $name,\n\nYour return request has been $status!";
+    $body = "Dear $name,\n\nYour return request has been $status!\n\n";
 
     if (!empty($optionalMessage)) {
       $body .= "Message from Admin: $optionalMessage\n\n"; // Add the optional message if present
