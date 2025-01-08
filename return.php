@@ -286,7 +286,7 @@ $listp = mysqli_query($db, $sqlgetp);
                     <select id="unitDropdown" name="additem" class="form-select" required>
                         <option value="">- Select -</option>
                         <?php while ($data = mysqli_fetch_assoc($listp)) { ?>
-                            <option value="<?php echo $data['id'] ?>" data-quantity="<?php echo $data['quantity'] ?>"><?php echo $data['name'] ?> | <?php echo $data['unit'] ?></option>
+                            <option value="<?php echo $data['id'] ?>" data-quantity="<?php echo $data['borrowqty'] ?>"><?php echo $data['name'] ?> | <?php echo $data['unit'] ?></option>
                         <?php } ?>
                     </select>
                 </div>
