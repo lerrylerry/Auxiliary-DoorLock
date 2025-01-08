@@ -321,7 +321,7 @@ $listp = mysqli_query($db, $sqlgetp);
             <!-- Add Button below Quantity -->
             <div class="row">
                 <div class="col-md-6 offset-md-6 d-flex justify-content-end">
-                    <button type="submit" id="add" class="btn btn-primary w-50">Add</button>
+                    <button type="submit" id="add" class="btn btn-primary w-50 adds">Add</button>
                 </div>
             </div>
         </form>
@@ -423,10 +423,10 @@ $(document).ready(function() {
         $("#deleted").addClass("disabled-button");
 
         // Disable the submit button functionality
-        $("#add").prop("disabled", true);
+        $(".adds").prop("disabled", true);
 
         // Add a class to change the appearance
-        $("#add").addClass("disabled-button");
+        $(".adds").addClass("disabled-button");
     });
 });
 </script>
