@@ -55,7 +55,7 @@ $listmr = mysqli_query($db, $sqlgetmr);
                 <td><a href="#" class="requestLink" data-bs-toggle="modal" data-bs-target="#requestDetailsModal<?php echo $data['id']?>"><?php echo $data['name']?></a></td>
                 <!-- Modal Structure -->
                 <div class="modal fade" id="requestDetailsModal<?php echo $data['id']?>" tabindex="-1" role="dialog" aria-labelledby="requestModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-xl" role="document">
+                    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
                         <div class="modal-body">
                             <!-- Center the card inside the modal -->
                             <div class="row justify-content-center">

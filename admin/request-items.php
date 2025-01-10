@@ -63,7 +63,7 @@ $listreturn= mysqli_query($db, $sqlgetreturn);
                     <!-- Person Details Modal -->
                     <div class="modal fade" id="personDetailsModal<?php echo $data['mainid'] ?>" tabindex="-1"
                          aria-labelledby="personDetailsModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-lg">
+                        <div class="modal-dialog modal-lg modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="personDetailsModalLabel">Items Requested</h5>
@@ -114,7 +114,7 @@ $listreturn= mysqli_query($db, $sqlgetreturn);
                     <!-- Person Details Modal -->
                     <div class="modal fade" id="personDetailsModalret<?php echo $datar['mainid'] ?>" tabindex="-1"
                          aria-labelledby="personDetailsModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-lg">
+                        <div class="modal-dialog modal-lg modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="personDetailsModalLabel">Items Requested</h5>

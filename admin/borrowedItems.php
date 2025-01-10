@@ -248,7 +248,7 @@ $listsimply = mysqli_query($db, $sqlgetsimplifiedlist);
                         <!-- Person Details Modal -->
                         <div class="modal fade" id="personDetailsModal<?php echo $data['mainid'] ?>" tabindex="-1"
                             aria-labelledby="personDetailsModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-lg">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="personDetailsModalLabel">Items Requested</h5>
@@ -298,7 +298,7 @@ $listsimply = mysqli_query($db, $sqlgetsimplifiedlist);
                             </button>
                             <!-- Approve Modal -->
                             <div class="modal fade" id="approveModal<?php echo $data['mainid'] ?>" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
+                                <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             <h5 class="modal-title" id="approveModalLabel">Approve Request</h5>
@@ -330,10 +330,10 @@ $listsimply = mysqli_query($db, $sqlgetsimplifiedlist);
 
                             <!-- Reject Modal -->
                             <div class="modal fade" id="rejectModal<?php echo $data['mainid'] ?>" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
+                                <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="rejectModalLabel">Reject Request: </h5>
+                                            <h5 class="modal-title" id="rejectModalLabel">Reject Request </h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
@@ -341,7 +341,7 @@ $listsimply = mysqli_query($db, $sqlgetsimplifiedlist);
                                             <!-- Optional message input field -->
                                             <form method="post" action="">
                                             <textarea name="rejectionMessage" class="form-control" placeholder="Optional message" rows="3"></textarea>
-                                        </div>
+                                        </div> 
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                             
@@ -360,7 +360,7 @@ $listsimply = mysqli_query($db, $sqlgetsimplifiedlist);
         </table>
         <!-- Success Modal -->
         <div id="successModal" class="modal fade" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="successModalLabel">Success</h5>
@@ -375,7 +375,7 @@ $listsimply = mysqli_query($db, $sqlgetsimplifiedlist);
 
         <!-- Error Modal -->
         <div id="errorModal" class="modal fade" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="errorModalLabel">Error</h5>

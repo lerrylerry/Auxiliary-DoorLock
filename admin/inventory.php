@@ -166,6 +166,68 @@ $listtemp = mysqli_query($db, $sqltemp);
         <td>
           <!-- Edit Button -->
           <button type="button" class="btn btn-primary btn-sm editBtn bi bi-pencil-fill" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $data['id']?>"></button>
+
+          <!-- Edit Modals -->
+          <div class="modal fade" id="editModal<?php echo $data['id']?>" tabindex="-1" aria-labelledby="editModalLabel1" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <h5 class="modal-title" id="editModalLabel1"><span class="text-danger fw-bold">Edit a quantity?</span></h5>
+                      </div>
+                      <div class="modal-body">
+                          <!-- Info Note -->
+                          <div class="alert alert-info" role="alert" style="text-align: justify;">
+                              <strong>Note:</strong> Please ensure that the quantity you are updating is correct. Once saved, the changes will be reflected in the inventory.
+                          </div>
+
+                          <!-- Edit Form -->
+                          <form method="post" action="">
+                              <div class="mb-3">
+                                  <label for="productName1" class="form-label fw-bold namezzz">Product:</label>
+                                  <input type="hidden" class="form-control" id="productName1" name="updatepid" value="<?php echo $data['id']?>">
+                                  <input type="hidden" class="form-control" id="productName1" name="updatename" value="<?php echo $data['name']?>">
+                                  <input type="text" class="form-control" id="productName1" name="updatename" value="<?php echo $data['name']?>" disabled>
+                              </div>
+                              <div class="mb-3">
+                                  <label for="unit1" class="form-label fw-bold namezzz">Unit:</label>
+                                  <input type="hidden" name="updateunit" class="form-select" value="<?php echo $data['unit']?>">
+                                  <select id="unitDropdown" name="updateunit" class="form-select" disabled>
+                                      <option value="<?php echo $data['unit']?>"><?php echo $data['unit']?></option>
+                                      <option value="kls">kls</option>
+                                      <option value="gal">gal</option>
+                                      <option value="pcs">pcs</option>
+                                      <option value="tubes">tubes</option>
+                                      <option value="rolls">rolls</option>
+                                      <option value="can">can</option>
+                                      <option value="ltrs">ltrs</option>
+                                      <option value="pairs">pairs</option>
+                                      <option value="other">other</option>
+                                  </select>
+                              </div>
+                              <div class="mb-3">
+                                  <label for="quantity1" class="form-label fw-bold namezzz">Quantity:</label>
+                                  <input type="number" class="form-control" name="updateqty" id="quantity1" value="<?php echo $data['quantity']?>" required min="1">
+                              </div>
+                              <div class="mb-3">
+                                  <label for="unit2" class="form-label fw-bold namezzz">Category:</label>
+                                  <input type="hidden" name="updatecat" class="form-select" value="<?php echo $data['category']?>">
+                                  <select id="unitDropdown" name="updatecat" class="form-select" disabled>
+                                      <option value="<?php echo $data['category']?>"><?php echo $data['category']?></option>
+                                      <option value="Consumables">Consumables (Products that can be consumed)</option>
+                                      <option value="Returnables">Returnables (Products that can be returned)</option>
+                                      <option value="Unknown">Unknown</option>
+                                  </select>
+                              </div>
+                      </div>
+                      <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button type="submit" class="btn btn-primary">Save changes</button>
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
             <!-- Edit Modals -->
             <div class="modal fade" id="editModal<?php echo $data['id']?>" tabindex="-1" aria-labelledby="editModalLabel1" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
@@ -293,7 +355,7 @@ $(document).ready(function() {
             <div class="row">
             <!-- DRNo. Input Field -->
             <div class="col-4">
-            <label class="mb-2">DRNo.:</label>
+            <label class="mb-2">Delivery Receipt Number:</label>
             <input type="text" class="form-control" id="drnum" name="drnum" value="<?php echo htmlspecialchars($drnum); ?>" required>
             <input type="hidden" id="hiddenDrnum" name="drnum" value="<?php echo htmlspecialchars($drnum); ?>">
             </div>

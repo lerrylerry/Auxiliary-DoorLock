@@ -250,13 +250,18 @@ $pincode = isset($mp['pincode']) ? $mp['pincode'] : ''; // Default to empty if n
           <button type="button" class="btn btn-primary btn-sm editBtn bi bi-pencil-fill" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $data['id']?>"> Edit</button>
             <!-- Edit Modals -->
             <div class="modal fade" id="editModal<?php echo $data['id']?>" tabindex="-1" aria-labelledby="editPersonnelModal" aria-hidden="true">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="editPersonnelLabel">Edit personnel <span class="text-danger"><?php echo $data['name']?>?</span></h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
+                          <!-- Info Note -->
+                          <div class="alert alert-info" role="alert" style="text-align: justify;">
+                            <strong>Note:</strong> Ensure that the personnel's name, email and pincode are unique. The pincode must be a 4-digit number, and it will be used by the utility personnel to access the stockroom.
+                          </div>
+
                             <!-- Edit Form -->
                             <form action="" method="POST">
                                 <input type="hidden" class="form-control" name ="updateupid" value="<?php echo $data['id']?>">
@@ -321,7 +326,7 @@ $pincode = isset($mp['pincode']) ? $mp['pincode'] : ''; // Default to empty if n
 
             <!-- Active Modal -->
             <div class="modal fade" id="activeModal" tabindex="-1" aria-labelledby="activeModalLabel" aria-hidden="true">
-              <div class="modal-dialog">
+              <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                   <div class="modal-header">
                     <h5 class="modal-title" id="activeModalLabel">Confirm Action for <span class="text-danger"><?php echo $data['name']?>?</span></h5>
@@ -357,7 +362,7 @@ $pincode = isset($mp['pincode']) ? $mp['pincode'] : ''; // Default to empty if n
 
             <!-- Inactive Modal -->
             <div class="modal fade" id="inactiveModal" tabindex="-1" aria-labelledby="inactiveModalLabel" aria-hidden="true">
-              <div class="modal-dialog">
+              <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                   <div class="modal-header">
                     <h5 class="modal-title" id="inactiveModalLabel">Confirm Action for <span class="text-danger"><?php echo $data['name']?>?</span></h5>
@@ -365,12 +370,13 @@ $pincode = isset($mp['pincode']) ? $mp['pincode'] : ''; // Default to empty if n
                   </div>
                   <div class="modal-body">
                     Are you sure you want to change the status to <button id="toggleButton" class="btn btn-secondary btn-sm btn-icon" disabled>
-                        <i id="toggleIcon" class="bi bi-play-fill"><span id="toggleText">Inactive</span></i>
+                      <i id="toggleIcon" class="bi bi-play-fill"><span id="toggleText">Inactive</span></i>
                     </button> ?
                     <hr>
-                    <p class="mt-3 text-secondary">
+                    <!-- Info Note -->
+                    <div class="alert alert-info" role="alert" style="text-align: justify;">
                       <strong>Note:</strong> The deactivation of the utility personnel will set the pincode to default and the previous pincode use will be usable again by other personnel.
-                    </p>
+                    </div>
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -396,15 +402,20 @@ $pincode = isset($mp['pincode']) ? $mp['pincode'] : ''; // Default to empty if n
 
 <!-- Add Product Modal -->
 <div class="modal fade" id="addPersonnelModal" tabindex="-1" aria-labelledby="addPersonnelLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="addPersonnelLabel">Add New Personnel</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <!-- Add Product Form -->
-        <form id="addProductForm" method="post" action ="">
+        <!-- Info Note -->
+        <div class="alert alert-info" role="alert" style="text-align: justify;">
+          <strong>Note:</strong> Ensure that the personnel's name, email and pincode are unique. The pincode must be a 4-digit number, and it will be used by the utility personnel to access the stockroom.
+        </div>
+
+        <!-- Add Personnel Form -->
+        <form id="addProductForm" method="post" action="">
           <div class="mb-3">
             <label for="productName" class="form-label">Personnel:</label>
             <input type="text" name="name" class="form-control" id="addpersonnelName" placeholder="ex: Juan dela Cruz" required>
@@ -416,7 +427,7 @@ $pincode = isset($mp['pincode']) ? $mp['pincode'] : ''; // Default to empty if n
           <div class="mb-3">
             <label for="quantity" class="form-label">Pincode:</label>
             <div class="input-group">
-              <input type="password" class="form-control newpin" id="pincode1" name="pincode" min="0" maxlength="4" placeholder="Create 4 digit pincode" required >
+              <input type="password" class="form-control newpin" id="pincode1" name="pincode" min="0" maxlength="4" placeholder="Create 4 digit pincode" required>
               <div class="input-group-append">
                 <span class="input-group-text">
                     <i class="bi bi-eye" id="togglePassword2"></i>
@@ -436,14 +447,19 @@ $pincode = isset($mp['pincode']) ? $mp['pincode'] : ''; // Default to empty if n
 
 <!-- Master Pincode Modal -->
 <div class="modal fade" id="masterPinModal" tabindex="-1" aria-labelledby="masterPinLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="masterPinLabel">Edit Master Pincode</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <!-- Add Product Form -->
+        <!-- Info Note -->
+        <div class="alert alert-info" role="alert" style="text-align: justify;">
+          <strong>Note:</strong> You can view the master pincode by clicking the eye icon. The master pincode allows access to the stockroom without permission and can bypass security. You can edit the master pincode here.
+        </div>
+
+        <!-- Edit Pincode Form -->
         <form id="masterPinForm" method="post" action="">
           <div class="mb-3">
             <label for="quantity" class="form-label">Master Pincode:</label>
@@ -469,7 +485,7 @@ $pincode = isset($mp['pincode']) ? $mp['pincode'] : ''; // Default to empty if n
 
 <!-- Success/Error Modal -->
 <div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header justify-content-center">
         <h5 class="modal-title" id="statusModalLabel"></h5>
