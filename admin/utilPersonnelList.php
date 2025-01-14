@@ -320,34 +320,34 @@ $pincode = isset($mp['pincode']) ? $mp['pincode'] : ''; // Default to empty if n
             </div> -->
           <!-- Status Button -->
           <?php if($data['status'] =="inactive"){ ?>
-            <button id="toggleButton" class="btn btn-secondary btn-sm btn-icon" data-bs-toggle="modal" data-bs-target="#activeModal">
-              <i id="toggleIcon" class="bi bi-play-fill"><span id="toggleText">Inactive</span></i>
+            <button id="toggleButton_<?php echo $data['id']; ?>" class="btn btn-secondary btn-sm btn-icon" data-bs-toggle="modal" data-bs-target="#activeModal_<?php echo $data['id']; ?>">
+              <i id="toggleIcon_<?php echo $data['id']; ?>" class="bi bi-play-fill"><span id="toggleText_<?php echo $data['id']; ?>">Inactive</span></i>
             </button>
 
             <!-- Active Modal -->
-            <div class="modal fade" id="activeModal" tabindex="-1" aria-labelledby="activeModalLabel" aria-hidden="true">
+            <div class="modal fade" id="activeModal_<?php echo $data['id']; ?>" tabindex="-1" aria-labelledby="activeModalLabel_<?php echo $data['id']; ?>" aria-hidden="true">
               <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h5 class="modal-title" id="activeModalLabel">Confirm Action for <span class="text-danger"><?php echo $data['name']?>?</span></h5>
+                    <h5 class="modal-title" id="activeModalLabel_<?php echo $data['id']; ?>">Confirm Action for <span class="text-danger"><?php echo $data['name']?></span></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
-                    Are you sure you want to change the status to <button id="toggleButton" class="btn btn-success btn-sm btn-icon" disabled>
-                        <i id="toggleIcon" class="bi bi-pause-fill"><span id="toggleText">Active</span></i>
-                    </button> ?
+                    Are you sure you want to change the status to 
+                    <button id="toggleButton_<?php echo $data['id']; ?>" class="btn btn-success btn-sm btn-icon" disabled>
+                      <i id="toggleIcon_<?php echo $data['id']; ?>" class="bi bi-pause-fill"><span id="toggleText_<?php echo $data['id']; ?>">Active</span></i>
+                    </button>?
                     <hr>
                     <p class="mt-3 text-muted">
                       <strong>Note:</strong> The activation will automatically generate a random pin that can be used by the utility personnel.
                     </p>
-                    <!-- <p><span>&bull;</span> This action will change the status.</p>
-                    <p><span>&bull;</span> Ensure that this change is correct.</p> -->
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <form method="post" action="">
-                      <button id="toggleButton" class="btn btn-primary btn-sm btn-icon" onclick="toggleState(event)">Confirm
-                        <input type="hidden" class="form-control" id="pincode1" name="activateid" value="<?php echo $data['id']?>">
+                      <button type="submit" class="btn btn-primary btn-sm btn-icon" id="confirmButton_<?php echo $data['id']; ?>">
+                        Confirm
+                        <input type="hidden" name="activateid" value="<?php echo $data['id']; ?>">
                       </button>
                     </form>
                   </div>
@@ -355,23 +355,24 @@ $pincode = isset($mp['pincode']) ? $mp['pincode'] : ''; // Default to empty if n
               </div>
             </div>
 
-          <?php }else if($data['status'] =="active"){?>
-            <button id="toggleButton" class="btn btn-success btn-sm btn-icon" data-bs-toggle="modal" data-bs-target="#inactiveModal">
-                <i id="toggleIcon" class="bi bi-pause-fill"><span id="toggleText">Active</span></i>
+          <?php } else if($data['status'] == "active"){ ?>
+            <button id="toggleButton_<?php echo $data['id']; ?>" class="btn btn-success btn-sm btn-icon" data-bs-toggle="modal" data-bs-target="#inactiveModal_<?php echo $data['id']; ?>">
+              <i id="toggleIcon_<?php echo $data['id']; ?>" class="bi bi-pause-fill"><span id="toggleText_<?php echo $data['id']; ?>">Active</span></i>
             </button>
 
             <!-- Inactive Modal -->
-            <div class="modal fade" id="inactiveModal" tabindex="-1" aria-labelledby="inactiveModalLabel" aria-hidden="true">
+            <div class="modal fade" id="inactiveModal_<?php echo $data['id']; ?>" tabindex="-1" aria-labelledby="inactiveModalLabel_<?php echo $data['id']; ?>" aria-hidden="true">
               <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h5 class="modal-title" id="inactiveModalLabel">Confirm Action for <span class="text-danger"><?php echo $data['name']?>?</span></h5>
+                    <h5 class="modal-title" id="inactiveModalLabel_<?php echo $data['id']; ?>">Confirm Action for <span class="text-danger"><?php echo $data['name']?></span></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
-                    Are you sure you want to change the status to <button id="toggleButton" class="btn btn-secondary btn-sm btn-icon" disabled>
-                      <i id="toggleIcon" class="bi bi-play-fill"><span id="toggleText">Inactive</span></i>
-                    </button> ?
+                    Are you sure you want to change the status to 
+                    <button id="toggleButton_<?php echo $data['id']; ?>" class="btn btn-secondary btn-sm btn-icon" disabled>
+                      <i id="toggleIcon_<?php echo $data['id']; ?>" class="bi bi-play-fill"><span id="toggleText_<?php echo $data['id']; ?>">Inactive</span></i>
+                    </button>?
                     <hr>
                     <!-- Info Note -->
                     <div class="alert alert-info" role="alert" style="text-align: justify;">
@@ -381,16 +382,18 @@ $pincode = isset($mp['pincode']) ? $mp['pincode'] : ''; // Default to empty if n
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <form method="post" action="">
-                      <button id="toggleButton" class="btn btn-primary btn-sm btn-icon" onclick="toggleState()">Confirm
-                          <input type="hidden" class="form-control" id="pincode1" name="deactivateid" value="<?php echo $data['id']?>">
+                      <button type="submit" class="btn btn-primary btn-sm btn-icon" id="confirmButton_<?php echo $data['id']; ?>">
+                        Confirm
+                        <input type="hidden" name="deactivateid" value="<?php echo $data['id']; ?>">
                       </button>
                     </form>
                   </div>
                 </div>
               </div>
             </div>
-              
-            <?php  } ?>
+
+          <?php } ?>
+
         </td>
       </tr>
     <?php } ?>
